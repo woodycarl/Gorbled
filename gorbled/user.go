@@ -3,7 +3,6 @@ package gorbled
 import (
     "net/http"
     "strings"
-
     "appengine"
     "appengine/user"
 )
