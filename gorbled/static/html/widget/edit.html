@@ -1,0 +1,12 @@
+{{define "content"}}
+{{range .PageData.Widget}}
+<form action="/widget?action=manager&operation=edit&id={{.ID}}" method="post">
+<div><input type="text" name="title" class="title" placeholder="Widget Title" value="{{.Title}}" /></div>
+<div><a href="#" class="btn" onclick="openWindow('/file?action=upload')" >Upload File</a></div>
+<hr />
+<div><textarea name="content" class="content" placeholder="Widget Content" >{{.Content | html}}</textarea></div>
+<div><input type="text" name="sequence" class="sequence" placeholder="Widget Sequence" value="{{.Sequence}}" /></div>
+<div><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></div>
+</form>
+{{end}}
+{{end}}

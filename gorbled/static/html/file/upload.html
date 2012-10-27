@@ -1,0 +1,12 @@
+{{define "content"}}
+
+{{if .PageData.File.Success}}
+    <p>Upload Success</p>
+    <p>Get file url is <a href="/file?action=get&file={{.PageData.File.BlobKey}}">/file?action=get&file={{.PageData.File.BlobKey}}</a> </p>
+{{else}}
+    <form action="{{.PageData.File.PostUrl}}" method="post" enctype="multipart/form-data" >
+    <div><input type="file" name="file" /> <input type="submit" value="Upload" /></div>
+    </form>
+{{end}}
+
+{{end}}

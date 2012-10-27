@@ -1,0 +1,6 @@
+{
+    "Title":       "Gorbled",
+    "Description": "A simple blog system written by Go, Running in Google App Engine",
+
+    "PageSize": 5
+}

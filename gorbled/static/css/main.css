@@ -1,0 +1,17 @@
+.title {
+    height:30px;
+    width:400px;
+    font-size:20px;
+    line-height:25px;
+}
+
+.content {
+    height:500px;
+    width:800px;
+    font-size:20px;
+    line-height:25px;
+}
+
+.sequence {
+    width:120px;
+}

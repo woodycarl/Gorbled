@@ -1,0 +1,31 @@
+{{define "content"}}
+
+<div class="hero-unit">
+    <h1>{{.PageSetting.Title}}</h1>
+    <p>{{.PageSetting.Description}}</p>
+</div>
+
+{{range .PageData.Article}}
+<div class="post well">
+    <h2><a href="/article?id={{.ID}}">{{.Title}}</a></h2>
+    <h6>Post on {{.Date.Format "3:04pm, Mon 2 Jan"}}</h6>
+    <div style="margin-top:10px">{{.Content}}</div>
+</div>
+{{end}}
+
+<div class="pageination">
+    <ul class="pager">
+    {{if .PageSetting.ShowPrev}}
+        <li class="previous">
+            <a href="?pid={{.PageSetting.PrevPageID}}">&larr; Older</a>
+        </li>
+    {{end}}
+    {{if .PageSetting.ShowNext}}
+        <li class="next">
+            <a href="?pid={{.PageSetting.NextPageID}}">Newer &rarr;</a>
+        </li>
+    {{end}}
+    </ul>
+</div>
+
+{{end}}
