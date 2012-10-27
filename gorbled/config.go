@@ -35,6 +35,8 @@ type Config struct {
     Disqus              string
 
     TimeZone            float64
+    BaseUrl             string
+    Version             float64
 }
 
 var config Config
@@ -155,11 +157,12 @@ func initSystem(c appengine.Context) {
 /*
  * Init config
  */
-func initConfig(c appengine.Context) {
+func initConfig(r *http.Request) {
+    c := appengine.NewContext(r)
     config, _, _ = getConfig(c)
     if config.Title == "" {
         initSystem(c)
     }
-
+    config.BaseUrl = "http://" + r.Host
     return
 }

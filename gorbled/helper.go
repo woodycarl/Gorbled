@@ -1,14 +1,13 @@
 package gorbled
 
 import (
-    "crypto/rand"
     "fmt"
     "net/url"
-    "io"
     "net/http"
 
     "appengine"
     "appengine/datastore"
+    "time"
 )
 
 func init() {
@@ -32,10 +31,7 @@ func handleDecodeContent(w http.ResponseWriter, r *http.Request) {
  * @return (string) 
  */
 func genID() string {
-    buf := make([]byte, 16)
-    io.ReadFull(rand.Reader, buf)
-
-    return fmt.Sprintf("%x", buf)
+    return fmt.Sprint(time.Now().Unix())
 }
 
 /*

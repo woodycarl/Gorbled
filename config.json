@@ -12,5 +12,6 @@
     "GoogleAnalytics":  "UA-28475410-3",
     "Disqus":           "gorbled",
 
-    "TimeZone":         8.0
+    "TimeZone":         8.0,
+    "Version":          2.1
 }

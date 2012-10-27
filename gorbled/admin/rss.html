@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+  xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+  >
+{{$baseUrl := .Config.BaseUrl}}
+<channel>
+  <title>{{.Config.Title}}</title>
+  <atom:link href="{{$baseUrl}}/rss.xml" rel="self" type="application/rss+xml" />
+  <link>{{$baseUrl}}</link>
+  <description>{{.Config.Description}}</description>
+  <lastBuildDate></lastBuildDate>
+  <language>zh-cn</language>
+  <sy:updatePeriod></sy:updatePeriod>
+  <sy:updateFrequency></sy:updateFrequency>
+  <generator>Gorbled {{.Config.Version}}</generator>
+    {{range .Articles}}<item>
+    <title>{{.Title}}</title>
+    <link>{{$baseUrl}}/?id={{.ID}}</link>
+    <comments></comments>
+    <pubDate>{{showDate .Date}}</pubDate>
+    <dc:creator></dc:creator>
+    <description><![CDATA[{{decodeMD .Content}}]]></description>
+      <content:encoded><![CDATA[{{decodeMD .Content}}
+<p>本文网址:<a href="{{$baseUrl}}/?id={{.ID}}">{{$baseUrl}}/?id={{.ID}}</a></p>
+]]></content:encoded>
+      <wfw:commentRss></wfw:commentRss>
+    <slash:comments></slash:comments>
+    </item>{{end}}
+  </channel>
+</rss>

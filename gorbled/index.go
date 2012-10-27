@@ -9,7 +9,7 @@ import (
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(c)
+    initConfig(r)
 
     // Get user info
     user := getUserInfo(c)

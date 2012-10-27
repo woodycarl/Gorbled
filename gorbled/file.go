@@ -251,7 +251,7 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 
 func handleFileList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(c)
+    initConfig(r)
 
     // Get page id, pageSize
     pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
