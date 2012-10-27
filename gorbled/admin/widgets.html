@@ -1,0 +1,45 @@
+{{define "content"}}
+<h2>{{.Title}}</h2>
+<hr />
+<a href="/admin/widget-add" class="btn"><i class="icon-pencil"></i>Add Widget</a>
+<table class="table table-striped">
+<thead>
+    <tr>
+        <th>Title</th>
+        <th>Sequence</th>
+        <th>Operations</th>
+    </tr>
+</thead>
+<tbody>
+{{range .Widgets}}
+    <tr>
+        <td>{{.Title}}</td>
+        <td>{{.Sequence}}</td>
+        <td>
+            <a href="/admin/widget-edit?id={{.ID}}" class="btn"><i class="icon-pencil"></i> Edit</a>
+            <a href="/admin/widget-delete?id={{.ID}}" class="btn"><i class="icon-trash"></i> Delete</a>
+        </td>
+    </tr>
+{{end}}
+</tbody>
+</table>
+<div class="pageination">
+    <ul class="pager">
+    {{if .Nav.ShowPrev}}
+        <li class="previous">
+            <a href="?pid={{.Nav.PrevPageID}}">&larr; Older</a>
+        </li>
+    {{end}}
+    {{if .Nav.ShowIDs}}
+        {{range .Nav.PageIDs}}
+            {{if .Current}}<li class='number current'><a>{{.Id}}</a></li>{{else}}<li class='number'><a href='?pid={{.Id}}'>{{.Id}}</a></li>{{end}}
+        {{end}}
+    {{end}}
+    {{if .Nav.ShowNext}}
+        <li class="next">
+            <a href="?pid={{.Nav.NextPageID}}">Newer &rarr;</a>
+        </li>
+    {{end}}
+    </ul>
+</div>
+{{end}}

@@ -5,10 +5,26 @@ import (
     "fmt"
     "net/url"
     "io"
+    "net/http"
 
     "appengine"
     "appengine/datastore"
 )
+
+func init() {
+    http.HandleFunc("/decodeContent", handleDecodeContent)
+}
+
+/*
+ * Decode markdown code
+ *
+ * @return (string) 
+ */
+func handleDecodeContent(w http.ResponseWriter, r *http.Request) {
+    content := []byte(r.FormValue("content"))
+    fmt.Fprint(w, decodeMD(content))
+}
+
 
 /*
  * Generate ID
@@ -23,31 +39,19 @@ func genID() string {
 }
 
 /*
- * Get Offset && PageNums
+ * Check id is exists
  *
- * @param kind     (string)
- * @param pageId   (int)
- * @param pageSize (int)
- * @param c        (appengine.Context)
- * 
- * @return offset   (int)
- * @return pageNums (int)
+ * @param kind (string)
+ * @param id   (string)
+ *
+ * @return (string)
  */
-func getOffset(kind string, pageId int, pageSize int, c appengine.Context) (offset int, pageNums int) {
-    dbQuery  := datastore.NewQuery(kind)
-    count, _ := dbQuery.Count(c)
-    pageNums = (count / pageSize)
-    if count % pageSize != 0 {
-        pageNums++
+func getID(kind string, id string, c appengine.Context) string {
+    if id != "" && !checkIdIsExists(kind, id, c) {
+        return id
     }
 
-    if pageId <= 0 || pageId > pageNums {
-        pageId = 1
-    }
-
-    offset = (pageId - 1) * pageSize
-
-    return
+    return genID()
 }
 
 /*
@@ -56,7 +60,7 @@ func getOffset(kind string, pageId int, pageSize int, c appengine.Context) (offs
  * @param kind (string)
  * @param id   (string)
  *
- * @return bool
+ * @return (bool)
  */
 func checkIdIsExists(kind string, id string, c appengine.Context) bool {
     dbQuery := datastore.NewQuery(kind).Filter("ID =", id)

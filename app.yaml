@@ -1,18 +1,17 @@
 application: gorbled
-version: 1
+version: 2
 runtime: go
 api_version: go1
 default_expiration: "7d"
 
 handlers:
-- url: /css
-  static_dir: gorbled/static/css
+- url: /admin/static/(.*)
+  static_files: gorbled/admin/static/\1
+  upload: gorbled/admin/static/(.*)
 
-- url: /js
-  static_dir: gorbled/static/js
-
-- url: /img
-  static_dir: gorbled/static/img
+- url: /([\w]+)/static/(.*)
+  static_files: gorbled/templates/\1/static/\2
+  upload: gorbled/templates/([\w]+)/static/(.*)
 
 - url: /favicon.ico
   static_files: gorbled/static/favicon.ico

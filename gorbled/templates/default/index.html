@@ -1,0 +1,36 @@
+{{define "content"}}
+
+<div class="hero-unit">
+    <h1>{{.Config.Title}}</h1>
+    <p>{{.Config.Description}}</p>
+</div>
+
+{{range .Articles}}
+<div class="post well">
+    <h2><a href="/article?id={{.ID}}">{{.Title}}</a></h2>
+    <h6>Post on {{showDate .Date}}</h6>
+    <div style="margin-top:10px">{{decodeMD .Content}}</div>
+</div>
+{{end}}
+
+<div class="pageination">
+    <ul class="pager">
+    {{if .Nav.ShowPrev}}
+        <li class="previous">
+            <a href="?pid={{.Nav.PrevPageID}}">&larr; Older</a>
+        </li>
+    {{end}}
+    {{if .Nav.ShowIDs}}
+        {{range .Nav.PageIDs}}
+            {{if .Current}}<li class='number current'><a>{{.Id}}</a></li>{{else}}<li class='number'><a href='?pid={{.Id}}'>{{.Id}}</a></li>{{end}}
+        {{end}}
+    {{end}}
+    {{if .Nav.ShowNext}}
+        <li class="next">
+            <a href="?pid={{.Nav.NextPageID}}">Newer &rarr;</a>
+        </li>
+    {{end}}
+    </ul>
+</div>
+
+{{end}}

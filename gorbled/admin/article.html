@@ -1,0 +1,160 @@
+{{define "content"}}
+<form action="/admin/article-{{if .New}}add{{else}}edit?id={{.Article.ID}}{{end}}" method="post">
+<div><input type="text" name="title" class="title" placeholder="Article Title" value="{{if not .New}}{{.Article.Title}}{{end}}" /></div>
+<div><input type="text" name="customid" class="title" placeholder="Custom ID" value="{{if not .New}}{{.Article.ID}}{{end}}" /></div>
+<div>
+    <!--<a href="#" class="btn" onclick="openWindow('/file?action=upload')" >Upload File</a>-->
+    <a data-toggle="modal" href="#uploadModal" class="btn" id="upload">Upload File</a>
+    <a data-toggle="modal" href="#previewModal" class="btn" id="preview">Preview</a>
+</div>
+<hr />
+<div><textarea name="content" class="content" placeholder="Article Content" >{{if not .New}}{{.Article.Content | printf "%s"}}{{end}}</textarea></div>
+<div><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></div>
+</form>
+
+<!-- 文章预览 -->
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/bootstrap-modal.js"></script>
+<script>
+  $(document).ready(function(){
+    $("#preview").click(function(){
+      title=$(".title").val();
+      content=$(".content").val();
+      $.post("/decodeContent",{content:content},function(result){
+        $("#previewModalLabel").html(title);
+        $(".modal-body").html(result);
+      });
+    });
+    $("#save-changes").click(function(){
+      $("#submit").click()
+    });
+  });
+</script>
+<div id="previewModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="previewModalLabel">Modal Heading</h3>
+  </div>
+  <div class="modal-body"></div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button class="btn btn-primary" id="save-changes">Save changes</button>
+  </div>
+</div>
+
+<script src="/static/js/bootstrap-tab.js"></script>
+<script>
+  $(document).ready(function(){
+    var upload_url;
+    $("#upload").click(function(){
+      $.get("/admin/file-new-url", function(data){
+        upload_url=data;
+      });
+    });
+
+    $("#btn-file-upload").click(function(){
+      //$(".test").html(upload_url);
+      var fileObj = $("#file").files[0]; // 获取文件对象
+
+      // FormData 对象
+      var form = new FormData();
+      form.append("author", "hooyes");  // 可以增加表单数据
+      form.append("file", fileObj);     // 文件对象
+
+      // XMLHttpRequest 对象
+      var xhr = new XMLHttpRequest();
+      xhr.open("post", upload_url, true);
+      xhr.onload = function () {
+          alert("上传完成!");
+      };
+      xhr.send(form);
+      
+    });
+
+  });
+</script>
+<link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
+<div id="uploadModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+  <!-- <div class="modal-header"><h3 id="uploadModalLabel">Modal Heading</h3></div> -->
+
+  <div class="modal-body">
+
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    
+
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#file-list" data-toggle="tab">File List</a></li>
+  <li><a href="#file-edit" data-toggle="tab">Uploat</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="file-list">
+
+  <!--<form action="{{.File.Url}}" method="post" enctype="multipart/form-data" ></form>-->
+    <span class="btn btn-success fileinput-button">
+        <i class="icon-plus icon-white"></i>
+        <span>Add</span>
+        <input id="file" type="file" name="file">
+    </span>
+    <button id="btn-file-upload" class="btn btn-primary start">
+        <i class="icon-upload icon-white"></i>
+        <span>Upload</span>
+    </button>
+    
+
+    <table class="table table-striped">
+      <thead>
+          <tr>
+              <th class="test">Title</th>
+              <th>Date</th>
+              <th>Operations</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr>
+              <td>test.jpg</td>
+              <td>1986-12-16</td>
+              <td>
+                  <a href="/admin/file-edit?id= " class="btn"><i class="icon-pencil"></i> Edit</a>
+                  <a href="/admin/file-delete?id= " class="btn"><i class="icon-trash"></i> Delete</a>
+              </td>
+          </tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="tab-pane" id="file-edit">
+
+    <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Title</th>
+              <th>Date</th>
+              <th>Operations</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr>
+              <td>test.jpg</td>
+              <td>1986-12-16</td>
+              <td>
+                  <a href="/admin/file-edit?id= " class="btn"><i class="icon-pencil"></i> Edit</a>
+                  <a href="/admin/file-delete?id= " class="btn"><i class="icon-trash"></i> Delete</a>
+              </td>
+          </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button class="btn btn-primary" id="save-changes">Save changes</button>
+  </div>
+</div>
+{{end}}

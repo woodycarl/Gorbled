@@ -15,3 +15,10 @@
 .sequence {
     width:120px;
 }
+
+.pager .number {
+  text-align: center;
+}
+.pager .current {
+    color: red;
+}

@@ -3,149 +3,123 @@ package gorbled
 import (
     "net/http"
     "strconv"
-    "other_package/blackfriday"
 
     "appengine"
     "appengine/datastore"
 )
 
-type WidgetDB struct {
-    ID, Title   string
+func init() {
+    http.HandleFunc("/admin/widget-list",   handleWidgetList)
+    http.HandleFunc("/admin/widget-add",    handleWidgetAdd)
+    http.HandleFunc("/admin/widget-edit",   handleWidgetEdit)
+    http.HandleFunc("/admin/widget-delete", handleWidgetDelete)
+}
+
+/*
+ * Widget data struct
+ */
+type Widget struct {
+    ID          string
+    Title       string
     Sequence    int
     Content     []byte
 }
 
-type WidgetData struct {
-    ID, Title, Content string
-    Sequence    int
+func (p *Widget) save(c appengine.Context) (err error) {
+    _, err = datastore.Put(c, datastore.NewIncompleteKey(c, "Widget", nil), p)
+    return
+}
+
+func (p *Widget) update(key *datastore.Key, c appengine.Context) (err error) {
+    _, err = datastore.Put(c, key, p)
+    return
 }
 
 /*
  * Get widget data
  */
-func getWidgetData(dbQuery *datastore.Query, MDOutput bool, c appengine.Context) (widgetData []WidgetData , err error) {
-    var widgetDB []*WidgetDB
-    _, err = dbQuery.GetAll(c, &widgetDB)
-    if err != nil {
-        return
-    }
+func getWidgets(c appengine.Context) (widgets []Widget, err error) {
+    dbQuery := datastore.NewQuery("Widget").Order("Sequence")
+    _, err = dbQuery.GetAll(c, &widgets)
+    return
+}
 
-    widgetData = make([]WidgetData, len(widgetDB))
-    for i := 0; i < len(widgetDB); i++ {
-        widgetData[i].ID       = widgetDB[i].ID
-        widgetData[i].Title    = widgetDB[i].Title
-        widgetData[i].Sequence = widgetDB[i].Sequence
-        if MDOutput {
-            widgetData[i].Content  = string(blackfriday.MarkdownCommon(widgetDB[i].Content))
-        } else {
-            widgetData[i].Content  = string(widgetDB[i].Content)
-        }
+func getWidget(id string,
+    c appengine.Context) (widget Widget, key *datastore.Key, err error) {
+
+    dbQuery := datastore.NewQuery("Widget").Filter("ID =", id)
+    var widgets []Widget
+    keys, err := dbQuery.GetAll(c, &widgets)
+    if len(widgets) > 0 {
+        widget = widgets[0]
+        key = keys[0]
     }
 
     return
 }
 
-func handleWidget(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
+func getWidgetsPerPage(offset, pageSize int,
+        c appengine.Context) (widgets []Widget, err error) {
 
-    // Get action && id
-    action := getUrlQuery(r.URL, "action")
-    id     := getUrlQuery(r.URL, "id")
+    dbQuery := datastore.NewQuery("Widget").
+        Order("-Sequence").
+        Offset(offset).
+        Limit(pageSize)
 
-    switch action {
-        case "manager":
-            // Check user permissions
-            userInfo := getUserInfo(c)
-            if userInfo == nil || !userInfo.IsAdmin {
-                serve404(w)
-                return
-            }
+    _, err = dbQuery.GetAll(c, &widgets)
 
-            operation := getUrlQuery(r.URL, "operation")
-            widgetManager(w, r, operation, id)
-    }
+    return
 }
 
-func widgetManager(w http.ResponseWriter, r *http.Request, operation string, id string) {
-    switch operation {
-        case "add":
-            widgetAdd(w, r)
-        case "edit":
-            widgetEdit(w, r, id)
-        case "delete":
-            widgetDelete(w, r, id)
-
-        default :
-            widgetList(w, r)
-    }
-}
-
-func widgetList(w http.ResponseWriter, r *http.Request) {
+/*
+ * Widget handler
+ */
+func handleWidgetList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initConfig(c)
 
-    // Get widget data
-
-    // Get page id
+    // Get page id, pageSize
     pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
-    pageSize  := 10
+    pageSize  := config.AdminWidgets
 
-    // Get offset and page numbers
-    offset, pageNums := getOffset("Widget", pageId, pageSize, c)
-
-    // New PageSetting
-    pageSetting := new(PageSetting)
-
-    // Setting PageSetting
-    pageSetting.Title  = "Widget Manager - " + config.Title
-    pageSetting.Layout = "column1"
-
-    // showNext and showPrev button
-    if pageId <= 0 || pageId > pageNums {
-        pageId = 1
-    }
-    if pageId < pageNums {
-        pageSetting.ShowPrev = true
-    }
-    if pageId != 1 {
-        pageSetting.ShowNext = true
-    }
-    pageSetting.PrevPageID = pageId + 1
-    pageSetting.NextPageID = pageId - 1
+    // Get offset and page nav
+    offset, nav := getPageNav("Widget", pageId, pageSize, c)
 
     // Get widget data
-    dbQuery         := datastore.NewQuery("Widget").Order("Sequence").Offset(offset).Limit(pageSize)
-    widgetData, err := getWidgetData(dbQuery, false, c)
+    widgets, err := getWidgetsPerPage(offset, pageSize, c)
     if err != nil {
         serveError(c, w, err)
         return
     }
 
-    // New PageData
-    pageData := &PageData{ Widget: widgetData }
-
     // New Page
-    page := NewPage(pageSetting, pageData)
+    page := Page {
+        Title :     "Widget Manager",
+        Widgets :   widgets,
+        Nav :       nav,
+        Config :    config,
+    }
 
     // Render page
-    page.Render("widget/manager", w)
+    page.Render("admin/widgets", w)
 }
 
-func widgetAdd(w http.ResponseWriter, r *http.Request) {
+func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initConfig(c)
 
     if r.Method != "POST" {
         // Show widget add page
 
-        // New PageSetting
-        pageSetting := new(PageSetting)
-        pageSetting.Title  = "Widget Manager - Add - " + config.Title
-        pageSetting.Layout = "column1"
-
         // New Page
-        page := NewPage(pageSetting, nil)
+        page := Page {
+            Title:     "Add Widget",
+            Config:    config,
+            New:       true,
+        }
 
         // Render page
-        err := page.Render("widget/add", w)
+        err := page.Render("admin/widget", w)
         if err != nil {
             serveError(c, w, err)
             return
@@ -161,28 +135,42 @@ func widgetAdd(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Sequence
-    var sequence int
-    sequence, _ = strconv.Atoi(r.FormValue("sequence"))
-
-    // Create widgetDB
-    widgetDB := &WidgetDB{
-        ID:       genID(),
-        Title:    r.FormValue("title"),
-        Sequence: sequence,
-        Content:  []byte(r.FormValue("content")),
+    // Create widget
+    sequence, _ := strconv.Atoi(r.FormValue("sequence"))
+    widget := &Widget{
+        ID:         getID("Widget", r.FormValue("customid"), c),
+        Title:      r.FormValue("title"),
+        Content:    []byte(r.FormValue("content")),
+        Sequence:   sequence,
     }
 
     // Save to datastore
-    if _, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Widget", nil), widgetDB); err != nil {
+    if err := widget.save(c); err != nil {
         serveError(c, w, err)
-    } else {
-        http.Redirect(w, r, "/widget?action=manager", http.StatusFound)
     }
+
+    http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
 }
 
-func widgetEdit(w http.ResponseWriter, r *http.Request, id string) {
+func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initConfig(c)
+
+    // Get widget id
+    id := getUrlQuery(r.URL, "id")
+
+    // Get widget data
+    widget, key, err := getWidget(id, c)
+    if err != nil {
+        serveError(c, w, err)
+        return
+    }
+
+    // Check widget is exists
+    if widget.ID == "" {
+        serve404(w)
+        return
+    }
 
     if r.Method != "POST" {
         // Show widget edit page
@@ -191,29 +179,19 @@ func widgetEdit(w http.ResponseWriter, r *http.Request, id string) {
 
         // Check error
         if count, _ := dbQuery.Count(c); count < 1 {
-            http.Redirect(w, r, "/widget?action=manager", http.StatusFound)
+            http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
         }
-
-        // Get widget data
-        widgetData, err := getWidgetData(dbQuery, false, c)
-        if err != nil {
-            serveError(c, w, err)
-            return
-        }
-
-        // New PageSetting
-        pageSetting := new(PageSetting)
-        pageSetting.Title  = "Widget Manager - Edit - " + config.Title
-        pageSetting.Layout = "column1"
-
-        // New PageData
-        pageData := &PageData{ Widget: widgetData }
 
         // New Page
-        page := NewPage(pageSetting, pageData)
+        page := Page {
+            Title :     "Edit Widget",
+            Config :    config,
+            Widget:     widget,
+            New:        false,
+        }
 
         // Render page
-        err = page.Render("widget/edit", w)
+        err = page.Render("admin/widget", w)
         if err != nil {
             serveError(c, w, err)
         }
@@ -229,53 +207,37 @@ func widgetEdit(w http.ResponseWriter, r *http.Request, id string) {
         return
     }
 
-    // Delete old widget
-    dbQuery := datastore.NewQuery("Widget").Filter("ID =", id)
-    var widgetDBTmp []*WidgetDB
-    keys, err := dbQuery.GetAll(c, &widgetDBTmp)
-    if err != nil {
-        serveError(c, w, err)
-        return
-    }
-    datastore.DeleteMulti(c, keys)
-
     // Add new widget
 
     // Sequence
-    var sequence int
-    sequence, _ = strconv.Atoi(r.FormValue("sequence"))
+    sequence, _ := strconv.Atoi(r.FormValue("sequence"))
 
-    // Create widgetDB
-    widgetDB := &WidgetDB{
-        ID:       widgetDBTmp[0].ID,
-        Title:    r.FormValue("title"),
-        Sequence: sequence,
-        Content:  []byte(r.FormValue("content")),
-    }
+    widget.Sequence = sequence
+    widget.Title = r.FormValue("title")
+    widget.Content = []byte(r.FormValue("content"))
 
     // Save to datastore
-    if _, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Widget", nil), widgetDB); err != nil {
-        serveError(c, w, err)
-    } else {
-        http.Redirect(w, r, "/widget?action=manager", http.StatusFound)
+    if err := widget.update(key, c); err != nil {
+      serveError(c, w, err)
     }
+    http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
 }
 
-func widgetDelete(w http.ResponseWriter, r *http.Request, id string) {
+func handleWidgetDelete(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initConfig(c)
 
-    // Get delete widget
-    dbQuery := datastore.NewQuery("Widget").Filter("ID =", id)
+    // Get widget id
+    id := getUrlQuery(r.URL, "id")
 
-    // Check error
-    if count, _ := dbQuery.Count(c); count < 1 {
-        http.Redirect(w, r, "/", http.StatusFound)
+    // Get widget data
+    _, key, err := getWidget(id, c)
+    if err != nil {
+      serveError(c, w, err)
+      return
     }
 
-    // Delete widget
-    var widgetDB []*WidgetDB
-    keys, _ := dbQuery.GetAll(c, &widgetDB)
-    datastore.DeleteMulti(c, keys)
+    datastore.Delete(c, key)
 
-    http.Redirect(w, r, "/widget?action=manager", http.StatusFound)
+    http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
 }

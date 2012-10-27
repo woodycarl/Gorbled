@@ -1,0 +1,43 @@
+{{define "content"}}
+<form action="/admin/widget-{{if .New}}add{{else}}edit?id={{.Widget.ID}}{{end}}" method="post">
+<div><input type="text" name="title" class="title" placeholder="Widget Title" value="{{if not .New}}{{.Widget.Title}}{{end}}" /></div>
+<div>
+    <a href="#" class="btn" onclick="openWindow('/file?action=upload')" >Upload File</a>
+    <a data-toggle="modal" href="#myModal" class="btn btn-primary" id="preview">Preview</a>
+</div>
+<hr />
+<div><textarea name="content" class="content" placeholder="Widget Content" >{{if not .New}}{{.Widget.Content | printf "%s"}}{{end}}</textarea></div>
+<div><input type="text" name="sequence" class="sequence" placeholder="Widget Sequence" value="{{if not .New}}{{.Widget.Sequence}}{{end}}" /></div>
+<div><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></div>
+</form>
+
+<!-- Widget Preview -->
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/bootstrap-modal.js"></script>
+<script>
+  $(document).ready(function(){
+    $("#preview").click(function(){
+      title=$(".title").val();
+      content=$(".content").val();
+      $.post("/decodeContent",{content:content},function(result){
+        $("#myModalLabel").html(title);
+        $(".modal-body").html(result);
+      });
+    });
+    $("#save-changes").click(function(){
+      $("#submit").click()
+    });
+  });
+</script>
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Modal Heading</h3>
+  </div>
+  <div class="modal-body"></div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button class="btn btn-primary" id="save-changes">Save changes</button>
+  </div>
+</div>
+{{end}}

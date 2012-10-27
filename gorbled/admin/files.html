@@ -1,0 +1,147 @@
+{{define "content"}}
+<h2>{{.Title}}</h2>
+<hr />
+
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/bootstrap-tab.js"></script>
+<script src="/static/js/bootstrap-modal.js"></script>
+<script>
+$(document).ready(function(){
+
+    initFileList(1);
+
+    $("#btn-file-upload").click(function(){
+
+        var file = document.getElementById('file').files[0];  //获取文件对象
+        var upload_url = $("#file").attr("upload_url"); // 接收上传文件的后台地址 
+
+        
+        // FormData 对象
+        var form = new FormData();
+        form.append("file", file);  // 文件对象
+
+        // XMLHttpRequest 对象
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", upload_url, true);
+
+        xhr.send(form);
+
+        initFileList(1);
+    });
+
+});
+
+function initFileList(pid){
+    $.getJSON('/admin/file-new-url', function(message) {
+        if (message.Success) {
+            //upload_url = message.Data;
+            $("#file").attr("upload_url",message.Data);
+        }
+        $(".message-info").html(message.Info);
+    });
+
+    $.getJSON("/admin/file-data?pid="+pid, function(message) {
+        if (message.Success) {
+            var page = jQuery.parseJSON(message.Data);
+            var filesInfo = [];
+
+            $.each(page.Files, function(i, file) {
+                filesInfo.push('<tr><td>'+(i+1+(pid-1)*{{.Config.AdminFiles}})+'</td><td>preview</td><td>'+file.ID+'</td><td>'+file.Date+'</td><td><a href="/admin/file-edit?id='+file.ID+'" class="btn"><i class="icon-pencil"></i> Edit</a><a href="/admin/file-delete?id='+file.ID+'" class="btn"><i class="icon-trash"></i> Delete</a></td></tr>');
+            });
+
+            $(".file-data").html(filesInfo.join(''));
+
+            var navInfo = [];
+            $(".pageination .pager").html("");
+            if (page.Nav.ShowPrev) {
+                navInfo.push('<li class="previous"><a href="javascript:void(0)" onclick="initFileList('+page.Nav.PrevPageID+');">&larr; Older</a></li>');
+            }
+            if (page.Nav.ShowIDs) {
+
+                $.each(page.Nav.PageIDs, function(i, pageID) {
+                    if (pageID.Current) {
+                        navInfo.push('<li class="current"><a>'+pageID.Id+'</a></li>');
+                    } else {
+                        navInfo.push('<li class=""><a href="javascript:void(0)" onclick="initFileList('+pageID.Id+');">'+pageID.Id+'</a></li>');
+                    }
+                });
+            }
+            if (page.Nav.ShowNext) {
+                navInfo.push('<li class="next"><a href="javascript:void(0)" onclick="initFileList('+page.Nav.NextPageID+');">Newer &rarr;</a></li>');
+            }
+            $(".pageination .pager").html(navInfo.join(''));
+        }
+
+        $(".message-info").append(message.Info);
+    });
+}
+
+
+</script>
+<link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
+
+<div class=" " id="file-list">
+    <span class="btn btn-success fileinput-button">
+        <i class="icon-plus icon-white"></i>
+        <span>Add</span>
+        <input id="file" type="file" name="file" >
+    </span>
+    <button id="btn-file-upload" class="btn btn-primary start">
+        <i class="icon-upload icon-white"></i>
+        <span>Upload</span>
+    </button>
+
+    <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Num</th>
+              <th>Preview</th>
+              <th>Title</th>
+              <th>Date</th>
+              <th>Operations</th>
+          </tr>
+      </thead>
+      <tbody class="file-data"></tbody>
+    </table>
+
+    <div class="pageination">
+        <ul class="pager"></ul>
+    </div>
+</div>
+
+<div class="message-info"></div>
+
+<div id="file-edit-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-edit-modal-Label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="previewModalLabel">File Edit</h3>
+  </div>
+  <div class="modal-body">
+    <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Title</th>
+              <th>Date</th>
+              <th>Operations</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr>
+              <td>test.jpg</td>
+              <td>1986-12-16</td>
+              <td>
+                  <a href="/admin/file-edit?id= " class="btn"><i class="icon-pencil"></i> Edit</a>
+                  <a href="/admin/file-delete?id= " class="btn"><i class="icon-trash"></i> Delete</a>
+              </td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Close</button>
+    <button class="btn btn-primary" id="save-changes">Save changes</button>
+  </div>
+</div>
+
+
+{{end}}

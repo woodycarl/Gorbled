@@ -1,0 +1,40 @@
+{{define "content"}}
+<h2>{{.Title}}</h2>
+<hr />
+
+<table class="table table-striped">
+<tbody>
+
+    <tr>
+        <th>站点标题</th>
+        <td>{{.Config.Title}}</td>
+    </tr>
+
+    <tr>
+        <th>站点描述</th>
+        <td>{{.Config.Description}}</td>
+    </tr>
+
+    <tr>
+        <th>每页显示文章数</th>
+        <td>{{.Config.Articles}}</td>
+    </tr>
+
+    <tr>
+        <th>管理每页显示文章数</th>
+        <td>{{.Config.AdminArticles}}</td>
+    </tr>
+
+    <tr>
+        <th>管理每页显示widget数</th>
+        <td>{{.Config.AdminWidgets}}</td>
+    </tr>
+
+    <tr>
+        <th>时区</th>
+        <td>{{.Config.TimeZone}}</td>
+    </tr>
+
+</tbody>
+</table>
+{{end}}

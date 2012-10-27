@@ -4,215 +4,117 @@ import (
     "net/http"
     "time"
     "strconv"
-    "html"
-    "other_package/blackfriday"
 
     "appengine"
     "appengine/datastore"
 )
 
-type ArticleDB struct {
-    ID, Title string
-    Date      time.Time
-    Content   []byte
-}
+func init() {
+    http.HandleFunc("/admin/article-list",   handleArticleList)
+    http.HandleFunc("/admin/article-add",    handleArticleAdd)
+    http.HandleFunc("/admin/article-edit",   handleArticleEdit)
+    http.HandleFunc("/admin/article-delete", handleArticleDelete)
 
-type ArticleData struct {
-    ID, Title, Content string
-    Date time.Time
+    http.HandleFunc("/article", handleArticleView)
 }
 
 /*
- * Get article data
+ * Article data struct
  */
-func getArticleData(dbQuery *datastore.Query, MDOutput bool, c appengine.Context) (articleData []ArticleData , err error) {
-    var articleDB []*ArticleDB
-    _, err = dbQuery.GetAll(c, &articleDB)
-    if err != nil {
-        return
-    }
+type Article struct {
+    ID         string
+    Title      string
+    Date       time.Time
+    Content    []byte
+}
 
-    articleData = make([]ArticleData, len(articleDB))
-    for i := 0; i < len(articleDB); i++ {
-        articleData[i].ID    = articleDB[i].ID
-        articleData[i].Title = articleDB[i].Title
-        if MDOutput {
-            articleData[i].Content = string(blackfriday.MarkdownCommon(articleDB[i].Content))
-        } else {
-            articleData[i].Content = string(articleDB[i].Content)
-        }
-        articleData[i].Date = articleDB[i].Date
+func (article *Article) save(c appengine.Context) (err error) {
+    _, err = datastore.Put(c, datastore.NewIncompleteKey(c, "Article", nil), article)
+    return
+}
+
+func (article *Article) update(key *datastore.Key, c appengine.Context) (err error) {
+    _, err = datastore.Put(c, key, article)
+    return
+}
+
+func getArticle(id string, c appengine.Context) (article Article, key *datastore.Key, err error) {
+    dbQuery := datastore.NewQuery("Article").Filter("ID =", id)
+    var articles []Article
+    keys, err := dbQuery.GetAll(c, &articles)
+    if len(articles) > 0 {
+        article = articles[0]
+        key = keys[0]
     }
 
     return
 }
 
-func handleArticle(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
+func getArticlesPerPage(offset, pageSize int, c appengine.Context) (articles []Article, err error) {
 
-    // Get action && id
-    action := getUrlQuery(r.URL, "action")
-    id     := getUrlQuery(r.URL, "id")
+    dbQuery := datastore.NewQuery("Article").
+                                    Order("-Date").
+                                    Offset(offset).
+                                    Limit(pageSize)
+    _, err = dbQuery.GetAll(c, &articles)
 
-    switch action {
-        case "manager":
-            // Check user permissions
-            userInfo := getUserInfo(c)
-            if userInfo == nil || !userInfo.IsAdmin {
-                serve404(w)
-                return
-            }
-
-            operation := getUrlQuery(r.URL, "operation")
-            articleManager(w, r, operation, id)
-
-        default :
-            articleView(w, r, id)
-    }
+    return
 }
 
-func articleView(w http.ResponseWriter, r *http.Request, id string) {
+/*
+ * Article handler
+ */
+func handleArticleList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initConfig(c)
 
-    // Get user info
-    userInfo := getUserInfo(c)
-
-    // Create get article data query
-    dbQuery := datastore.NewQuery("Article").Filter("ID =", id)
-
-    // Check article is exists
-    if count, _ := dbQuery.Count(c); count < 1 {
-        serve404(w)
-        return
-    }
-
-    // Get article data
-    articleData, err := getArticleData(dbQuery, true, c)
-    if err != nil {
-        serveError(c, w, err)
-        return
-    }
-
-    // Get widget data
-    dbQuery          = datastore.NewQuery("Widget").Order("Sequence")
-    widgetData, err := getWidgetData(dbQuery, true, c)
-    if err != nil {
-        serveError(c, w, err)
-        return
-    }
-
-    // New PageSetting
-    pageSetting := new(PageSetting)
-
-    // Setting PageSetting
-    for _, v := range articleData {
-        // title
-        pageSetting.Title = v.Title + " - " + config.Title
-
-        // description
-        if len(v.Content) < 100 {
-            pageSetting.Description = html.EscapeString(v.Content)
-        } else {
-            pageSetting.Description = html.EscapeString(v.Content[:100])
-        }
-    }
-    pageSetting.Layout      = "column2"
-    pageSetting.ShowSidebar = true
-
-    // New PageData
-    pageData := &PageData{ User: userInfo, Article: articleData, Widget: widgetData }
-
-    // New Page
-    page := NewPage(pageSetting, pageData)
-
-    // Render page
-    page.Render("article/view", w)
-}
-
-func articleManager(w http.ResponseWriter, r *http.Request, operation string, id string) {
-    switch operation {
-        case "add":
-            articleAdd(w, r)
-        case "edit":
-            articleEdit(w, r, id)
-        case "delete":
-            articleDelete(w, r, id)
-
-        default :
-            articleList(w, r)
-    }
-}
-
-func articleList(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
-
-    // Get article data
-
-    // Get page id
+    // Get page id, pageSize
     pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
-    pageSize  := 10
+    pageSize  := config.AdminArticles
 
-    // Get offset and page numbers
-    offset, pageNums := getOffset("Article", pageId, pageSize, c)
-
-    // New PageSetting
-    pageSetting := new(PageSetting)
-
-    // Setting PageSetting
-    pageSetting.Title  = "Article Manager - " + config.Title
-    pageSetting.Layout = "column1"
-
-    // showNext and showPrev button
-    if pageId <= 0 || pageId > pageNums {
-        pageId = 1
-    }
-    if pageId < pageNums {
-        pageSetting.ShowPrev = true
-    }
-    if pageId != 1 {
-        pageSetting.ShowNext = true
-    }
-    pageSetting.PrevPageID = pageId + 1
-    pageSetting.NextPageID = pageId - 1
+    // Get offset and page nav
+    offset, nav := getPageNav("Article", pageId, pageSize, c)
 
     // Get article data
-    dbQuery          := datastore.NewQuery("Article").Order("-Date").Offset(offset).Limit(pageSize)
-    articleData, err := getArticleData(dbQuery, false, c)
+    articles, err := getArticlesPerPage(offset, pageSize, c)
     if err != nil {
         serveError(c, w, err)
         return
     }
 
-    // New PageData
-    pageData := &PageData{ Article: articleData }
-
     // New Page
-    page := NewPage(pageSetting, pageData)
+    page := Page {
+        Title:    "Article Manager",
+        Articles: articles,
+        Nav:      nav,
+        Config:   config,
+    }
 
     // Render page
-    page.Render("article/manager", w)
+    page.Render("admin/articles", w)
 }
 
-func articleAdd(w http.ResponseWriter, r *http.Request) {
+func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initConfig(c)
 
     if r.Method != "POST" {
         // Show article add page
 
-        // New PageSetting
-        pageSetting := new(PageSetting)
-        pageSetting.Title  = "Article Manager - Add - " + config.Title
-        pageSetting.Layout = "column1"
-
         // New Page
-        page := NewPage(pageSetting, nil)
+        page := Page {
+            Title:  "Add Article",
+            Config: config,
+            New:    true,
+        }
 
         // Render page
-        err := page.Render("article/add", w)
+        err := page.Render("admin/article", w)
         if err != nil {
             serveError(c, w, err)
             return
         }
+
         return
     }
 
@@ -224,139 +126,145 @@ func articleAdd(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Custom ID
-    var customID string
-    if r.FormValue("customid") != "" {
-        // Check custom id is exists
-        if checkIdIsExists("Article", r.FormValue("customid"), c) {
-            customID = genID()
-        } else {
-            customID = r.FormValue("customid")
-        }
-    } else {
-        customID = genID()
-    }
-
-    // Create articleDB
-    articleDB := &ArticleDB{
-        ID:      customID,
+    // Create article
+    article := &Article{
         Date:    time.Now(),
         Title:   r.FormValue("title"),
         Content: []byte(r.FormValue("content")),
     }
 
-    // Save to datastore
-    if _, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Article", nil), articleDB); err != nil {
-        serveError(c, w, err)
+    // Get ID
+    if r.FormValue("customid") != "" && !checkIdIsExists("Article", r.FormValue("customid"), c) {
+        // Check id is exists
+        article.ID = r.FormValue("customid")
     } else {
-        http.Redirect(w, r, "/article?action=manager", http.StatusFound)
+        article.ID = genID()
     }
+
+    // Save to datastore
+    if err := article.save(c); err != nil {
+        serveError(c, w, err)
+    }
+
+    http.Redirect(w, r, "/admin/article-list", http.StatusFound)
 }
 
-func articleEdit(w http.ResponseWriter, r *http.Request, id string) {
+func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initConfig(c)
 
-    if r.Method != "POST" {
-        // Show article edit page
+    // Get article id
+    id := getUrlQuery(r.URL, "id")
 
-        dbQuery := datastore.NewQuery("Article").Filter("ID =", id)
-
-        // Check error
-        if count, _ := dbQuery.Count(c); count < 1 {
-            http.Redirect(w, r, "/article?action=manager", http.StatusFound)
-        }
-
-        // Get article data
-        articleData, err := getArticleData(dbQuery, false, c)
-        if err != nil {
-            serveError(c, w, err)
-            return
-        }
-
-        // New PageSetting
-        pageSetting := new(PageSetting)
-        pageSetting.Title  = "Article Manager - Edit - " + config.Title
-        pageSetting.Layout = "column1"
-
-        // New PageData
-        pageData := &PageData{ Article: articleData }
-
-        // New Page
-        page := NewPage(pageSetting, pageData)
-
-        // Render page
-        err = page.Render("article/edit", w)
-        if err != nil {
-            serveError(c, w, err)
-        }
-
-        return
-    }
-
-    // Process post data
-
-    // Parse form data
-    if err := r.ParseForm(); err != nil {
-        serveError(c, w, err)
-        return
-    }
-
-    // Delete old article
-    dbQuery := datastore.NewQuery("Article").Filter("ID =", id)
-    var articleDBTmp []*ArticleDB
-    keys, err := dbQuery.GetAll(c, &articleDBTmp)
+    // Get article data
+    article, key, err := getArticle(id, c)
     if err != nil {
         serveError(c, w, err)
         return
     }
-    datastore.DeleteMulti(c, keys)
 
-    // Add new article
+    // Check article is exists
+    if article.ID == "" {
+        serve404(w)
+        return
+    }
 
-    // Custom ID
-    var customID string
-    if r.FormValue("customid") != "" {
-        // Check custom id is exists
-        if checkIdIsExists("Article", r.FormValue("customid"), c) {
-            customID = articleDBTmp[0].ID
-        } else {
-            customID = r.FormValue("customid")
+    if r.Method != "POST" {
+        // Show article edit page
+
+        // New Page
+        page := Page {
+            Title:   "Edit Article",
+            Article: article,
+            Config:  config,
+            New:     false,
         }
-    } else {
-        customID = articleDBTmp[0].ID
+
+        // Render page
+        err = page.Render("admin/article", w)
+        if err != nil {
+            serveError(c, w, err)
+        }
+        return
     }
 
-    // Create articleDB
-    articleDB := &ArticleDB{
-        ID:      customID,
-        Date:    time.Now(),
-        Title:   r.FormValue("title"),
-        Content: []byte(r.FormValue("content")),
-    }
+    // Process post data
 
-    // Save to datastore
-    if _, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Article", nil), articleDB); err != nil {
+    if err := r.ParseForm(); err != nil {
         serveError(c, w, err)
-    } else {
-        http.Redirect(w, r, "/article?action=manager", http.StatusFound)
+        return
     }
+
+    // Update article
+    if r.FormValue("customid") != "" {
+        article.ID = r.FormValue("customid")
+    }
+    article.Title   = r.FormValue("title")
+    article.Content = []byte(r.FormValue("content"))
+
+    if err := article.update(key, c); err != nil {
+        serveError(c, w, err)
+    }
+
+    http.Redirect(w, r, "/admin/article-list", http.StatusFound)
 }
 
-func articleDelete(w http.ResponseWriter, r *http.Request, id string) {
+func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initConfig(c)
 
-    // Get delete article
-    dbQuery := datastore.NewQuery("Article").Filter("ID =", id)
+    // Get article id
+    id := getUrlQuery(r.URL, "id")
 
-    // Check error
-    if count, _ := dbQuery.Count(c); count < 1 {
-        http.Redirect(w, r, "/", http.StatusFound)
+    // Get article data
+    _, key, err := getArticle(id, c)
+    if err != nil {
+      serveError(c, w, err)
+      return
     }
 
-    // Delete article
-    var articleDB []*ArticleDB
-    keys, _ := dbQuery.GetAll(c, &articleDB)
-    datastore.DeleteMulti(c, keys)
+    datastore.Delete(c, key)
 
-    http.Redirect(w, r, "/article?action=manager", http.StatusFound)
+    http.Redirect(w, r, "/admin/article-list", http.StatusFound)
+}
+
+func handleArticleView(w http.ResponseWriter, r *http.Request) {
+    c := appengine.NewContext(r)
+    initConfig(c)
+
+    // Get article id
+    id := getUrlQuery(r.URL, "id")
+
+    // Get user info
+    user := getUserInfo(c)
+
+    // Get article data
+    article, _, err := getArticle(id, c)
+    if err != nil {
+        serveError(c, w, err)
+        return
+    }
+    // Check article is exists
+    if article.ID == "" {
+        serve404(w)
+        return
+    }
+
+    // Get widget data
+    widgets, err := getWidgets(c)
+    if err != nil {
+        serveError(c, w, err)
+        return
+    }
+
+    // New Page
+    page := Page {
+        User:    user,
+        Article: article,
+        Widgets: widgets,
+        Config:  config,
+    }
+
+    // Render page
+    page.Render("article", w)
 }
