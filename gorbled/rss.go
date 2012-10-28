@@ -9,21 +9,16 @@ import (
     "text/template"
 )
 
-func init() {
-    
-}
-
 /*
  * RSS handler
  */
 func handleRSS(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     var articles []Article
     _, err := datastore.NewQuery("Article").Order("-Date").GetAll(c, &articles)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -39,6 +34,7 @@ func handleRSS(w http.ResponseWriter, r *http.Request) {
             "gorbled/admin/rss.html",
         )
     if err != nil {
+        serveError(w, err)
         return
     }
 

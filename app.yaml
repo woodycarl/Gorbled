@@ -5,7 +5,7 @@ api_version: go1
 default_expiration: "7d"
 
 handlers:
-- url: /admin/static/(.*)
+- url: /static/(.*)
   static_files: gorbled/admin/static/\1
   upload: gorbled/admin/static/(.*)
 
@@ -17,6 +17,9 @@ handlers:
   static_files: gorbled/static/favicon.ico
   upload: gorbled/static/favicon.ico
 
+- url: /admin/.*
+  script: _go_app
+  login: admin
+
 - url: /.*
   script: _go_app
-

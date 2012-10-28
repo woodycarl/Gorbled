@@ -13,10 +13,6 @@ import (
     "strings"
 )
 
-func init() {
-
-}
-
 /*
  * File data struct
  */
@@ -96,17 +92,36 @@ func decodeFile(s string) (f File, err error) {
 func handleFileNewUrl(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
     m := new(Message)
+    errInfo := ""
 
-    // Get upload url
-    uploadURL, err := blobstore.UploadURL(c, "/admin/file-upload", nil)
-
+    num, err := strconv.Atoi(getUrlQuery(r.URL, "num"))
     if err != nil {
+        errInfo = errInfo + fmt.Sprint(err)
+    }
+
+    uploadURLs := make([]string, num)
+
+    for i:=0;i<num;i++ {
+        uploadURL, _ := blobstore.UploadURL(c, "/admin/file-upload", nil)
+
+        uploadURLs[i] = uploadURL.String()
+        if err != nil {
+            errInfo = errInfo + fmt.Sprint(err)
+        }
+    }
+
+    b, err := json.Marshal(uploadURLs)
+    if err != nil {
+        errInfo = errInfo + fmt.Sprint(err)
+    }
+
+    if errInfo != "" {
         m.Success = false
-        m.Info = "Error: blobstore.UploadURL"
+        m.Info = "Error: " + errInfo
     } else {
         m.Success = true
         m.Info = "UploadURL Get!"
-        m.Data = fmt.Sprint(uploadURL)
+        m.Data = string(b)
     }
 
     fmt.Fprint(w, m.encode())
@@ -117,15 +132,15 @@ func handleFileUpload(w http.ResponseWriter, r *http.Request) {
     
     blobs, _, _ := blobstore.ParseUpload(r)
 
-    fileInfo := blobs["file"]
+    blobInfo, _ := blobstore.Stat(c, blobs["file"][0].BlobKey)
 
     file := File {
-        ID:     string(fileInfo[0].BlobKey),
-        Key:    fileInfo[0].BlobKey,
-        Type:   fileInfo[0].ContentType,
-        Date:   fileInfo[0].CreationTime,
-        Name:   fileInfo[0].Filename,
-        Size:   fileInfo[0].Size,
+        ID:     string(blobInfo.BlobKey),
+        Key:    blobInfo.BlobKey,
+        Type:   blobInfo.ContentType,
+        Date:   blobInfo.CreationTime,
+        Name:   blobInfo.Filename,
+        Size:   blobInfo.Size,
     }
 
     file.save(c)
@@ -157,15 +172,22 @@ func handleFileEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
     m := new(Message)
 
-    if fileIn, err := decodeFile(r.FormValue("file")); err != nil {
+    if id := r.FormValue("id"); id == "" {
         m.Success = false
-        m.Info = "Error: decodeFile"
-    } else if file, key, err := getFile(fileIn.ID, c); err != nil {
+        m.Info = "Error: enpty id"
+    } else if file, key, err := getFile(id, c); err != nil {
         m.Success = false
-        m.Info = "Error: getFile dbQuery.GetAll"
+        m.Info = "Error: "+fmt.Sprint(err)
     } else {
-        file.ID = fileIn.ID
-        file.Description = fileIn.Description
+        name := r.FormValue("name")
+        description := r.FormValue("description")
+        if name != "" {
+            file.Name = name
+        }
+        if description != "" {
+            file.Description = description
+        }
+        
         file.update(key, c)
         m.Success = true
         m.Info = "File Update!"
@@ -229,7 +251,7 @@ func handleFileList(w http.ResponseWriter, r *http.Request) {
     // Get file data
     files, err := getFilesPerPage(offset, pageSize, c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 

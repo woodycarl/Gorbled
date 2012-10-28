@@ -8,10 +8,6 @@ import (
     "appengine/datastore"
 )
 
-func init() {
-
-}
-
 /*
  * Widget data struct
  */
@@ -56,7 +52,7 @@ func getWidget(id string,
 }
 
 func getWidgetsPerPage(offset, pageSize int,
-        c appengine.Context) (widgets []Widget, err error) {
+    c appengine.Context) (widgets []Widget, err error) {
 
     dbQuery := datastore.NewQuery("Widget").
         Order("-Sequence").
@@ -73,7 +69,6 @@ func getWidgetsPerPage(offset, pageSize int,
  */
 func handleWidgetList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     // Get page id, pageSize
     pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
@@ -85,7 +80,7 @@ func handleWidgetList(w http.ResponseWriter, r *http.Request) {
     // Get widget data
     widgets, err := getWidgetsPerPage(offset, pageSize, c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -103,7 +98,6 @@ func handleWidgetList(w http.ResponseWriter, r *http.Request) {
 
 func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     if r.Method != "POST" {
         // Show widget add page
@@ -116,11 +110,8 @@ func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
         }
 
         // Render page
-        err := page.Render("admin/widget", w)
-        if err != nil {
-            serveError(c, w, err)
-            return
-        }
+        page.Render("admin/widget", w)
+
         return
     }
 
@@ -128,7 +119,7 @@ func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
 
     // Parse form data
     if err := r.ParseForm(); err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -143,7 +134,8 @@ func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
 
     // Save to datastore
     if err := widget.save(c); err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
+        return
     }
 
     http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
@@ -151,7 +143,6 @@ func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
 
 func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     // Get widget id
     id := getUrlQuery(r.URL, "id")
@@ -159,7 +150,7 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
     // Get widget data
     widget, key, err := getWidget(id, c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -188,10 +179,7 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
         }
 
         // Render page
-        err = page.Render("admin/widget", w)
-        if err != nil {
-            serveError(c, w, err)
-        }
+        page.Render("admin/widget", w)
 
         return
     }
@@ -200,7 +188,7 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
 
     // Parse form data
     if err := r.ParseForm(); err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -215,14 +203,14 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
 
     // Save to datastore
     if err := widget.update(key, c); err != nil {
-      serveError(c, w, err)
+        serveError(w, err)
+        return
     }
     http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
 }
 
 func handleWidgetDelete(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     // Get widget id
     id := getUrlQuery(r.URL, "id")
@@ -230,11 +218,14 @@ func handleWidgetDelete(w http.ResponseWriter, r *http.Request) {
     // Get widget data
     _, key, err := getWidget(id, c)
     if err != nil {
-      serveError(c, w, err)
-      return
+        serveError(w, err)
+        return
     }
 
-    datastore.Delete(c, key)
+    if err = datastore.Delete(c, key); err != nil {
+        serveError(w, err)
+        return
+    }
 
     http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
 }

@@ -4,7 +4,7 @@ import (
     "net/http"
     "time"
     "strconv"
-
+    "fmt"
     "appengine"
     "appengine/datastore"
 )
@@ -55,9 +55,19 @@ func getArticlesPerPage(offset, pageSize int, c appengine.Context) (articles []A
 /*
  * Article handler
  */
+
+/*
+ * Decode markdown code
+ *
+ * @return (string) 
+ */
+func handleDecodeContent(w http.ResponseWriter, r *http.Request) {
+    content := []byte(r.FormValue("content"))
+    fmt.Fprint(w, decodeMD(content))
+}
+
 func handleArticleList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     // Get page id, pageSize
     pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
@@ -69,7 +79,7 @@ func handleArticleList(w http.ResponseWriter, r *http.Request) {
     // Get article data
     articles, err := getArticlesPerPage(offset, pageSize, c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -99,11 +109,7 @@ func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
         }
 
         // Render page
-        err := page.Render("admin/article", w)
-        if err != nil {
-            serveError(c, w, err)
-            return
-        }
+        page.Render("admin/article", w)
 
         return
     }
@@ -112,7 +118,7 @@ func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
 
     // Parse form data
     if err := r.ParseForm(); err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -133,7 +139,7 @@ func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
 
     // Save to datastore
     if err := article.save(c); err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
     }
 
     http.Redirect(w, r, "/admin/article-list", http.StatusFound)
@@ -148,7 +154,7 @@ func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
     // Get article data
     article, key, err := getArticle(id, c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -170,17 +176,15 @@ func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
         }
 
         // Render page
-        err = page.Render("admin/article", w)
-        if err != nil {
-            serveError(c, w, err)
-        }
+        page.Render("admin/article", w)
+
         return
     }
 
     // Process post data
 
     if err := r.ParseForm(); err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -192,7 +196,8 @@ func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
     article.Content = []byte(r.FormValue("content"))
 
     if err := article.update(key, c); err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
+        return
     }
 
     http.Redirect(w, r, "/admin/article-list", http.StatusFound)
@@ -207,11 +212,14 @@ func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
     // Get article data
     _, key, err := getArticle(id, c)
     if err != nil {
-      serveError(c, w, err)
-      return
+        serveError(w, err)
+        return
     }
 
-    datastore.Delete(c, key)
+    if err = datastore.Delete(c, key); err != nil {
+        serveError(w, err)
+        return
+    }
 
     http.Redirect(w, r, "/admin/article-list", http.StatusFound)
 }
@@ -228,7 +236,7 @@ func handleArticleView(w http.ResponseWriter, r *http.Request) {
     // Get article data
     article, _, err := getArticle(id, c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
     // Check article is exists
@@ -240,7 +248,7 @@ func handleArticleView(w http.ResponseWriter, r *http.Request) {
     // Get widget data
     widgets, err := getWidgets(c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 

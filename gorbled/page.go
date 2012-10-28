@@ -7,7 +7,6 @@ import (
     "appengine"
     "appengine/datastore"
     "strings"
-
     "other_package/blackfriday"
 )
 
@@ -64,78 +63,79 @@ var funcMap = template.FuncMap{
  * 计算页面导航序号
  */
 func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (offset int, pageNav PageNav) {
-  NavLen := config.NavLen
+    NavLen := config.NavLen
 
-  dbQuery  := datastore.NewQuery(kind)
-  count, _ := dbQuery.Count(c)
-  pageNums := (count / pageSize)
-  if count % pageSize != 0 {
-    pageNums++
-  }
-  if pageId <= 0 || pageId > pageNums {
-    pageId = 1
-  }
-  offset = (pageId - 1) * pageSize
-
-  pageHalfLen := (NavLen / 2)
-  if NavLen / 2 != 0 {
-    pageHalfLen++
-  }
-
-  var start, length, nextId, prevId int
-  var prev, next, showIDs bool
-
-  switch {
-    case pageNums <= NavLen :
-      start = 1
-      prev = false
-      length = pageNums
-      next = false
-    case pageId <= pageHalfLen :
-      start = 1
-      prev = false
-      length = NavLen
-      next = true
-      nextId = NavLen + 1
-    case pageId + pageHalfLen >= pageNums :
-      start = pageNums - NavLen
-      prev = true
-      prevId = start - 1
-      length = NavLen
-      next = false
-    default :
-      start = pageId - pageHalfLen + 1
-      prev = true
-      prevId = start - 1
-      length = NavLen
-      next = true
-      nextId = start + length
-  }
-
-  var ids = make([]PageId, length)
-  for i:=0;i<length;i++{
-    ids[i].Id=i+start
-    if ids[i].Id == pageId {
-      ids[i].Current = true
-    } else {
-      ids[i].Current = false
+    dbQuery  := datastore.NewQuery(kind)
+    count, _ := dbQuery.Count(c)
+    pageNums := (count / pageSize)
+    if count % pageSize != 0 {
+        pageNums++
     }
-  }
-  if length>1 {
-    showIDs = true
-  } else {
-    showIDs = false
-  }
+    if pageId <= 0 || pageId > pageNums {
+        pageId = 1
+    }
+    offset = (pageId - 1) * pageSize
 
-  pageNav = PageNav {
-    ShowPrev      : prev,
-    ShowNext      : next,
-    ShowIDs       : showIDs,
-    NextPageID    : nextId,
-    PrevPageID    : prevId,
-    PageIDs       : ids,
-  }
-  return
+    pageHalfLen := (NavLen / 2)
+    if NavLen / 2 != 0 {
+        pageHalfLen++
+    }
+
+    var start, length, nextId, prevId int
+    var prev, next, showIDs bool
+
+    switch {
+        case pageNums <= NavLen :
+            start = 1
+            prev = false
+            length = pageNums
+            next = false
+        case pageId <= pageHalfLen :
+            start = 1
+            prev = false
+            length = NavLen
+            next = true
+            nextId = NavLen + 1
+        case pageId + pageHalfLen >= pageNums :
+            start = pageNums - NavLen
+            prev = true
+            prevId = start - 1
+            length = NavLen
+            next = false
+        default :
+            start = pageId - pageHalfLen + 1
+            prev = true
+            prevId = start - 1
+            length = NavLen
+            next = true
+            nextId = start + length
+    }
+
+    var ids = make([]PageId, length)
+    for i:=0; i < length;i++{
+        ids[i].Id = i+start
+        if ids[i].Id == pageId {
+            ids[i].Current = true
+        } else {
+            ids[i].Current = false
+        }
+    }
+    if length > 1 {
+        showIDs = true
+    } else {
+        showIDs = false
+    }
+
+    pageNav = PageNav {
+        ShowPrev      : prev,
+        ShowNext      : next,
+        ShowIDs       : showIDs,
+        NextPageID    : nextId,
+        PrevPageID    : prevId,
+        PageIDs       : ids,
+    }
+
+    return
 }
 
 /*
@@ -148,7 +148,7 @@ func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (off
  */
 func (page *Page) Render(pageFilePath string, w http.ResponseWriter) (err error) {
     base := "gorbled/templates/" + config.Theme + "/"
-
+    
     if strings.Contains(pageFilePath, "admin") {
         base = "gorbled/admin/"
         pageFilePath = strings.Replace(pageFilePath, "admin/", "", -1)
@@ -161,9 +161,14 @@ func (page *Page) Render(pageFilePath string, w http.ResponseWriter) (err error)
     )
 
     if err != nil {
+        serveError(w, err)
         return
     }
 
-    tmpl.Execute(w, page)
+    if err = tmpl.Execute(w, page); err != nil {
+        serveError(w, err)
+        return
+    }
+
     return
 }

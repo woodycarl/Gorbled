@@ -1,40 +1,42 @@
 {{define "content"}}
 <h2>{{.Title}}</h2>
 <hr />
-
+<form action="/admin/config" method="post">
 <table class="table table-striped">
 <tbody>
 
     <tr>
         <th>站点标题</th>
-        <td>{{.Config.Title}}</td>
+        <td><input type="text" name="title" class="" placeholder="Title" value="{{.Config.Title}}" /></td>
     </tr>
 
     <tr>
         <th>站点描述</th>
-        <td>{{.Config.Description}}</td>
+        <td><input type="text" name="description" class="" placeholder="Description" value="{{.Config.Description}}" /></td>
     </tr>
 
     <tr>
         <th>每页显示文章数</th>
-        <td>{{.Config.Articles}}</td>
+        <td><input type="text" name="articles" class="" placeholder="Articles Per Page" value="{{.Config.Articles}}" /></td>
     </tr>
 
     <tr>
         <th>管理每页显示文章数</th>
-        <td>{{.Config.AdminArticles}}</td>
+        <td><input type="text" name="admin-articles" class="" placeholder="Articles Per Page" value="{{.Config.AdminArticles}}" /></td>
     </tr>
 
     <tr>
         <th>管理每页显示widget数</th>
-        <td>{{.Config.AdminWidgets}}</td>
+        <td><input type="text" name="admin-widgets" class="" placeholder="Widgets Per Page" value="{{.Config.AdminWidgets}}" /></td>
     </tr>
 
     <tr>
         <th>时区</th>
-        <td>{{.Config.TimeZone}}</td>
+        <td><input type="text" name="timezone" class="" placeholder="Timezone" value="{{.Config.TimeZone}}" /></td>
     </tr>
 
 </tbody>
 </table>
+<div><input type="submit" value="Submit" class="btn"/> <input type="reset" value="Reset" class="btn" /></div>
+</form>
 {{end}}

@@ -3,27 +3,12 @@ package gorbled
 import (
     "fmt"
     "net/url"
-    "net/http"
+    //"net/http"
 
     "appengine"
     "appengine/datastore"
     "time"
 )
-
-func init() {
-    http.HandleFunc("/decodeContent", handleDecodeContent)
-}
-
-/*
- * Decode markdown code
- *
- * @return (string) 
- */
-func handleDecodeContent(w http.ResponseWriter, r *http.Request) {
-    content := []byte(r.FormValue("content"))
-    fmt.Fprint(w, decodeMD(content))
-}
-
 
 /*
  * Generate ID

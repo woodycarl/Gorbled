@@ -87,10 +87,7 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
         }
 
         // Render page
-        err := page.Render("admin/config", w)
-        if err != nil {
-            serveError(c, w, err)
-        }
+        page.Render("admin/config", w)
 
         return
     }
@@ -98,14 +95,14 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
     // Process post data
 
     if err := r.ParseForm(); err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
     // Get config
     config, key, err := getConfig(c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
@@ -115,14 +112,21 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
     config.Articles, _ = strconv.Atoi(r.FormValue("articles"))
     config.AdminArticles, _ = strconv.Atoi(r.FormValue("admin-articles"))
     config.AdminWidgets, _ = strconv.Atoi(r.FormValue("admin-widgets"))
-    config.Theme = r.FormValue("theme")
+    config.Theme = checkTheme(r.FormValue("theme"))
     config.TimeZone, _ = strconv.ParseFloat(r.FormValue("timezone"), 64)
 
     if err := config.update(key, c); err != nil {
-      serveError(c, w, err)
+      serveError(w, err)
     }
 
     http.Redirect(w, r, "/admin/config", http.StatusFound)
+}
+
+func checkTheme(s string) string {
+    if s == "" {
+        return "default"
+    }
+    return s
 }
 
 /*

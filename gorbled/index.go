@@ -3,7 +3,7 @@ package gorbled
 import (
     "net/http"
     "strconv"
-
+    //"fmt"
     "appengine"
 )
 
@@ -23,14 +23,14 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
     // Get article data
     articles, err := getArticlesPerPage(offset, pageSize, c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 
     // Get widget data
     widgets, err := getWidgets(c)
     if err != nil {
-        serveError(c, w, err)
+        serveError(w, err)
         return
     }
 

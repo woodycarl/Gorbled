@@ -7,11 +7,6 @@ import (
     "appengine/user"
 )
 
-func init() {
-    http.HandleFunc("/login", handleUserLogin)
-    http.HandleFunc("/logout", handleUserLogout)
-}
-
 type User struct {
     Nickname    string
     Email       string
@@ -20,33 +15,39 @@ type User struct {
 }
 
 /*
- * Redirect to user login
+ * Login and Redirect to previous page
  *
- * @param c   (appengine.Context)
- * @param url (string)
  */
 func handleUserLogin(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
 
     url := r.Referer()
-    loginUrl, _  := user.LoginURL(c, url)
+    loginUrl, err := user.LoginURL(c, url)
+    if err != nil {
+        serveError(w, err)
+        return
+    }
+    
     http.Redirect(w, r, loginUrl, http.StatusFound)
 }
 
 /*
- * Redirect to user logout
+ * Logout and Redirect to previous page
  *
- * @param c   (appengine.Context)
- * @param url (string)
  */
 func handleUserLogout(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
 
     url := r.Referer()
-    if strings.Contains(url, "admin") {
+    if strings.Contains(r.URL.Path, "admin") {
       url = "/"
     }
-    logoutUrl, _ := user.LogoutURL(c, url)
+    logoutUrl, err := user.LogoutURL(c, url)
+    if err != nil {
+        serveError(w, err)
+        return
+    }
+
     http.Redirect(w, r, logoutUrl, http.StatusFound)
 }
 
@@ -60,7 +61,12 @@ func handleUserLogout(w http.ResponseWriter, r *http.Request) {
 func getUserInfo(c appengine.Context) User {
     u := user.Current(c)
     if u != nil {
-        return User{ Nickname: u.String(), Email: u.Email, IsAdmin: user.IsAdmin(c), IsLogin: true}
+        return User { 
+                Nickname: u.String(), 
+                Email: u.Email, 
+                IsAdmin: user.IsAdmin(c), 
+                IsLogin: true,
+            }
     }
 
     return User{}
