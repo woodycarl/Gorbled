@@ -76,7 +76,7 @@ func getWidgetsPerPage(offset, pageSize int,
  */
 func handleWidgetList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     // Get page id, pageSize
     pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
@@ -106,7 +106,7 @@ func handleWidgetList(w http.ResponseWriter, r *http.Request) {
 
 func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     if r.Method != "POST" {
         // Show widget add page
@@ -154,7 +154,7 @@ func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
 
 func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     // Get widget id
     id := getUrlQuery(r.URL, "id")
@@ -225,7 +225,7 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
 
 func handleWidgetDelete(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     // Get widget id
     id := getUrlQuery(r.URL, "id")

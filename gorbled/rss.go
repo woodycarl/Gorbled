@@ -14,11 +14,11 @@ func init() {
 }
 
 /*
- * Article handler
+ * RSS handler
  */
 func handleRSS(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     var articles []Article
     _, err := datastore.NewQuery("Article").Order("-Date").GetAll(c, &articles)

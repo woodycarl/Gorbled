@@ -39,8 +39,6 @@ type Config struct {
     Version             float64
 }
 
-var config Config
-
 func (config *Config) save(c appengine.Context) (err error) {
     _, err = datastore.Put(c, datastore.NewIncompleteKey(c, "Config", nil), config)
 
@@ -55,11 +53,10 @@ func (config *Config) update(key *datastore.Key, c appengine.Context) (err error
 
 func getConfig(c appengine.Context) (config Config, key *datastore.Key, err error) {
     dbQuery := datastore.NewQuery("Config")
-    var configs []Config
-    keys, err := dbQuery.GetAll(c, &configs)
-    if len(configs) > 0 {
-        config = configs[0]
+    keys, err := dbQuery.GetAll(c, nil)
+    if len(keys) > 0 {
         key    = keys[0]
+        datastore.Get(c, key, config)
     }
 
     return
@@ -132,7 +129,7 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
 /*
  * Init system
  */
-func initSystem(c appengine.Context) {
+func initSystem(c appengine.Context) (config Config) {
     config = getJsonConfig()
     config.save(c)
 
@@ -157,12 +154,16 @@ func initSystem(c appengine.Context) {
 /*
  * Init config
  */
-func initConfig(r *http.Request) {
+func initConfig(r *http.Request) (config Config) {
     c := appengine.NewContext(r)
     config, _, _ = getConfig(c)
     if config.Title == "" {
-        initSystem(c)
+        config = initSystem(c)
     }
     config.BaseUrl = "http://" + r.Host
     return
 }
+
+var r, _ = http.NewRequest("GET", "http://google.com", nil)
+
+var config = initConfig(r)

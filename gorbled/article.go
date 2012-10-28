@@ -66,7 +66,7 @@ func getArticlesPerPage(offset, pageSize int, c appengine.Context) (articles []A
  */
 func handleArticleList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     // Get page id, pageSize
     pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
@@ -96,7 +96,7 @@ func handleArticleList(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     if r.Method != "POST" {
         // Show article add page
@@ -151,7 +151,7 @@ func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     // Get article id
     id := getUrlQuery(r.URL, "id")
@@ -211,7 +211,7 @@ func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     // Get article id
     id := getUrlQuery(r.URL, "id")
@@ -230,7 +230,7 @@ func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleView(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initConfig(r)
+    
 
     // Get article id
     id := getUrlQuery(r.URL, "id")
