@@ -12,13 +12,11 @@ import (
     "strconv"
 )
 
-func init() {
-    http.HandleFunc("/admin/config", handleConfigEdit)
-}
-
 const (
     CONFIG_FILE_PATH = "config.json"
 )
+
+var config Config
 
 type Config struct {
     Title               string
@@ -53,10 +51,11 @@ func (config *Config) update(key *datastore.Key, c appengine.Context) (err error
 
 func getConfig(c appengine.Context) (config Config, key *datastore.Key, err error) {
     dbQuery := datastore.NewQuery("Config")
-    keys, err := dbQuery.GetAll(c, nil)
+    var configs []Config
+    keys, err := dbQuery.GetAll(c, &configs)
     if len(keys) > 0 {
         key    = keys[0]
-        datastore.Get(c, key, config)
+        config = configs[0]
     }
 
     return
@@ -78,13 +77,6 @@ func getJsonConfig() (config Config) {
 func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
 
-    // Get config
-    config, key, err := getConfig(c)
-    if err != nil {
-        serveError(c, w, err)
-        return
-    }
-
     if r.Method != "POST" {
         // Show article edit page
 
@@ -95,7 +87,7 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
         }
 
         // Render page
-        err = page.Render("admin/config", w)
+        err := page.Render("admin/config", w)
         if err != nil {
             serveError(c, w, err)
         }
@@ -110,7 +102,14 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // 更新并存储config数据
+    // Get config
+    config, key, err := getConfig(c)
+    if err != nil {
+        serveError(c, w, err)
+        return
+    }
+
+    // Update config data
     config.Title = r.FormValue("title")
     config.Description = r.FormValue("description")
     config.Articles, _ = strconv.Atoi(r.FormValue("articles"))
@@ -156,14 +155,10 @@ func initSystem(c appengine.Context) (config Config) {
  */
 func initConfig(r *http.Request) (config Config) {
     c := appengine.NewContext(r)
-    config, _, _ = getConfig(c)
-    if config.Title == "" {
+    config, _, err := getConfig(c)
+    if err != nil || config.Title == "" {
         config = initSystem(c)
     }
     config.BaseUrl = "http://" + r.Host
     return
 }
-
-var r, _ = http.NewRequest("GET", "http://google.com", nil)
-
-var config = initConfig(r)

@@ -9,15 +9,6 @@ import (
     "appengine/datastore"
 )
 
-func init() {
-    http.HandleFunc("/admin/article-list",   handleArticleList)
-    http.HandleFunc("/admin/article-add",    handleArticleAdd)
-    http.HandleFunc("/admin/article-edit",   handleArticleEdit)
-    http.HandleFunc("/admin/article-delete", handleArticleDelete)
-
-    http.HandleFunc("/article", handleArticleView)
-}
-
 /*
  * Article data struct
  */
@@ -96,7 +87,6 @@ func handleArticleList(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     if r.Method != "POST" {
         // Show article add page
@@ -151,7 +141,6 @@ func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     // Get article id
     id := getUrlQuery(r.URL, "id")
@@ -211,7 +200,6 @@ func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     // Get article id
     id := getUrlQuery(r.URL, "id")
@@ -230,7 +218,6 @@ func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleView(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     // Get article id
     id := getUrlQuery(r.URL, "id")

@@ -9,10 +9,7 @@ import (
 )
 
 func init() {
-    http.HandleFunc("/admin/widget-list",   handleWidgetList)
-    http.HandleFunc("/admin/widget-add",    handleWidgetAdd)
-    http.HandleFunc("/admin/widget-edit",   handleWidgetEdit)
-    http.HandleFunc("/admin/widget-delete", handleWidgetDelete)
+
 }
 
 /*

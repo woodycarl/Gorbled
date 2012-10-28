@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-    http.HandleFunc("/rss.xml", handleRSS)
+    
 }
 
 /*

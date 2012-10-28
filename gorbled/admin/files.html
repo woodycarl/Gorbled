@@ -5,52 +5,176 @@
 <script src="/static/js/jquery.js"></script>
 <script src="/static/js/bootstrap-tab.js"></script>
 <script src="/static/js/bootstrap-modal.js"></script>
+<script src="/admin/static/js/file-upload.js"></script>
 <script>
+
+var files = [];
+var filesUpload = [];
+var fileEdit;
+var uploadUrls =[];
+
 $(document).ready(function(){
 
     initFileList(1);
-
-    $("#btn-file-upload").click(function(){
-
-        var file = document.getElementById('file').files[0];  //获取文件对象
-        var upload_url = $("#file").attr("upload_url"); // 接收上传文件的后台地址 
-
-        
-        // FormData 对象
-        var form = new FormData();
-        form.append("file", file);  // 文件对象
-
-        // XMLHttpRequest 对象
-        var xhr = new XMLHttpRequest();
-        xhr.open("post", upload_url, true);
-
-        xhr.send(form);
-
-        initFileList(1);
+    
+    $("#file-edit-modal .cancel").live("click",function(){
+        $("#file-edit-modal .preview").html("");
+        $("#file-edit-modal .message").html("");
     });
 
 });
 
-function initFileList(pid){
-    $.getJSON('/admin/file-new-url', function(message) {
+/*
+ * Upload Modal
+ *
+ */
+function showUploadModal(){
+    filesUpload = document.getElementById('file').files;
+    initUploadList();
+}
+
+function initUploadList(){
+    if (filesUpload.length>0){
+        $("#file-upload-modal").modal('show');
+        var filesInfo = [];
+
+        for (var i = 0; i < filesUpload.length; i++) {
+            filesInfo.push('<tr><td>'+(i+1)+'</td><td>preview</td><td>'+filesUpload[i].name+'</td><td><a href="javascript:void(0)" onclick="deleteUploadFile('+i+');" class="btn"><i class="icon-trash"></i> </a></td></tr>');
+        };
+
+        $("#file-upload-modal .file-data").html(filesInfo.join(''));
+    } else {
+        $("#file-upload-modal").modal('hide');
+    }
+}
+
+function uploadFiles(){
+    $("#file-upload-modal .message").html("Uploading...");
+    $.getJSON('/admin/file-new-url?num='+filesUpload.length, function(message) {
+        // Get uploadUrls
         if (message.Success) {
-            //upload_url = message.Data;
-            $("#file").attr("upload_url",message.Data);
+            uploadUrls = jQuery.parseJSON(message.Data);
+            for (var i = 0; i < filesUpload.length; i++) {
+                // FormData 对象
+                var form = new FormData();
+                form.append("file", filesUpload[i]);
+
+                // XMLHttpRequest 对象
+                var xhr = new XMLHttpRequest();
+                xhr.overrideMimeType("text/html;charset=utf-8");
+
+                if (i<filesUpload.length-1){
+                    xhr.open("post", uploadUrls[i], true);
+                } else {
+                    xhr.open("post", uploadUrls[i], false);
+                }
+
+                //xhr.open("post", uploadUrls[i], false);
+                xhr.send(form);
+            };
+
+            initFileList(1);
+            $("#file-upload-modal").modal('hide');
         }
+        $("#file-upload-modal .message").html(message.Info);
+    });
+}
+
+function deleteUploadFile(i){
+    var tmp = filesUpload;
+    filesUpload = [];
+
+    for(var j=0,n=0;j<tmp.length;j++){
+        if(j!=i){
+            filesUpload[n]=tmp[j];
+            n++;
+        }
+    }
+    initUploadList();
+}
+
+/*
+ * Edit Modal
+ *
+ */
+function initEditModal(id){
+    fileEdit = files[id];
+
+    var type = fileEdit.Type;
+    var src = '/file?key='+fileEdit.ID;
+
+    $("#file-edit-modal .preview").html(getPreview(type, src));
+    $("#file-edit-modal .description").val(fileEdit.Description);
+    $("#file-edit-modal .name").val(fileEdit.Name);
+    $("#file-edit-modal .message").html("");
+}
+
+function getPreview(type, src){
+    var preview;
+    if (type.indexOf("image") != -1) {
+        preview = '<img src="'+src+'" style="max-height:500px;width:auto;" />';
+    } else if (type.indexOf("audio") != -1) {
+        preview = '<audio src="'+src+'" type="audio/mp3" width="510" height="35" controls="controls" ></audio>';
+    } else if (type.indexOf("video") != -1) {
+        preview = '<video src="'+src+'" width="510" height="340" controls="controls"></video>';
+    } else {
+        preview = '<img src="/static/img/readme.png" style="max-height:500px;width:auto;" />';
+    }
+    return preview;
+}
+
+function saveEditFile(){
+    var name = $("#file-edit-modal .name").val();
+    var description = $("#file-edit-modal .description").val();
+    if (name != "" && (name != fileEdit.Name || description != fileEdit.Description)){
+        $.post("/admin/file-edit?id="+fileEdit.ID,{name:name,description:description},function(message){
+            $(".message-info").html(message.Info);
+            $("#file-edit-modal").modal("hide");
+            initFileList(1);
+        });
+        $("#file-edit-modal .message").html("Save changes...");
+    } else {
+        $("#file-edit-modal .message").html("Make some changes!");
+    }
+}
+
+/*
+ * Delete file
+ *
+ */
+function deleteFile(id, pid){
+    fileDelete = files[id];
+    $.post("/admin/file-delete?id="+fileDelete.ID, function(message){
+        initFileList(pid);
         $(".message-info").html(message.Info);
     });
+    $(".message-info").html("delete file...");
+}
 
+/*
+ * File List
+ *
+ */
+function initFileList(pid){
+    uploadUrls =[];
+    filesUpload = [];
+    files = [];
+
+    // Get data from server by page id
     $.getJSON("/admin/file-data?pid="+pid, function(message) {
         if (message.Success) {
             var page = jQuery.parseJSON(message.Data);
+            files = page.Files;
+            
+            // Insert file data to table
             var filesInfo = [];
-
             $.each(page.Files, function(i, file) {
-                filesInfo.push('<tr><td>'+(i+1+(pid-1)*{{.Config.AdminFiles}})+'</td><td>preview</td><td>'+file.ID+'</td><td>'+file.Date+'</td><td><a href="/admin/file-edit?id='+file.ID+'" class="btn"><i class="icon-pencil"></i> Edit</a><a href="/admin/file-delete?id='+file.ID+'" class="btn"><i class="icon-trash"></i> Delete</a></td></tr>');
+                fileNum = (i+1+(pid-1)*{{.Config.AdminFiles}});
+                filesInfo.push('<tr class="file" fileid="'+i+'"><td class="num">'+fileNum+'</td><td class="name">'+getFileIcon(file.Type)+' <a href="/file?key='+file.ID+'" target="blank">'+file.Name+'</a></td><td class="date">'+file.Date+'</td><td class="Operations"><a data-toggle="modal" onclick="initEditModal('+i+');" href="#file-edit-modal" class="btn edit"><i class="icon-pencil"></i> Edit</a><a href="javascript:void(0)" onclick="deleteFile('+i+','+pid+');" class="btn"><i class="icon-trash"></i> Delete</a></td></tr>');
             });
+            $("#file-list .file-data").html(filesInfo.join(''));
 
-            $(".file-data").html(filesInfo.join(''));
-
+            // Insert nav data
             var navInfo = [];
             $(".pageination .pager").html("");
             if (page.Nav.ShowPrev) {
@@ -70,33 +194,52 @@ function initFileList(pid){
                 navInfo.push('<li class="next"><a href="javascript:void(0)" onclick="initFileList('+page.Nav.NextPageID+');">Newer &rarr;</a></li>');
             }
             $(".pageination .pager").html(navInfo.join(''));
-        }
 
-        $(".message-info").append(message.Info);
+        } else {
+            // If err, clear 
+            $("#file-list .file-data").html("");
+        }
+        // Show server message
+        $(".message-info").html(message.Info);
     });
 }
 
+function getFileIcon(type){
+    var content;
+
+    if (type.indexOf("image") != -1) {
+        content = 'picture';
+    } else if (type.indexOf("audio") != -1) {
+        content = 'music';
+        // headphones | music
+    } else if (type.indexOf("video") != -1) {
+        content = 'facetime-video'; 
+        // film | facetime-video
+    } else if (type.indexOf("application/octet-stream") != -1) {
+        content = 'gift'; 
+        // calendar | th-list | gift
+    } else {
+        content = 'file';
+    }
+
+    return '<i class="icon-'+content+'"></i>';
+}
 
 </script>
 <link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
 
-<div class=" " id="file-list">
-    <span class="btn btn-success fileinput-button">
-        <i class="icon-plus icon-white"></i>
-        <span>Add</span>
-        <input id="file" type="file" name="file" >
-    </span>
-    <button id="btn-file-upload" class="btn btn-primary start">
+<div id="file-list">
+    <span class="btn btn-primary fileinput-button">
         <i class="icon-upload icon-white"></i>
         <span>Upload</span>
-    </button>
+        <input id="file" type="file" name="file" multiple onchange="showUploadModal();">
+    </span>
 
     <table class="table table-striped">
       <thead>
           <tr>
               <th>Num</th>
-              <th>Preview</th>
-              <th>Title</th>
+              <th>File Name</th>
               <th>Date</th>
               <th>Operations</th>
           </tr>
@@ -113,35 +256,52 @@ function initFileList(pid){
 
 <div id="file-edit-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-edit-modal-Label" aria-hidden="true">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="previewModalLabel">File Edit</h3>
+    <button type="button" class="close cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>File Edit</h3>
+  </div>
+  <div class="modal-body">
+    <div class="preview" style="text-align:center;">Preview</div>
+    <table class="table table-striped">
+      <tbody>
+          <tr>
+            <th>File Name</th>
+            <td><input type="text" class="name" placeholder="File Name" value="" /></td></tr>
+          <tr>
+            <th>File Description</th>
+            <td><input type="text" class="description" placeholder="File Description" value="" /></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <div class="message" style="float:left;"></div>
+    <button class="btn cancel" data-dismiss="modal">Close</button>
+    <button class="btn btn-primary" onclick="saveEditFile();">Save changes</button>
+  </div>
+</div>
+
+<div id="file-upload-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-upload-modal-Label" data-dismiss="modal" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close cancel" aria-hidden="true">&times;</button>
+    <h3>Upload File List</h3>
   </div>
   <div class="modal-body">
     <table class="table table-striped">
       <thead>
           <tr>
-              <th>Title</th>
-              <th>Date</th>
+              <th>Num</th>
+              <th>Preview</th>
+              <th>File Name</th>
               <th>Operations</th>
           </tr>
       </thead>
-      <tbody>
-          <tr>
-              <td>test.jpg</td>
-              <td>1986-12-16</td>
-              <td>
-                  <a href="/admin/file-edit?id= " class="btn"><i class="icon-pencil"></i> Edit</a>
-                  <a href="/admin/file-delete?id= " class="btn"><i class="icon-trash"></i> Delete</a>
-              </td>
-          </tr>
-      </tbody>
+      <tbody class="file-data"></tbody>
     </table>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">Close</button>
-    <button class="btn btn-primary" id="save-changes">Save changes</button>
+    <div class="message" style="float:left;"></div>
+    <button class="btn cancel" data-dismiss="modal">Cancel</button>
+    <button class="btn btn-primary" onclick="uploadFiles();">Upload Files</button>
   </div>
 </div>
-
 
 {{end}}

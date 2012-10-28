@@ -14,16 +14,7 @@ import (
 )
 
 func init() {
-    http.HandleFunc("/admin/file-list", handleFileList)
 
-    http.HandleFunc("/admin/file-edit", handleFileEdit)
-
-    http.HandleFunc("/file", handleFileGet)
-
-    http.HandleFunc("/admin/file-new-url", handleFileNewUrl)
-    http.HandleFunc("/admin/file-upload", handleFileUpload)
-    http.HandleFunc("/admin/file-delete", handleFileDelete)
-    http.HandleFunc("/admin/file-data", handleFileData)
 }
 
 /*
@@ -94,16 +85,6 @@ func decodeFile(s string) (f File, err error) {
 }
 
 /*
-func decodeMessage(s string) (m Message, err error) {
-    dec := json.NewDecoder(strings.NewReader(s))
-    err = dec.Decode(&m)
-    return
-}
-
-*/
-
-
-/*
  * File handler
  */
 
@@ -134,20 +115,6 @@ func handleFileNewUrl(w http.ResponseWriter, r *http.Request) {
 func handleFileUpload(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
     
-/*  
-    m := new(Message)
-    if blobs, _, err := blobstore.ParseUpload(r); err != nil {
-        m.Success = false
-        m.Info = "Error: blobstore.ParseUpload"
-    } else {
-        fileInfo := blobs["file"]
-        file := initFile(fileInfo[0])
-        file.save(c)
-        m.Success = true
-        m.Info = "File Upload!"
-    }
-    fmt.Fprint(w, m.encode())
-*/
     blobs, _, _ := blobstore.ParseUpload(r)
 
     fileInfo := blobs["file"]
@@ -251,7 +218,6 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 
 func handleFileList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    
 
     // Get page id, pageSize
     pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
@@ -261,11 +227,11 @@ func handleFileList(w http.ResponseWriter, r *http.Request) {
     offset, nav := getPageNav("File", pageId, pageSize, c)
 
     // Get file data
-    files, _ := getFilesPerPage(offset, pageSize, c)
-    /*if err != nil {
+    files, err := getFilesPerPage(offset, pageSize, c)
+    if err != nil {
         serveError(c, w, err)
         return
-    }*/
+    }
 
     // New Page
     page := Page {
