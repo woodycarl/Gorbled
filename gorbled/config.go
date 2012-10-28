@@ -114,9 +114,14 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
     config.AdminWidgets, _ = strconv.Atoi(r.FormValue("admin-widgets"))
     config.Theme = checkTheme(r.FormValue("theme"))
     config.TimeZone, _ = strconv.ParseFloat(r.FormValue("timezone"), 64)
+    config.Version, _ = strconv.ParseFloat(r.FormValue("version"), 64)
+    config.Disqus = r.FormValue("disqus")
+    config.GoogleAnalytics = r.FormValue("google-analytics")
+
 
     if err := config.update(key, c); err != nil {
       serveError(w, err)
+      return
     }
 
     http.Redirect(w, r, "/admin/config", http.StatusFound)
