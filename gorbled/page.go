@@ -61,6 +61,9 @@ var funcMap = template.FuncMap{
 
 /*
  * 计算页面导航序号
+ *
+ * <<       2       3   ...   x             >>
+ * prev     ids[0]  ids[1]    ids[NavLen-1] next
  */
 func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (offset int, pageNav PageNav) {
     NavLen := config.NavLen
@@ -146,7 +149,7 @@ func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (off
  *
  * @return (error)
  */
-func (page *Page) Render(pageFilePath string, w http.ResponseWriter) (err error) {
+func (page *Page) Render(pageFilePath string, w http.ResponseWriter) {
     base := "gorbled/templates/" + config.Theme + "/"
     
     if strings.Contains(pageFilePath, "admin") {
@@ -170,5 +173,4 @@ func (page *Page) Render(pageFilePath string, w http.ResponseWriter) (err error)
         return
     }
 
-    return
 }
