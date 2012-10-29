@@ -2,10 +2,88 @@
 <h2>{{.Title}}</h2>
 <hr />
 
+
+<link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
+
+<div id="file-list">
+    <span class="btn btn-primary fileinput-button">
+        <i class="icon-upload icon-white"></i>
+        <span>Upload</span>
+        <input id="file" type="file" name="file" multiple onchange="showUploadModal();">
+    </span>
+
+    <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Num</th>
+              <th>File Name</th>
+              <th>Date</th>
+              <th>Operations</th>
+          </tr>
+      </thead>
+      <tbody class="file-data"></tbody>
+    </table>
+
+    <div class="pageination">
+        <ul class="pager"></ul>
+    </div>
+</div>
+
+<div class="message-info"></div>
+
+<div id="file-edit-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-edit-modal-Label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>File Edit</h3>
+  </div>
+  <div class="modal-body">
+    <div class="preview" style="text-align:center;">Preview</div>
+    <table class="table table-striped">
+      <tbody>
+          <tr>
+            <th>File Name</th>
+            <td><input type="text" class="name" placeholder="File Name" value="" /></td></tr>
+          <tr>
+            <th>File Description</th>
+            <td><input type="text" class="description" placeholder="File Description" value="" /></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <div class="message" style="float:left;"></div>
+    <button class="btn cancel" data-dismiss="modal">Close</button>
+    <button class="btn btn-primary" onclick="saveEditFile();">Save changes</button>
+  </div>
+</div>
+
+<div id="file-upload-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-upload-modal-Label" data-dismiss="modal" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close cancel" aria-hidden="true">&times;</button>
+    <h3>Upload File List</h3>
+  </div>
+  <div class="modal-body">
+    <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Num</th>
+              <th>Preview</th>
+              <th>File Name</th>
+              <th>Operations</th>
+          </tr>
+      </thead>
+      <tbody class="file-data"></tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <div class="message" style="float:left;"></div>
+    <button class="btn cancel" data-dismiss="modal">Cancel</button>
+    <button class="btn btn-primary" onclick="uploadFiles();">Upload Files</button>
+  </div>
+</div>
+
 <script src="/static/js/jquery.js"></script>
-<script src="/static/js/bootstrap-tab.js"></script>
 <script src="/static/js/bootstrap-modal.js"></script>
-<script src="/static/js/file-upload.js"></script>
+<!--<script src="/static/js/file-upload.js"></script>-->
 <script>
 
 var files = [];
@@ -156,7 +234,7 @@ function deleteFile(id, pid){
  *
  */
 function initFileList(pid){
-    uploadUrls =[];
+    uploadUrls = [];
     filesUpload = [];
     files = [];
 
@@ -226,82 +304,4 @@ function getFileIcon(type){
 }
 
 </script>
-<link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
-
-<div id="file-list">
-    <span class="btn btn-primary fileinput-button">
-        <i class="icon-upload icon-white"></i>
-        <span>Upload</span>
-        <input id="file" type="file" name="file" multiple onchange="showUploadModal();">
-    </span>
-
-    <table class="table table-striped">
-      <thead>
-          <tr>
-              <th>Num</th>
-              <th>File Name</th>
-              <th>Date</th>
-              <th>Operations</th>
-          </tr>
-      </thead>
-      <tbody class="file-data"></tbody>
-    </table>
-
-    <div class="pageination">
-        <ul class="pager"></ul>
-    </div>
-</div>
-
-<div class="message-info"></div>
-
-<div id="file-edit-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-edit-modal-Label" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>File Edit</h3>
-  </div>
-  <div class="modal-body">
-    <div class="preview" style="text-align:center;">Preview</div>
-    <table class="table table-striped">
-      <tbody>
-          <tr>
-            <th>File Name</th>
-            <td><input type="text" class="name" placeholder="File Name" value="" /></td></tr>
-          <tr>
-            <th>File Description</th>
-            <td><input type="text" class="description" placeholder="File Description" value="" /></td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="modal-footer">
-    <div class="message" style="float:left;"></div>
-    <button class="btn cancel" data-dismiss="modal">Close</button>
-    <button class="btn btn-primary" onclick="saveEditFile();">Save changes</button>
-  </div>
-</div>
-
-<div id="file-upload-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-upload-modal-Label" data-dismiss="modal" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close cancel" aria-hidden="true">&times;</button>
-    <h3>Upload File List</h3>
-  </div>
-  <div class="modal-body">
-    <table class="table table-striped">
-      <thead>
-          <tr>
-              <th>Num</th>
-              <th>Preview</th>
-              <th>File Name</th>
-              <th>Operations</th>
-          </tr>
-      </thead>
-      <tbody class="file-data"></tbody>
-    </table>
-  </div>
-  <div class="modal-footer">
-    <div class="message" style="float:left;"></div>
-    <button class="btn cancel" data-dismiss="modal">Cancel</button>
-    <button class="btn btn-primary" onclick="uploadFiles();">Upload Files</button>
-  </div>
-</div>
-
 {{end}}
