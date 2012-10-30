@@ -1,13 +1,13 @@
 {{define "content"}}
-<h2>{{.Title}}</h2>
+<h2>{{l .Title}}</h2>
 <hr />
-<a href="/admin/article-add" class="btn"><i class="icon-pencil"></i>Add Article</a>
+<a href="/admin/article-add" class="btn"><i class="icon-pencil"></i>{{l "Add Article"}}</a>
 <table class="table table-striped">
 <thead>
     <tr>
-        <th>Title</th>
-        <th>Data</th>
-        <th>Operations</th>
+        <th>{{l "Title"}}</th>
+        <th>{{l "Date"}}</th>
+        <th>{{l "Operations"}}</th>
     </tr>
 </thead>
 <tbody>
@@ -16,8 +16,8 @@
         <td>{{.Title}}</td>
         <td>{{showDate .Date}}</td>
         <td>
-            <a href="/admin/article-edit?id={{.ID}}" class="btn"><i class="icon-pencil"></i> Edit</a>
-            <a href="/admin/article-delete?id={{.ID}}" class="btn"><i class="icon-trash"></i> Delete</a>
+            <a href="/admin/article-edit?id={{.ID}}" class="btn"><i class="icon-pencil"></i> {{l "Edit"}}</a>
+            <a href="/admin/article-delete?id={{.ID}}" class="btn"><i class="icon-trash"></i> {{l "Delete"}}</a>
         </td>
     </tr>
 {{end}}

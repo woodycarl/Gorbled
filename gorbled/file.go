@@ -120,7 +120,7 @@ func handleFileNewUrl(w http.ResponseWriter, r *http.Request) {
         m.Info = "Error: " + errInfo
     } else {
         m.Success = true
-        m.Info = "UploadURL Get!"
+        m.Info = L("UploadURL Get!")
         m.Data = string(b)
     }
 
@@ -231,7 +231,7 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 
         b, _ := json.Marshal(data)
         m.Success = true
-        m.Info = "Files Date Get!"
+        m.Info = L(" Files Date Get! ")
         m.Data = string(b)
     }
 

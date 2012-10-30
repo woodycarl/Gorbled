@@ -1,14 +1,18 @@
 {{define "content"}}
+<!--<h2>{{.Title}}</h2><hr />-->
+
 <form action="/admin/article-{{if .New}}add{{else}}edit?id={{.Article.ID}}{{end}}" method="post">
-<div><input type="text" name="title" class="title" id="title" placeholder="Article Title" value="{{if not .New}}{{.Article.Title}}{{end}}" /></div>
-<div><input type="text" name="customid" class="title" id="customID" placeholder="Custom ID" value="{{if not .New}}{{.Article.ID}}{{end}}" /></div>
+<div><input type="text" name="title" class="title" id="title" placeholder='{{l "Article Title"}}' value="{{if not .New}}{{.Article.Title}}{{end}}" /></div>
+<div><input type="text" name="customid" class="title" id="customID" placeholder='{{l "Custom ID"}}' value="{{if not .New}}{{.Article.ID}}{{end}}" /></div>
 <div>
-    <a class="btn" id="upload">Upload File</a>
-    <a class="btn" id="preview">Preview</a>
+    <a class="btn" id="upload">{{l "Upload Files"}}</a>
+    <a class="btn" id="preview">{{l "Preview"}}</a>
 </div>
 <hr />
-<div><textarea name="content" class="content" id="content" placeholder="Article Content" >{{if not .New}}{{.Article.Content | printf "%s"}}{{end}}</textarea></div>
-<div><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></div>
+<div><textarea name="content" class="content" id="content" placeholder='{{l "Article Content"}}' >{{if not .New}}{{.Article.Content | printf "%s"}}{{end}}</textarea></div>
+<div>
+  <input class="btn btn-primary" type="submit" value='{{l "Submit"}}' /> 
+  <input class="btn btn-danger" type="reset" value='{{l "Reset"}}' /></div>
 </form>
 
 <!-- Article Preview -->
@@ -19,8 +23,8 @@
   </div>
   <div class="modal-body"> </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">Close</button>
-    <button class="btn btn-primary save">Save changes</button>
+    <button class="btn" data-dismiss="modal">{{l "Close"}}</button>
+    <button class="btn btn-primary save">{{l "Save changes"}}</button>
   </div>
 </div>
 
@@ -32,9 +36,9 @@
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#file-list" data-toggle="tab">File List</a></li>
-      <li><a href="#file-upload" data-toggle="tab">Upload List</a></li>
-      <li><a href="#file-edit" data-toggle="tab">Edit</a></li>
+      <li class="active"><a href="#file-list" data-toggle="tab">{{l "File List"}}</a></li>
+      <li><a href="#file-upload" data-toggle="tab">{{l "Upload List"}}</a></li>
+      <li><a href="#file-edit" data-toggle="tab">{{l "Edit"}}</a></li>
     </ul>
 
     <div class="tab-content">
@@ -42,16 +46,16 @@
         <link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
         <span class="btn btn-primary fileinput-button">
             <i class="icon-upload icon-white"></i>
-            <span>Upload</span>
+            <span>{{l "Upload"}}</span>
             <input id="file" type="file" name="file" multiple>
         </span>
 
         <table class="table table-striped">
           <thead>
               <tr>
-                  <th>Num</th>
-                  <th>Title</th>
-                  <th>Operations</th>
+                  <th>{{l "Num"}}</th>
+                  <th>{{l "File Name"}}</th>
+                  <th>{{l "Operations"}}</th>
               </tr>
           </thead>
           <tbody class="data"> </tbody>
@@ -62,15 +66,15 @@
       </div>
 
       <div class="tab-pane" id="file-edit">
-        <div class="preview" style="text-align:center;">Preview</div>
+        <div class="preview" style="text-align:center;">{{l "Preview"}}</div>
         <table class="table table-striped">
           <tbody>
               <tr>
-                <th>File Name</th>
-                <td><input type="text" class="name" placeholder="File Name" value="" /></td></tr>
+                <th>{{l "File Name"}}</th>
+                <td><input type="text" class="name" placeholder='{{l "File Name"}}' value="" /></td></tr>
               <tr>
-                <th>File Description</th>
-                <td><input type="text" class="description" placeholder="File Description" value="" /></td></tr>
+                <th>{{l "File Description"}}</th>
+                <td><input type="text" class="description" placeholder='{{l "File Description"}}' value="" /></td></tr>
           </tbody>
         </table>
       </div>
@@ -79,9 +83,9 @@
         <table class="table table-striped">
           <thead>
               <tr>
-                  <th>Num</th>
-                  <th>File Name</th>
-                  <th>Operations</th>
+                  <th>{{l "Num"}}</th>
+                  <th>{{l "File Name"}}</th>
+                  <th>{{l "Operations"}}</th>
               </tr>
           </thead>
           <tbody class="data"> </tbody>
@@ -94,7 +98,7 @@
 
   <div class="modal-footer">
     <div class="message" style="float:left;"></div>
-    <button class="btn" data-dismiss="modal">Close</button>
+    <button class="btn" data-dismiss="modal">{{l "Close"}}</button>
     <button class="btn btn-primary save"> </button>
   </div>
 </div>

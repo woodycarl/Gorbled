@@ -2,8 +2,8 @@
 <form action="/admin/widget-{{if .New}}add{{else}}edit?id={{.Widget.ID}}{{end}}" method="post">
 <div><input type="text" name="title" class="title" placeholder="Widget Title" value="{{if not .New}}{{.Widget.Title}}{{end}}" /></div>
 <div>
-    <a href="#" class="btn" onclick="openWindow('/file?action=upload')" >Upload File</a>
-    <a data-toggle="modal" href="#myModal" class="btn btn-primary" id="preview">Preview</a>
+    <a href="#" class="btn" onclick="openWindow('/file?action=upload')" >{{l "Upload File"}}</a>
+    <a data-toggle="modal" href="#myModal" class="btn btn-primary" id="preview">{{l "Preview"}}</a>
 </div>
 <hr />
 <div><textarea name="content" class="content" placeholder="Widget Content" >{{if not .New}}{{.Widget.Content | printf "%s"}}{{end}}</textarea></div>

@@ -4,6 +4,7 @@ import (
     "log"
     "net/http"
     "time"
+    "fmt"
 
     "io/ioutil"
     "encoding/json"
@@ -35,6 +36,7 @@ type Config struct {
     TimeZone            float64
     BaseUrl             string
     Version             float64
+    Language            string
 }
 
 func (config *Config) save(c appengine.Context) (err error) {
@@ -137,22 +139,28 @@ func checkTheme(s string) string {
 /*
  * Init system
  */
-func initSystem(c appengine.Context) (config Config) {
+func initSystem(r *http.Request) (config Config) {
+    c := appengine.NewContext(r)
+
     config = getJsonConfig()
     config.save(c)
 
+    initLang2(c)
+
+    lang = initLang(r, config.Language)
+
     article := Article {
         ID:      genID(),
-        Title:   "Hello World!",
+        Title:   L("Hello World!"),
         Date:    time.Now(),
-        Content: []byte("欢迎使用Gorbled，可以随时删除或编辑这篇文章。"),
+        Content: []byte(L("Welcome to Gorbled")+" "+fmt.Sprint(config.Version)+L(". You can edit or delete this post, then start blogging!")),
     }
     article.save(c)
 
     widget := Widget {
         ID:      genID(),
-        Title:   "公告",
-        Content: []byte("这是个**公告**呢"),
+        Title:   L("Notice"),
+        Content: []byte(L("This is **Notice** !")),
     }
     widget.save(c)
 
@@ -164,10 +172,12 @@ func initSystem(c appengine.Context) (config Config) {
  */
 func initConfig(r *http.Request) (config Config) {
     c := appengine.NewContext(r)
+
     config, _, err := getConfig(c)
     if err != nil || config.Title == "" {
-        config = initSystem(c)
+        config = initSystem(r)
     }
     config.BaseUrl = "http://" + r.Host
+
     return
 }

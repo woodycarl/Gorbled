@@ -1,0 +1,176 @@
+
+#   a01:article.go
+i-a01:      Article Manager
+o-a01:      文章管理
+#   a02:article.go
+i-a02:      Add Article
+o-a02:      写文章
+#   a03:widget.go
+i-a03:      Add Widget
+o-a03:      添加小工具
+#   a04:main.html
+i-a04:      Article
+o-a04:      文章
+#   a05:article.html
+i-a05:Article Title
+o-a05:文章标题
+#   a06:article.html
+i-a06:Article Content
+o-a06:文章内容
+
+
+#   c01:config.go, main.html
+i-c01:      Config
+o-c01:      设置
+#   c02:files.html
+i-c02:      Close
+o-c02:      关闭
+#   c03:files.html
+i-c03:      Cancel
+o-c03:      取消
+#   c04:article.html
+i-c04:Custom ID
+o-c04:自定义ID
+
+
+
+#   d01:articles.html
+i-d01:      Delete
+o-d01:      删除
+#   d02:articles.html
+i-d02:      Date
+o-d02:      日期
+
+
+#   e01:article.go
+i-e01:      Edit Article
+o-e01:      编辑文章
+#   e02:widget.go
+i-e02:      Edit Widget
+o-e02:      编辑小工具
+#   e03:articles.html
+i-e03:      Edit
+o-e03:      编辑
+
+
+#   f01:file.go
+i-f01:      File Manager
+o-f01:      文件管理
+#   f02:file.go
+i-f02:      Files Date Get!
+o-f02:      成功载入文件！
+#   f03:main.html
+i-f03:      File
+o-f03:      文件
+#   f04:files.html
+i-f04:      File Name
+o-f04:      文件名
+#   f05:files.html
+i-f05:      File Edit
+o-f05:      编辑文件
+#   f06:files.html
+i-f06:      File Description
+o-f06:      文件描述
+#   f07:article.html
+i-f07:File List
+o-f07:文件列表
+
+
+
+#   h01:main.html
+i-h01:      Home
+o-h01:      主页
+#   h02:config.go
+i-h02:      Hello World!
+o-h02:      你好，世界！
+
+#   i01:error.go
+i-i01:      Internal Server Error:
+o-i01:      系统内部错误：
+
+
+#   n01:config.go
+i-n01:      Notice
+o-n01:      公告
+#   n02:error.go
+i-n02:      Not Found!
+o-n02:      页面未找到！
+#   n03files.html
+i-n03:      Num
+o-n03:      序号
+
+
+#   o01:articles.html
+i-o01:      Operations
+o-o01:      操作
+
+
+#   p01:files.html
+i-p01:      Preview
+o-p01:      预览
+
+
+#   r01:article.html
+i-r01:Reset
+o-r01:重置
+
+
+#   s01:widget.go
+i-s01:      Sequence
+o-s01:      顺序
+#   s02:files.html
+i-s02:      Save changes
+o-s02:      保存修改
+#   s03:article.html
+i-s03:Submit
+o-s03:提交
+
+
+#   t01:config.go
+i-t01:      This is **Notice** !
+o-t01:      这个是**公告**呢！
+#   t02:articles.html
+i-t02:      Title
+o-t02:      标题
+
+
+#   u01:file.html
+i-u01:      Upload
+o-u01:      上传文件
+#   u02:file.go
+i-u02:      UploadURL Get!
+o-u02:      成功获取上传地址！
+#   u03:files.html
+i-u03:      Upload File List
+o-u03:      上传文件列表
+#   u04:files.html
+i-u04:      Upload Files
+o-u04:      上传文件
+#   u05:article.html
+i-u05:      Upload List
+o-u05:      上传列表
+
+
+#   w01:config.go
+i-w01:      Welcome to Gorbled
+o-w01:      欢迎使用Gorbled
+#   w02:widget.go
+i-w02:      Widget Manager
+o-w02:      小工具管理
+#   w03:main.html
+i-w03:      Widget
+o-w03:      小工具
+
+
+
+#   .01:config.go
+i-.01:      . You can edit or delete this post, then start blogging!
+o-.01:      ，可以随时删除或编辑这篇文章。
+
+
+#   301:page.go
+#i-301:     3:04pm, Mon 2 Jan
+#o-301:  
+
+
+

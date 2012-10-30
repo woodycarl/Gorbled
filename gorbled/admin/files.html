@@ -1,5 +1,5 @@
 {{define "content"}}
-<h2>{{.Title}}</h2>
+<h2>{{l .Title}}</h2>
 <hr />
 
 
@@ -8,17 +8,17 @@
 <div id="file-list">
     <span class="btn btn-primary fileinput-button">
         <i class="icon-upload icon-white"></i>
-        <span>Upload</span>
+        <span>{{l "Upload"}}</span>
         <input id="file" type="file" name="file" multiple onchange="showUploadModal();">
     </span>
 
     <table class="table table-striped">
       <thead>
           <tr>
-              <th>Num</th>
-              <th>File Name</th>
-              <th>Date</th>
-              <th>Operations</th>
+              <th>{{l "Num"}}</th>
+              <th>{{l "File Name"}}</th>
+              <th>{{l "Date"}}</th>
+              <th>{{l "Operations"}}</th>
           </tr>
       </thead>
       <tbody class="file-data"></tbody>
@@ -34,41 +34,41 @@
 <div id="file-edit-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-edit-modal-Label" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>File Edit</h3>
+    <h3>{{l "File Edit"}}</h3>
   </div>
   <div class="modal-body">
-    <div class="preview" style="text-align:center;">Preview</div>
+    <div class="preview" style="text-align:center;"> </div>
     <table class="table table-striped">
       <tbody>
           <tr>
-            <th>File Name</th>
+            <th>{{l "File Name"}}</th>
             <td><input type="text" class="name" placeholder="File Name" value="" /></td></tr>
           <tr>
-            <th>File Description</th>
+            <th>{{l "File Description"}}</th>
             <td><input type="text" class="description" placeholder="File Description" value="" /></td></tr>
       </tbody>
     </table>
   </div>
   <div class="modal-footer">
     <div class="message" style="float:left;"></div>
-    <button class="btn cancel" data-dismiss="modal">Close</button>
-    <button class="btn btn-primary" onclick="saveEditFile();">Save changes</button>
+    <button class="btn cancel" data-dismiss="modal">{{l "Close"}}</button>
+    <button class="btn btn-primary" onclick="saveEditFile();">{{l "Save changes"}}</button>
   </div>
 </div>
 
 <div id="file-upload-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-upload-modal-Label" data-dismiss="modal" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close cancel" aria-hidden="true">&times;</button>
-    <h3>Upload File List</h3>
+    <h3>{{l "Upload File List"}}</h3>
   </div>
   <div class="modal-body">
     <table class="table table-striped">
       <thead>
           <tr>
-              <th>Num</th>
-              <th>Preview</th>
-              <th>File Name</th>
-              <th>Operations</th>
+              <th>{{l "Num"}}</th>
+              <th>{{l "Preview"}}</th>
+              <th>{{l "File Name"}}</th>
+              <th>{{l "Operations"}}</th>
           </tr>
       </thead>
       <tbody class="file-data"></tbody>
@@ -76,8 +76,8 @@
   </div>
   <div class="modal-footer">
     <div class="message" style="float:left;"></div>
-    <button class="btn cancel" data-dismiss="modal">Cancel</button>
-    <button class="btn btn-primary" onclick="uploadFiles();">Upload Files</button>
+    <button class="btn cancel" data-dismiss="modal">{{l "Cancel"}}</button>
+    <button class="btn btn-primary" onclick="uploadFiles();">{{l "Upload Files"}}</button>
   </div>
 </div>
 

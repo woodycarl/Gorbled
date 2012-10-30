@@ -16,10 +16,8 @@ A simple blog system written by Go, Running in Google App Engine
 * DISQUS support
 
 ### Install && Config
-* Edit ./config.json Change blog config
+* Edit ./config.json Change blog config : disqus, google analytics, lang
 * Edit ./app.yaml for your gae app config
-* Edit ./gorbled/static/html/article/view.html for change disqus config
-* Edit ./gorbled/static/html/layouts/main.html for change google analytics config
 * Using GAE SDK update app
 
 ### License

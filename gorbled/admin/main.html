@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>{{.Title}} - {{.Config.Title}}</title>
+    <title>{{l .Title}} - {{.Config.Title}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{.Config.Description}}">
 
@@ -28,11 +28,11 @@
         <div class="container">
             <div class="nav-collapse">
                 <ul class="nav">
-                    <li class=""><a href="/"><i class="icon-white icon-home"></i> Home</a></li>
-                    <li class=""><a href="/admin/article-list"><i class="icon-white icon-th-list"></i> Article</a></li>
-                    <li class=""><a href="/admin/widget-list"><i class="icon-white icon-retweet"></i> Widget</a></li>
-                    <li class=""><a href="/admin/file-list"><i class="icon-white icon-folder-open"></i> File</a></li>
-                    <li class=""><a href="/admin/config"><i class="icon-white icon-cog"></i> Config</a></li>
+                    <li class=""><a href="/"><i class="icon-white icon-home"></i> {{l "Home"}}</a></li>
+                    <li class=""><a href="/admin/article-list"><i class="icon-white icon-th-list"></i> {{l "Article"}}</a></li>
+                    <li class=""><a href="/admin/widget-list"><i class="icon-white icon-retweet"></i> {{l "Widget"}}</a></li>
+                    <li class=""><a href="/admin/file-list"><i class="icon-white icon-folder-open"></i> {{l "File"}}</a></li>
+                    <li class=""><a href="/admin/config"><i class="icon-white icon-cog"></i> {{l "Config"}}</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div>

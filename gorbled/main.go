@@ -4,10 +4,6 @@ import (
     "net/http"
 )
 
-func init() {
-    http.HandleFunc("/", handle)
-}
-
 var urls = map[string](func(http.ResponseWriter, *http.Request)){
     // config.go
     "/admin/config": handleConfigEdit,
@@ -47,9 +43,19 @@ var urls = map[string](func(http.ResponseWriter, *http.Request)){
     // index.go
     "/":    handleIndex,
 
+    // lang.go
+    "/admin/init-lang": handleInitLang,
+
+}
+
+func init() {
+    http.HandleFunc("/", handle)
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
     config = initConfig(r)
+
+    lang = initLang(r, config.Language)
+
     urls[r.URL.Path](w, r)
 }

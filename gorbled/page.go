@@ -51,12 +51,13 @@ func decodeMD(content []byte) string {
 
 func showDate(t time.Time) string {
     newLocation := time.FixedZone("myTimeZone", (int)(config.TimeZone*60*60))
-    return t.In(newLocation).Format("3:04pm, Mon 2 Jan")
+    return t.In(newLocation).Format(L("3:04pm, Mon 2 Jan"))
 }
 
 var funcMap = template.FuncMap{
     "showDate": showDate,
     "decodeMD": decodeMD,
+    "l":        L,
 }
 
 /*

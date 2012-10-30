@@ -2,6 +2,10 @@
     "Title":            "Gorbled",
     "Description":      "A simple blog system written by Go, Running in Google App Engine",
 
+    "GoogleAnalytics":  "UA-28475410-3",
+    "Disqus":           "gorbled",
+    "Language":         "zh",
+
     "Articles":         5,
     "AdminArticles":    10,
     "AdminWidgets":     10,
@@ -9,9 +13,6 @@
     "NavLen":           5,
 
     "Theme":            "default",
-    "GoogleAnalytics":  "UA-28475410-3",
-    "Disqus":           "gorbled",
-
     "TimeZone":         8.0,
     "Version":          2.1
 }
