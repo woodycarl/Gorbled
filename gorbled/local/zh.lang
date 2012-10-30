@@ -12,11 +12,11 @@ o-a03:      添加小工具
 i-a04:      Article
 o-a04:      文章
 #   a05:article.html
-i-a05:Article Title
-o-a05:文章标题
+i-a05:      Article Title
+o-a05:      文章标题
 #   a06:article.html
-i-a06:Article Content
-o-a06:文章内容
+i-a06:      Article Content
+o-a06:      文章内容
 
 
 #   c01:config.go, main.html
@@ -29,8 +29,8 @@ o-c02:      关闭
 i-c03:      Cancel
 o-c03:      取消
 #   c04:article.html
-i-c04:Custom ID
-o-c04:自定义ID
+i-c04:      Custom ID
+o-c04:      自定义ID
 
 
 
@@ -40,6 +40,9 @@ o-d01:      删除
 #   d02:articles.html
 i-d02:      Date
 o-d02:      日期
+#   d03:article.html
+i-d03:      Delete File...
+o-d03:      删除文件...
 
 
 #   e01:article.go
@@ -72,8 +75,8 @@ o-f05:      编辑文件
 i-f06:      File Description
 o-f06:      文件描述
 #   f07:article.html
-i-f07:File List
-o-f07:文件列表
+i-f07:      File List
+o-f07:      文件列表
 
 
 
@@ -89,21 +92,29 @@ i-i01:      Internal Server Error:
 o-i01:      系统内部错误：
 
 
+
+
+
 #   n01:config.go
 i-n01:      Notice
 o-n01:      公告
 #   n02:error.go
 i-n02:      Not Found!
 o-n02:      页面未找到！
-#   n03files.html
+#   n03:files.html
 i-n03:      Num
 o-n03:      序号
+#   n04:article.html
+i-n04:      Newer
+o-n04:      后一页
 
 
 #   o01:articles.html
 i-o01:      Operations
 o-o01:      操作
-
+#   o02:article.html
+i-o02:      Older
+o-o02:      前一页
 
 #   p01:files.html
 i-p01:      Preview
@@ -111,8 +122,11 @@ o-p01:      预览
 
 
 #   r01:article.html
-i-r01:Reset
-o-r01:重置
+i-r01:      Reset
+o-r01:      重置
+#   r02:article.html
+i-r02:      Refresh
+o-r02:      刷新
 
 
 #   s01:widget.go
@@ -122,8 +136,8 @@ o-s01:      顺序
 i-s02:      Save changes
 o-s02:      保存修改
 #   s03:article.html
-i-s03:Submit
-o-s03:提交
+i-s03:      Submit
+o-s03:      提交
 
 
 #   t01:config.go
@@ -149,6 +163,9 @@ o-u04:      上传文件
 #   u05:article.html
 i-u05:      Upload List
 o-u05:      上传列表
+#   u06:article.html
+i-u06:      Uploading...
+o-u06:      上传中...
 
 
 #   w01:config.go

@@ -27,7 +27,7 @@
     <ul class="pager">
     {{if .Nav.ShowPrev}}
         <li class="previous">
-            <a href="?pid={{.Nav.PrevPageID}}">&larr; Older</a>
+            <a href="?pid={{.Nav.PrevPageID}}">&larr; {{l "Older"}}</a>
         </li>
     {{end}}
     {{if .Nav.ShowIDs}}
@@ -37,7 +37,7 @@
     {{end}}
     {{if .Nav.ShowNext}}
         <li class="next">
-            <a href="?pid={{.Nav.NextPageID}}">Newer &rarr;</a>
+            <a href="?pid={{.Nav.NextPageID}}">{{l "Newer"}} &rarr;</a>
         </li>
     {{end}}
     </ul>

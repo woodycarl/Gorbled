@@ -1,5 +1,5 @@
-Gorbled
-=======
+Gorbled v2.2
+============
 
 A simple blog system written by Go, Running in Google App Engine
 --------------------------------------------------------------------------------------------------------
@@ -23,3 +23,9 @@ A simple blog system written by Go, Running in Google App Engine
 ### License
 * [blackfriday](https://github.com/russross/blackfriday) BSD License
 * [Gorbled](https://github.com/specode/Gorbled) MIT License
+
+### todo list: v3
+* 简洁的代码 
+  * pageNav算法改进
+* 改进后台页面样式
+* 新的主题

@@ -9,7 +9,7 @@
     <span class="btn btn-primary fileinput-button">
         <i class="icon-upload icon-white"></i>
         <span>{{l "Upload"}}</span>
-        <input id="file" type="file" name="file" multiple onchange="showUploadModal();">
+        <input id="file" type="file" name="file" multiple>
     </span>
 
     <table class="table table-striped">
@@ -21,7 +21,7 @@
               <th>{{l "Operations"}}</th>
           </tr>
       </thead>
-      <tbody class="file-data"></tbody>
+      <tbody class="data"></tbody>
     </table>
 
     <div class="pageination">
@@ -31,7 +31,7 @@
 
 <div class="message-info"></div>
 
-<div id="file-edit-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-edit-modal-Label" aria-hidden="true">
+<div id="file-edit" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-edit-modal-Label" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3>{{l "File Edit"}}</h3>
@@ -52,11 +52,11 @@
   <div class="modal-footer">
     <div class="message" style="float:left;"></div>
     <button class="btn cancel" data-dismiss="modal">{{l "Close"}}</button>
-    <button class="btn btn-primary" onclick="saveEditFile();">{{l "Save changes"}}</button>
+    <button class="btn btn-primary" onclick="$.saveEditFile();">{{l "Save changes"}}</button>
   </div>
 </div>
 
-<div id="file-upload-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-upload-modal-Label" data-dismiss="modal" aria-hidden="true">
+<div id="file-upload" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-upload-modal-Label" data-dismiss="modal" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close cancel" aria-hidden="true">&times;</button>
     <h3>{{l "Upload File List"}}</h3>
@@ -66,242 +66,51 @@
       <thead>
           <tr>
               <th>{{l "Num"}}</th>
-              <th>{{l "Preview"}}</th>
+              <!--<th>{{l "Preview"}}</th>-->
               <th>{{l "File Name"}}</th>
               <th>{{l "Operations"}}</th>
           </tr>
       </thead>
-      <tbody class="file-data"></tbody>
+      <tbody class="data"></tbody>
     </table>
   </div>
   <div class="modal-footer">
     <div class="message" style="float:left;"></div>
     <button class="btn cancel" data-dismiss="modal">{{l "Cancel"}}</button>
-    <button class="btn btn-primary" onclick="uploadFiles();">{{l "Upload Files"}}</button>
+    <button class="btn btn-primary" onclick="$.uploadFiles();">{{l "Upload Files"}}</button>
   </div>
 </div>
 
 <script src="/static/js/jquery.js"></script>
 <script src="/static/js/bootstrap-modal.js"></script>
-<!--<script src="/static/js/file-upload.js"></script>-->
+<script src="/static/js/c-plugin.js"></script>
 <script>
+    // setting
+    var tS = {
+        // common
+        style:  "modal",  // tab | modal
+        numListFiles: {{.Config.AdminFiles}},
 
-var files = [];
-var filesUpload = [];
-var fileEdit;
-var uploadUrls =[];
+        messageList: ".message-info",
 
-$(document).ready(function(){
+        // upload
+        upload: "#upload",
+        uploadModal:  "#modal-upload",
 
-    initFileList(1);
-    
-    $("#file-edit-modal .cancel").live("click",function(){
-        $("#file-edit-modal .preview").html("");
-        $("#file-edit-modal .message").html("");
+        // lang
+        lOrdler: '{{l "Older"}}',
+        lNewer: '{{l "Newer"}}',
+        lUpload: '{{l "Upload"}}',
+        lDeleteFile: '{{l "Delete File..."}}',
+        lUploading: '{{l "Uploading..."}}',
+        lRefresh: '{{l "Refresh"}}',
+        lSaveEdit: '{{l "Save"}}',
+        lDelete: '{{l "Delete"}}',
+        lEdit: '{{l "Edit"}}'
+    }
+
+    $(document).ready(function(){
+        $.initList(1);
     });
-
-});
-
-/*
- * Upload Modal
- *
- */
-function showUploadModal(){
-    filesUpload = document.getElementById('file').files;
-    initUploadList();
-}
-
-function initUploadList(){
-    if (filesUpload.length>0){
-        $("#file-upload-modal").modal('show');
-        var filesInfo = [];
-
-        for (var i = 0; i < filesUpload.length; i++) {
-            filesInfo.push('<tr><td>'+(i+1)+'</td><td>preview</td><td>'+filesUpload[i].name+'</td><td><a href="javascript:void(0)" onclick="deleteUploadFile('+i+');" class="btn"><i class="icon-trash"></i> </a></td></tr>');
-        };
-
-        $("#file-upload-modal .file-data").html(filesInfo.join(''));
-    } else {
-        $("#file-upload-modal").modal('hide');
-    }
-}
-
-function uploadFiles(){
-    $("#file-upload-modal .message").html("Uploading...");
-    $.getJSON('/admin/file-new-url?num='+filesUpload.length, function(message) {
-        // Get uploadUrls
-        if (message.Success) {
-            uploadUrls = jQuery.parseJSON(message.Data);
-            for (var i = 0; i < filesUpload.length; i++) {
-                // FormData 对象
-                var form = new FormData();
-                form.append("file", filesUpload[i]);
-
-                // XMLHttpRequest 对象
-                var xhr = new XMLHttpRequest();
-                xhr.overrideMimeType("text/html;charset=utf-8");
-
-                if (i<filesUpload.length-1){
-                    xhr.open("post", uploadUrls[i], true);
-                } else {
-                    xhr.open("post", uploadUrls[i], false);
-                }
-
-                //xhr.open("post", uploadUrls[i], false);
-                xhr.send(form);
-            };
-
-            initFileList(1);
-            $("#file-upload-modal").modal('hide');
-        }
-        $("#file-upload-modal .message").html(message.Info);
-    });
-}
-
-function deleteUploadFile(i){
-    var tmp = filesUpload;
-    filesUpload = [];
-
-    for(var j=0,n=0;j<tmp.length;j++){
-        if(j!=i){
-            filesUpload[n]=tmp[j];
-            n++;
-        }
-    }
-    initUploadList();
-}
-
-/*
- * Edit Modal
- *
- */
-function initEditModal(id){
-    fileEdit = files[id];
-
-    var type = fileEdit.Type;
-    var src = '/file?key='+fileEdit.ID;
-
-    $("#file-edit-modal .preview").html(getPreview(type, src));
-    $("#file-edit-modal .description").val(fileEdit.Description);
-    $("#file-edit-modal .name").val(fileEdit.Name);
-    $("#file-edit-modal .message").html("");
-}
-
-function getPreview(type, src){
-    var preview;
-    if (type.indexOf("image") != -1) {
-        preview = '<img src="'+src+'" style="max-height:500px;width:auto;" />';
-    } else if (type.indexOf("audio") != -1) {
-        preview = '<audio src="'+src+'" type="audio/mp3" width="510" height="35" controls="controls" ></audio>';
-    } else if (type.indexOf("video") != -1) {
-        preview = '<video src="'+src+'" width="510" height="340" controls="controls"></video>';
-    } else {
-        preview = '<img src="/static/img/readme.png" style="max-height:500px;width:auto;" />';
-    }
-    return preview;
-}
-
-function saveEditFile(){
-    var name = $("#file-edit-modal .name").val();
-    var description = $("#file-edit-modal .description").val();
-    if (name != "" && (name != fileEdit.Name || description != fileEdit.Description)){
-        $.post("/admin/file-edit?id="+fileEdit.ID,{name:name,description:description},function(message){
-            $(".message-info").html(message.Info);
-            $("#file-edit-modal").modal("hide");
-            initFileList(1);
-        });
-        $("#file-edit-modal .message").html("Save changes...");
-    } else {
-        $("#file-edit-modal .message").html("Make some changes!");
-    }
-}
-
-/*
- * Delete file
- *
- */
-function deleteFile(id, pid){
-    fileDelete = files[id];
-    $.post("/admin/file-delete?id="+fileDelete.ID, function(message){
-        initFileList(pid);
-        $(".message-info").html(message.Info);
-    });
-    $(".message-info").html("delete file...");
-}
-
-/*
- * File List
- *
- */
-function initFileList(pid){
-    uploadUrls = [];
-    filesUpload = [];
-    files = [];
-
-    // Get data from server by page id
-    $.getJSON("/admin/file-data?pid="+pid, function(message) {
-        if (message.Success) {
-            var page = jQuery.parseJSON(message.Data);
-            files = page.Files;
-            
-            // Insert file data to table
-            var filesInfo = [];
-            $.each(page.Files, function(i, file) {
-                fileNum = (i+1+(pid-1)*{{.Config.AdminFiles}});
-                filesInfo.push('<tr class="file" fileid="'+i+'"><td class="num">'+fileNum+'</td><td class="name">'+getFileIcon(file.Type)+' <a href="/file?key='+file.ID+'" target="blank">'+file.Name+'</a></td><td class="date">'+file.Date+'</td><td class="Operations"><a data-toggle="modal" onclick="initEditModal('+i+');" href="#file-edit-modal" class="btn edit"><i class="icon-pencil"></i> Edit</a><a href="javascript:void(0)" onclick="deleteFile('+i+','+pid+');" class="btn"><i class="icon-trash"></i> Delete</a></td></tr>');
-            });
-            $("#file-list .file-data").html(filesInfo.join(''));
-
-            // Insert nav data
-            var navInfo = [];
-            $(".pageination .pager").html("");
-            if (page.Nav.ShowPrev) {
-                navInfo.push('<li class="previous"><a href="javascript:void(0)" onclick="initFileList('+page.Nav.PrevPageID+');">&larr; Older</a></li>');
-            }
-            if (page.Nav.ShowIDs) {
-
-                $.each(page.Nav.PageIDs, function(i, pageID) {
-                    if (pageID.Current) {
-                        navInfo.push('<li class="current"><a>'+pageID.Id+'</a></li>');
-                    } else {
-                        navInfo.push('<li class=""><a href="javascript:void(0)" onclick="initFileList('+pageID.Id+');">'+pageID.Id+'</a></li>');
-                    }
-                });
-            }
-            if (page.Nav.ShowNext) {
-                navInfo.push('<li class="next"><a href="javascript:void(0)" onclick="initFileList('+page.Nav.NextPageID+');">Newer &rarr;</a></li>');
-            }
-            $(".pageination .pager").html(navInfo.join(''));
-
-        } else {
-            // If err, clear 
-            $("#file-list .file-data").html("");
-        }
-        // Show server message
-        $(".message-info").html(message.Info);
-    });
-}
-
-function getFileIcon(type){
-    var content;
-
-    if (type.indexOf("image") != -1) {
-        content = 'picture';
-    } else if (type.indexOf("audio") != -1) {
-        content = 'music';
-        // headphones | music
-    } else if (type.indexOf("video") != -1) {
-        content = 'facetime-video'; 
-        // film | facetime-video
-    } else if (type.indexOf("application/octet-stream") != -1) {
-        content = 'gift'; 
-        // calendar | th-list | gift
-    } else {
-        content = 'file';
-    }
-
-    return '<i class="icon-'+content+'"></i>';
-}
-
 </script>
 {{end}}
