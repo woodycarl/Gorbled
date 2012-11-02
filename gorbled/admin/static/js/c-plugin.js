@@ -3,23 +3,28 @@ var cS = {
     togList: "a[href='#file-list']",
     togEdit: "a[href='#file-edit']",
     togUpload: "a[href='#file-upload']",
-    Edit: "#file-edit",
-    List: "#file-list",
-    Upload: "#file-upload",
 
-    // content
-    file: "file",
-    listData: "#file-list .data",
-    listNav: ".pageination .pager",
-    uploadData: "#file-upload .data",
+    Edit: "#file-edit",
     editPreview: "#file-edit .preview",
     editName: "#file-edit .name",
     editDes: "#file-edit .description",
+    editMessage: "#file-edit .message",
 
-    message: "#modal-upload .message",
-    modalMessage: "",
+    List: "#file-list",
+    listData: "#file-list .data",
+    listNav: ".pagination ul",
+    listMessage: "#file-list .message",
 
+    Upload: "#file-upload",
+    uploadData: "#file-upload .data",
     uploadSave: "#modal-upload .save",
+    uploadMessage: "#file-upload .message",
+
+    // content
+    file: "file",
+
+    modalMessage: "#modal-upload .message",
+    message: ".manage-bar .manage-info",
 
     // preview
     previewTitle: "#modal-preview .title",
@@ -44,7 +49,7 @@ var uploadUrls =[];
 $(document).ready(function(){
 
     // preview-modal
-    $(tS.preview).click(function(){
+    $(tS.btnPreview).click(function(){
         $.showPreview();
     });
 
@@ -53,7 +58,7 @@ $(document).ready(function(){
     });
 
     // upload-modal
-    $(tS.upload).click(function(){
+    $(tS.btnUpload).click(function(){
         $.initList(1);
         $.showModal(tS.uploadModal);
     });
@@ -64,7 +69,7 @@ $(document).ready(function(){
         $.initUpload();
     });
 
-    $(tS.uploadModal+" .save").click(function(){
+    $(cS.uploadSave).click(function(){
         switch ($(this).attr("id")) {
             case "upload-save":
                 $.uploadFiles();
@@ -146,36 +151,43 @@ initList: function(pid) {
             var navInfo = [];
             $(cS.listNav).html("");
             if (page.Nav.ShowPrev) {
-                navInfo.push('<li class="previous"><a href="javascript:void(0)" onclick="$.initList('+page.Nav.PrevPageID+');">&larr; '+tS.lOlder+'</a></li>');
+                //navInfo.push('<li class="previous"><a href="javascript:void(0)" onclick="$.initList('+page.Nav.PrevPageID+');">&larr; '+tS.lOlder+'</a></li>');
+                navInfo.push('<li><a href="javascript:void(0)" onclick="$.initList('+page.Nav.PrevPageID+');">«</a></li>');
             }
             if (page.Nav.ShowIDs) {
 
                 $.each(page.Nav.PageIDs, function(i, pageID) {
                     if (pageID.Current) {
-                        navInfo.push('<li class="current"><a>'+pageID.Id+'</a></li>');
+                        //navInfo.push('<li class="current"><a>'+pageID.Id+'</a></li>');
+                        navInfo.push('<li class="active"><a>'+pageID.Id+'</a></li>');
                     } else {
-                        navInfo.push('<li class=""><a href="javascript:void(0)" onclick="$.initList('+pageID.Id+');">'+pageID.Id+'</a></li>');
+                        //navInfo.push('<li class=""><a href="javascript:void(0)" onclick="$.initList('+pageID.Id+');">'+pageID.Id+'</a></li>');
+                        navInfo.push('<li><a href="javascript:void(0)" onclick="$.initList('+pageID.Id+');">'+pageID.Id+'</a></li>');
                     }
                 });
             }
             if (page.Nav.ShowNext) {
-                navInfo.push('<li class="next"><a href="javascript:void(0)" onclick="$.initList('+page.Nav.NextPageID+');">'+tS.lNewer+' &rarr;</a></li>');
+                //navInfo.push('<li class="next"><a href="javascript:void(0)" onclick="$.initList('+page.Nav.NextPageID+');">'+tS.lNewer+' &rarr;</a></li>');
+                navInfo.push('<li><a href="javascript:void(0)" onclick="$.initList('+page.Nav.NextPageID+');">»</a></li>');
             }
             $(cS.listNav).html(navInfo.join(''));
 
+            $.showMessage(message.Info, "list", "success");
         } else {
             $(cS.listData).html("");
             $(cS.listNav).html("");
+            $.showMessage(message.Info, "list", "error");
         }
-        $.showMessage(message.Info,"list");
     });
 },
 deleteFile: function(id, pid){
     fileDelete = files[id];
-    $.showMessage(tS.lDeleteFile, "list");
+    $.showMessage(tS.lDeleteFile, "list", "alert");
     $.post(cS.urlDelete+fileDelete.ID, function(message){
+        message = jQuery.parseJSON(message);
+
         $.initList(pid);
-        $(cS.message).html(message.Info);
+        $.showMessage(message.Info, "list", message.Success);
     });
 },
 getFileIcon: function(type) {
@@ -207,7 +219,7 @@ initEdit: function(id) {
     $(cS.editPreview).html($.getPreview(type, src));
     $(cS.editDes).val(fileEdit.Description);
     $(cS.editName).val(fileEdit.Name);
-    $.showMessage("", "edit");
+    $.showMessage("", "edit", true);
 
     $.showEdit();
 },
@@ -235,17 +247,15 @@ saveEditFile: function(){
     var name = $(cS.editName).val();
     var description = $(cS.editDes).val();
     if (name != "" && (name != fileEdit.Name || description != fileEdit.Description)){
-        $.post(cS.urlEdit+fileEdit.ID,{name:name,description:description},function(message){
-            $(".message-info").html(message.Info);
-            $.showMessage(message.Info, "edit")
-            $("#file-edit-modal").modal("hide");
+        $.getJSON(cS.urlEdit+fileEdit.ID,{name:name,description:description},function(message){
+            $.showMessage(message.Info, "edit", "success")
             $.initList(1);
+            $.closeEdit();
         });
-        $("#file-edit-modal .message").html("Save changes...");
+        $.showMessage("Save changes...", "edit", "alert")
     } else {
-        $("#file-edit-modal .message").html("Make some changes!");
+        $.showMessage("Make some changes!", "edit", "error")
     }
-    $.closeEdit();
 },
 closeEdit: function(){
     if (tS.style == "tab") {
@@ -283,7 +293,7 @@ initUpload: function(){
 deleteUploadFile: function(i){
     var tmp = filesUpload;
     filesUpload = [];
-
+    $.showMessage(tS.lDeleteFile, "upload", "alert");
     for(var j=0,n=0;j<tmp.length;j++){
         if(j!=i){
             filesUpload[n]=tmp[j];
@@ -293,7 +303,7 @@ deleteUploadFile: function(i){
     $.initUpload();
 },
 uploadFiles: function(){
-    $.showMessage(tS.lUploading, "upload");
+    $.showMessage(tS.lUploading, "upload", true);
     $.getJSON(cS.urlNew+filesUpload.length, function(message) {
         // Get uploadUrls
         if (message.Success) {
@@ -325,19 +335,42 @@ uploadFiles: function(){
             }
             $(cS.uploadData).html("");
 
+            $.showMessage(message.Info, "upload", "success");
+        } else {
+            $.showMessage(message.Info, "upload", "alert");
         }
-        $.showMessage(message.Info, "upload");
+        
     });
 },
-showMessage: function(message, q){
+showMessage: function(message, r, state){
+    //var result;
+    //var id ="";
     if (tS.style == "tab") {
-        id = cS.message;
-    } else if (q == "list") {
-        id = tS.messageList;
+        if (r=="list" || r=="edit" || r=="upload") {
+            id = cS.modalMessage;
+        } else {
+            id = cS.message;
+        }
+
     } else {
-        id = "#file-upload-modal .message";
+        if (r=="edit") {
+            id = cS.editMessage;
+        } else if (r=="upload") {
+            id = cS.uploadMessage;
+        } else {
+            id = cS.message;
+        }
     }
-    $(id).html(message);
+
+    if (message=="") {
+        result = "";
+    } else {
+        result = '<div class="alert alert-'+state+'"><a class="close" data-dismiss="alert">×</a>'+message+'</div>';
+    }
+    $(id).html(result);
+    setTimeout("$(id).html('')",3000);
 }
 
 });
+
+

@@ -1,18 +1,21 @@
 {{define "content"}}
-<h2>{{l .Title}}</h2>
-<hr />
+<div class="row-fluid manage-bar">
+    <div class="span3 manage-title">
+        <h1>{{l .Title}}</h1>
+    </div>
+    <div class="span5 manage-tool btn-toolbar">
+        <link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
+        <span class="btn fileinput-button">
+            <i class="icon-upload"></i>
+            <span>{{l "Upload"}}</span>
+            <input id="file" type="file" name="file" multiple>
+        </span>
+    </div>
+    <div class="span4 manage-info"> </div>
+</div>
 
-
-<link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
-
-<div id="file-list">
-    <span class="btn btn-primary fileinput-button">
-        <i class="icon-upload icon-white"></i>
-        <span>{{l "Upload"}}</span>
-        <input id="file" type="file" name="file" multiple>
-    </span>
-
-    <table class="table table-striped">
+<div id="file-list" class="content">
+    <table class="table table-striped table-hover">
       <thead>
           <tr>
               <th>{{l "Num"}}</th>
@@ -24,12 +27,8 @@
       <tbody class="data"></tbody>
     </table>
 
-    <div class="pageination">
-        <ul class="pager"></ul>
-    </div>
+    <div class="pagination pagination-centered"><ul></ul></div>
 </div>
-
-<div class="message-info"></div>
 
 <div id="file-edit" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-edit-modal-Label" aria-hidden="true">
   <div class="modal-header">
@@ -38,7 +37,7 @@
   </div>
   <div class="modal-body">
     <div class="preview" style="text-align:center;"> </div>
-    <table class="table table-striped">
+    <table class="table table-striped table-hover">
       <tbody>
           <tr>
             <th>{{l "File Name"}}</th>
@@ -62,7 +61,7 @@
     <h3>{{l "Upload File List"}}</h3>
   </div>
   <div class="modal-body">
-    <table class="table table-striped">
+    <table class="table table-striped table-hover">
       <thead>
           <tr>
               <th>{{l "Num"}}</th>
@@ -77,12 +76,10 @@
   <div class="modal-footer">
     <div class="message" style="float:left;"></div>
     <button class="btn cancel" data-dismiss="modal">{{l "Cancel"}}</button>
-    <button class="btn btn-primary" onclick="$.uploadFiles();">{{l "Upload Files"}}</button>
+    <button class="btn btn-primary save" onclick="$.uploadFiles();">{{l "Upload Files"}}</button>
   </div>
 </div>
 
-<script src="/static/js/jquery.js"></script>
-<script src="/static/js/bootstrap-modal.js"></script>
 <script src="/static/js/c-plugin.js"></script>
 <script>
     // setting
@@ -90,12 +87,6 @@
         // common
         style:  "modal",  // tab | modal
         numListFiles: {{.Config.AdminFiles}},
-
-        messageList: ".message-info",
-
-        // upload
-        upload: "#upload",
-        uploadModal:  "#modal-upload",
 
         // lang
         lOrdler: '{{l "Older"}}',

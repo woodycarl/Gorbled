@@ -1,43 +1,146 @@
 {{define "content"}}
-<form action="/admin/widget-{{if .New}}add{{else}}edit?id={{.Widget.ID}}{{end}}" method="post">
-<div><input type="text" name="title" class="title" placeholder="Widget Title" value="{{if not .New}}{{.Widget.Title}}{{end}}" /></div>
-<div>
-    <a href="#" class="btn" onclick="openWindow('/file?action=upload')" >{{l "Upload File"}}</a>
-    <a data-toggle="modal" href="#myModal" class="btn btn-primary" id="preview">{{l "Preview"}}</a>
+<div class="row-fluid manage-bar">
+    <div class="span3 manage-title">
+        <h1>{{l .Title}}</h1>
+    </div>
+    <div class="span5 manage-tool btn-toolbar">
+        <a class="btn" id="upload">{{l "Upload Files"}}</a>
+        <a class="btn" id="preview">{{l "Preview"}}</a>
+    </div>
+    <div class="span4 manage-info"></div>
 </div>
-<hr />
-<div><textarea name="content" class="content" placeholder="Widget Content" >{{if not .New}}{{.Widget.Content | printf "%s"}}{{end}}</textarea></div>
-<div><input type="text" name="sequence" class="sequence" placeholder="Widget Sequence" value="{{if not .New}}{{.Widget.Sequence}}{{end}}" /></div>
-<div><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></div>
+
+<form class="row-fluid widget-edit" action="/admin/widget-{{if .New}}add{{else}}edit?id={{.Widget.ID}}{{end}}" method="post">
+    <div class="span7">
+        <input type="text" name="title" class="span12" id="title" placeholder="Widget Title" value="{{if not .New}}{{.Widget.Title}}{{end}}" />
+        <textarea rows="15" name="content" class="span12" id="content" placeholder="Widget Content" >{{if not .New}}{{.Widget.Content | printf "%s"}}{{end}}</textarea>
+    </div>
+
+    <div class="span5 well">
+        <div class="input-prepend row-fluid">
+            <span class="add-on">{{l "Sequence"}}</span>
+            <input type="text" name="sequence" class="sequence" placeholder="Widget Sequence" value="{{if not .New}}{{.Widget.Sequence}}{{end}}" />
+        </div>
+        <div class="row-fluid" style="margin-top:20px;">
+            <input class="btn btn-primary" type="submit" id="submit" value='{{l "Submit"}}' /> 
+            <input class="btn btn-danger" type="reset" value='{{l "Reset"}}' />
+        </div>
+    </div>
+
 </form>
 
 <!-- Widget Preview -->
-<script src="/static/js/jquery.js"></script>
-<script src="/static/js/bootstrap-modal.js"></script>
-<script>
-  $(document).ready(function(){
-    $("#preview").click(function(){
-      title=$(".title").val();
-      content=$(".content").val();
-      $.post("/decodeContent",{content:content},function(result){
-        $("#myModalLabel").html(title);
-        $(".modal-body").html(result);
-      });
-    });
-    $("#save-changes").click(function(){
-      $("#submit").click()
-    });
-  });
-</script>
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="myModalLabel">Modal Heading</h3>
-  </div>
-  <div class="modal-body"></div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">Close</button>
-    <button class="btn btn-primary" id="save-changes">Save changes</button>
-  </div>
+<div id="modal-preview" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 class="title"> </h3>
+    </div>
+    <div class="modal-body"> </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">{{l "Close"}}</button>
+        <button class="btn btn-primary save">{{l "Save changes"}}</button>
+    </div>
 </div>
+
+<!-- File Upload -->
+<div id="modal-upload" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+
+    <div class="modal-body">
+
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#file-list" data-toggle="tab">{{l "File List"}}</a></li>
+            <li><a href="#file-upload" data-toggle="tab">{{l "Upload List"}}</a></li>
+            <li><a href="#file-edit" data-toggle="tab">{{l "Edit"}}</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="file-list">
+                <link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
+                <span class="btn btn-primary fileinput-button">
+                    <i class="icon-upload icon-white"></i>
+                    <span>{{l "Upload"}}</span>
+                    <input id="file" type="file" name="file" multiple>
+                </span>
+
+                <table class="table table-striped table-hover">
+                    <thead><tr>
+                          <th>{{l "Num"}}</th>
+                          <th>{{l "File Name"}}</th>
+                          <th>{{l "Operations"}}</th>
+                    </tr></thead>
+                    <tbody class="data"> </tbody>
+                </table>
+                <div class="pageination">
+                    <ul class="pager"> </ul>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="file-edit">
+                <div class="preview" style="text-align:center;">{{l "Preview"}}</div>
+                <table class="table table-striped table-hover">
+                    <tbody>
+                        <tr>
+                          <th>{{l "File Name"}}</th>
+                          <td><input type="text" class="name" placeholder='{{l "File Name"}}' value="" /></td></tr>
+                        <tr>
+                          <th>{{l "File Description"}}</th>
+                          <td><input type="text" class="description" placeholder='{{l "File Description"}}' value="" /></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-pane" id="file-upload">
+                <table class="table table-striped">
+                    <thead><tr>
+                        <th>{{l "Num"}}</th>
+                        <th>{{l "File Name"}}</th>
+                        <th>{{l "Operations"}}</th>
+                    </tr></thead>
+                    <tbody class="data"> </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <div class="message" style="float:left;"></div>
+        <button class="btn" data-dismiss="modal">{{l "Close"}}</button>
+        <button class="btn btn-primary save">{{l "Refresh"}}</button>
+    </div>
+</div>
+
+<script src="/static/js/c-plugin.js"></script>
+<script>
+    // setting
+    var tS = {
+        // common
+        style:  "tab",  // tab | modal
+        numListFiles: {{.Config.AdminFiles}},
+        submit: "#submit",
+
+        // upload
+        btnUpload: ".btn#upload",
+        uploadModal:  "#modal-upload",
+
+        // preview
+        title: "#title",
+        content: "#content",
+        btnPreview: ".btn#preview",
+        previewModal: "#modal-preview",
+
+        // lang
+        lOrdler: '{{l "Older"}}',
+        lNewer: '{{l "Newer"}}',
+        lUpload: '{{l "Upload"}}',
+        lDeleteFile: '{{l "Delete File..."}}',
+        lUploading: '{{l "Uploading..."}}',
+        lRefresh: '{{l "Refresh"}}',
+        lSaveEdit: '{{l "Save"}}'
+    }
+</script>
+
 {{end}}

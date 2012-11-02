@@ -1,3 +1,11 @@
-function openWindow(url) {
-    window.open(url, '', 'left=300,top=100,width=500,height=500,toolbar=1,resizable=1')
+function setCurrent(url) { 
+        var host = "null";
+
+        url = window.location.href;
+        var regex = /.*\:\/\/[^\/]*\/admin\/([^\/\-\?\#]*).*/;
+        var match = url.match(regex);
+        if(typeof match != "undefined"
+                        && null != match)
+                host = match[1];
+        return host;
 }

@@ -1,59 +1,85 @@
 {{define "content"}}
-<h2>{{l .Title}}</h2>
-<hr />
-<form action="/admin/config" method="post">
-<table class="table">
-<tbody>
-    <tr>
-        <th style="width:150px;">站点标题</th>
-        <td><input type="text" name="title" class="" placeholder="Title" value="{{.Config.Title}}" /></td>
-    </tr>
+<div class="row-fluid manage-bar">
+    <div class="span3 manage-title">
+        <h1>{{l .Title}}</h1>
+    </div>
+    <div class="span5 manage-tool btn-toolbar">
+        <!--<a href="" class="btn">{{l "System"}}</a>
+        <a href="" class="btn">{{l "Read"}}</a>-->
+    </div>
+    <div class="span4 manage-info"></div>
+</div>
 
-    <tr>
-        <th>站点描述</th>
-        <td><textarea name="description" rows="3" cols="30">{{.Config.Description}}</textarea></td>
-    </tr>
-
-    <tr>
-        <th>每页显示文章数</th>
-        <td><input type="text" name="articles" class="" placeholder="Articles Per Page" value="{{.Config.Articles}}" /></td>
-    </tr>
-
-    <tr>
-        <th>管理每页显示文章数</th>
-        <td><input type="text" name="admin-articles" class="" placeholder="Articles Per Page" value="{{.Config.AdminArticles}}" /></td>
-    </tr>
-
-    <tr>
-        <th>管理每页显示widget数</th>
-        <td><input type="text" name="admin-widgets" class="" placeholder="Widgets Per Page" value="{{.Config.AdminWidgets}}" /></td>
-    </tr>
-
-    <tr>
-        <th>时区</th>
-        <td><input type="text" name="timezone" class="" placeholder="Timezone" value="{{.Config.TimeZone}}" /></td>
-    </tr>
-
-    <tr>
-        <th>Google Analytics</th>
-        <td><input type="text" name="google-analytics" class="" placeholder="Google Analytics" value="{{.Config.GoogleAnalytics}}" /></td>
-    </tr>
-
-    <tr>
-        <th>Disqus</th>
-        <td><input type="text" name="disqus" class="" placeholder="Disqus" value="{{.Config.Disqus}}" /></td>
-    </tr>
-
-    <tr>
-        <th>程序版本</th>
-        <td><input type="text" name="version" class="" placeholder="Version" value="{{.Config.Version}}" /></td>
-    </tr>
-
-</tbody>
-</table>
-<div>
-    <input type="submit" value='{{l "Submit"}}' class="btn btn-primary"/> 
-    <input type="reset" value='{{l "Reset"}}' class="btn btn-danger" /></div>
+<form class="form-horizontal" action="/admin/config" method="post">
+    <fieldset>
+        <legend>系统设置</legend>
+        <div class="control-group">
+          <label class="control-label" for="title">站点标题</label>
+          <div class="controls">
+            <input type="text" name="title" id="title" class="" placeholder="Title" value="{{.Config.Title}}" />
+            <span class="help-inline"> </span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="description">站点描述</label>
+          <div class="controls">
+            <textarea name="description" id="description" rows="3" style="width:480px;">{{.Config.Description}}</textarea>
+            <span class="help-inline"> </span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="articles">每页显示文章数</label>
+          <div class="controls">
+            <input type="text" name="articles" id="articles" class="" placeholder="Articles Per Page" value="{{.Config.Articles}}" />
+            <span class="help-inline"> </span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="admin-articles">管理每页显示文章数</label>
+          <div class="controls">
+            <input type="text" name="admin-articles" id="admin-articles" class="" placeholder="Articles Per Page" value="{{.Config.AdminArticles}}" />
+            <span class="help-inline"> </span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="admin-widgets">管理每页显示widget数</label>
+          <div class="controls">
+            <input type="text" name="admin-widgets" id="admin-widgets" class="" placeholder="Widgets Per Page" value="{{.Config.AdminWidgets}}" />
+            <span class="help-inline"> </span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="timezone">时区</label>
+          <div class="controls">
+            <input type="text" name="timezone" id="timezone" class="" placeholder="Timezone" value="{{.Config.TimeZone}}" />
+            <span class="help-inline"> </span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="google-analytics">Google Analytics</label>
+          <div class="controls">
+            <input type="text" name="google-analytics" id="google-analytics" class="" placeholder="Google Analytics" value="{{.Config.GoogleAnalytics}}" />
+            <span class="help-inline"> </span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="disqus">Disqus</label>
+          <div class="controls">
+            <input type="text" name="disqus" id="disqus" class="" placeholder="Disqus" value="{{.Config.Disqus}}" />
+            <span class="help-inline"> </span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="version">程序版本</label>
+          <div class="controls">
+            <input type="text" name="version" id="version" class="" placeholder="Version" value="{{.Config.Version}}" />
+            <span class="help-inline"> </span>
+          </div>
+        </div>
+    </fieldset>
+    <div>
+        <input type="submit" value='{{l "Submit"}}' class="btn btn-primary"/> 
+        <input type="reset" value='{{l "Reset"}}' class="btn btn-danger" /></div>
 </form>
 
 {{end}}

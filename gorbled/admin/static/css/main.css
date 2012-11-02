@@ -1,24 +1,43 @@
-.title {
-    height:30px;
-    width:400px;
-    font-size:20px;
-    line-height:25px;
+@font-face {
+    font-family: 'Trade Winds';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Trade Winds'), local('TradeWinds'), url(http://themes.googleusercontent.com/static/fonts/tradewinds/v2/P7L1H4TWVDNJivDGg_--QIbN6UDyHWBl620a-IRfuBk.woff) format('woff');
 }
 
-.content {
-    height:500px;
-    width:800px;
-    font-size:20px;
-    line-height:25px;
+/*nav*/
+.navbar .brand {
+    font-family: "Trade Winds", "Abel", "Helvetica Neue", Arial, Sans-serif;
+    font-size: 26px;
+}
+.navbar-red-top .nav > .active > a {
+    padding-top: 7px;
+}
+.navbar-red-top .nav > .active {
+    border-top: 3px solid #DD4B39;
 }
 
-.sequence {
-    width:120px;
+.manage-bar {
+    margin-bottom: 20px;
+}
+.manage-tool {
+    margin-top: 15px;
+}
+.manage-info {
+    margin-top: 10px;
+}
+.alert {
+    margin-bottom: 0px;
+}
+footer {
+    /*position: fixed;
+    width: 100%;
+    bottom: 0px;*/
+    padding: 10px 50px;
+    background-color: rgba(0, 0, 0, 0.298039);
+    border: 1px solid transparent;
 }
 
-.pager .number {
-  text-align: center;
-}
-.pager .current {
-    color: red;
+.content .table td {
+    vertical-align: middle;
 }

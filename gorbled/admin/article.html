@@ -1,18 +1,31 @@
 {{define "content"}}
-<!--<h2>{{.Title}}</h2><hr />-->
-
-<form action="/admin/article-{{if .New}}add{{else}}edit?id={{.Article.ID}}{{end}}" method="post">
-<div><input type="text" name="title" class="title" id="title" placeholder='{{l "Article Title"}}' value="{{if not .New}}{{.Article.Title}}{{end}}" /></div>
-<div><input type="text" name="customid" class="title" id="customID" placeholder='{{l "Custom ID"}}' value="{{if not .New}}{{.Article.ID}}{{end}}" /></div>
-<div>
-    <a class="btn" id="upload">{{l "Upload Files"}}</a>
-    <a class="btn" id="preview">{{l "Preview"}}</a>
+<div class="row-fluid manage-bar">
+    <div class="span3 manage-title">
+        <h1>{{l .Title}}</h1>
+    </div>
+    <div class="span5 manage-tool btn-toolbar">
+        <a class="btn" id="upload">{{l "Upload Files"}}</a>
+        <a class="btn" id="preview">{{l "Preview"}}</a>
+    </div>
+    <div class="span4 manage-info"></div>
 </div>
-<hr />
-<div><textarea name="content" class="content" id="content" placeholder='{{l "Article Content"}}' >{{if not .New}}{{.Article.Content | printf "%s"}}{{end}}</textarea></div>
-<div>
-    <input class="btn btn-primary" type="submit" id="submit" value='{{l "Submit"}}' /> 
-    <input class="btn btn-danger" type="reset" value='{{l "Reset"}}' /></div>
+
+<form class="row-fluid article-edit" action="/admin/article-{{if .New}}add{{else}}edit?id={{.Article.ID}}{{end}}" method="post">
+    <div class="span7">
+        <input type="text" name="title" class="span12" id="title" placeholder='{{l "Article Title"}}' value="{{if not .New}}{{.Article.Title}}{{end}}" />
+        <textarea rows="15" name="content" class="content span12" id="content" placeholder='{{l "Article Content"}}' >{{if not .New}}{{.Article.Content | printf "%s"}}{{end}}</textarea>
+    </div>
+    <div class="span5 well">
+        <div class="input-prepend row-fluid">
+            <span class="add-on">{{l "Custom ID"}}</span>
+            <input type="text" name="customid" class="span8 input-large" id="customID" placeholder='{{l "Optional"}}' value="{{if not .New}}{{.Article.ID}}{{end}}" />
+        </div>
+        <div class="row-fluid" style="margin-top:20px;">
+            <input class="btn btn-primary" type="submit" id="submit" value='{{l "Submit"}}' /> 
+            <input class="btn btn-danger" type="reset" value='{{l "Reset"}}' />
+        </div>
+    </div>
+
 </form>
 
 <!-- Article Preview -->
@@ -50,7 +63,7 @@
                     <input id="file" type="file" name="file" multiple>
                 </span>
 
-                <table class="table table-striped">
+                <table class="table table-striped table-hover">
                     <thead><tr>
                           <th>{{l "Num"}}</th>
                           <th>{{l "File Name"}}</th>
@@ -65,7 +78,7 @@
 
             <div class="tab-pane" id="file-edit">
                 <div class="preview" style="text-align:center;">{{l "Preview"}}</div>
-                <table class="table table-striped">
+                <table class="table table-hover">
                     <tbody>
                         <tr>
                           <th>{{l "File Name"}}</th>
@@ -78,7 +91,7 @@
             </div>
 
             <div class="tab-pane" id="file-upload">
-                <table class="table table-striped">
+                <table class="table table-striped table-hover">
                     <thead><tr>
                         <th>{{l "Num"}}</th>
                         <th>{{l "File Name"}}</th>
@@ -99,9 +112,6 @@
     </div>
 </div>
 
-<script src="/static/js/jquery.js"></script>
-<script src="/static/js/bootstrap-modal.js"></script>
-<script src="/static/js/bootstrap-tab.js"></script>
 <script src="/static/js/c-plugin.js"></script>
 <script>
     // setting
@@ -112,13 +122,13 @@
         submit: "#submit",
 
         // upload
-        upload: "#upload",
+        btnUpload: ".btn#upload",
         uploadModal:  "#modal-upload",
 
         // preview
         title: "#title",
         content: "#content",
-        preview: ".btn#preview",
+        btnPreview: ".btn#preview",
         previewModal: "#modal-preview",
 
         // lang
