@@ -68,9 +68,10 @@ func handleDecodeContent(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initSystem(r)
 
     // Get page id, pageSize
-    pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
+    pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
     pageSize  := config.AdminArticles
 
     // Get offset and page nav
@@ -142,14 +143,14 @@ func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
         serveError(w, err)
     }
 
-    http.Redirect(w, r, "/admin/article-list", http.StatusFound)
+    http.Redirect(w, r, "/admin/article", http.StatusFound)
 }
 
 func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
 
     // Get article id
-    id := getUrlQuery(r.URL, "id")
+    id := getUrlVar(r, "id")
 
     // Get article data
     article, key, err := getArticle(id, c)
@@ -200,14 +201,14 @@ func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    http.Redirect(w, r, "/admin/article-list", http.StatusFound)
+    http.Redirect(w, r, "/admin/article", http.StatusFound)
 }
 
 func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
 
     // Get article id
-    id := getUrlQuery(r.URL, "id")
+    id := getUrlVar(r, "id")
 
     // Get article data
     _, key, err := getArticle(id, c)
@@ -221,14 +222,15 @@ func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    http.Redirect(w, r, "/admin/article-list", http.StatusFound)
+    http.Redirect(w, r, "/admin/article", http.StatusFound)
 }
 
 func handleArticleView(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initSystem(r)
 
     // Get article id
-    id := getUrlQuery(r.URL, "id")
+    id := getUrlVar(r, "id")
 
     // Get user info
     user := getUserInfo(c)
@@ -237,11 +239,6 @@ func handleArticleView(w http.ResponseWriter, r *http.Request) {
     article, _, err := getArticle(id, c)
     if err != nil {
         serveError(w, err)
-        return
-    }
-    // Check article is exists
-    if article.ID == "" {
-        serve404(w)
         return
     }
 
@@ -262,4 +259,8 @@ func handleArticleView(w http.ResponseWriter, r *http.Request) {
 
     // Render page
     page.Render("article", w)
+}
+
+func handleRedirectArticleList(w http.ResponseWriter, r *http.Request) {
+    http.Redirect(w, r, "/admin/article", http.StatusFound)
 }

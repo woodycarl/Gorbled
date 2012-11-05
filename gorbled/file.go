@@ -94,7 +94,7 @@ func handleFileNewUrl(w http.ResponseWriter, r *http.Request) {
     m := new(Message)
     errInfo := ""
 
-    num, err := strconv.Atoi(getUrlQuery(r.URL, "num"))
+    num, err := strconv.Atoi(getUrlVar(r, "num"))
     if err != nil {
         errInfo = errInfo + fmt.Sprint(err)
     }
@@ -102,7 +102,7 @@ func handleFileNewUrl(w http.ResponseWriter, r *http.Request) {
     uploadURLs := make([]string, num)
 
     for i:=0;i<num;i++ {
-        uploadURL, _ := blobstore.UploadURL(c, "/admin/file-upload", nil)
+        uploadURL, _ := blobstore.UploadURL(c, "/admin/file/upload", nil)
 
         uploadURLs[i] = uploadURL.String()
         if err != nil {
@@ -150,7 +150,7 @@ func handleFileDelete(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
     m := new(Message)
     
-    if id := getUrlQuery(r.URL, "id"); id == "" {
+    if id := getUrlVar(r, "id"); id == "" {
         m.Success = false
         m.Info = "Error: empty id"
     } else if file, key, err := getFile(id, c); err != nil {
@@ -172,7 +172,7 @@ func handleFileEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
     m := new(Message)
 
-    if id := r.FormValue("id"); id == "" {
+    if id := getUrlVar(r, "id"); id == "" {
         m.Success = false
         m.Info = "Error: enpty id"
     } else if file, key, err := getFile(id, c); err != nil {
@@ -206,7 +206,7 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
     m := new(Message)
 
     // Get page id, pageSize
-    pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
+    pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
     pageSize  := config.AdminFiles
 
     // Get offset 
@@ -239,27 +239,11 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleFileList(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
-
-    // Get page id, pageSize
-    pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
-    pageSize  := config.AdminFiles
-
-    // Get offset and page nav
-    offset, nav := getPageNav("File", pageId, pageSize, c)
-
-    // Get file data
-    files, err := getFilesPerPage(offset, pageSize, c)
-    if err != nil {
-        serveError(w, err)
-        return
-    }
+    initSystem(r)
 
     // New Page
     page := Page {
         Title:      "File Manager",
-        Files:      files,
-        Nav:        nav,
         Config:     config,
     }
 
@@ -268,5 +252,9 @@ func handleFileList(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleFileGet(w http.ResponseWriter, r *http.Request) {
-    blobstore.Send(w, appengine.BlobKey(r.FormValue("key")))
+    blobstore.Send(w, appengine.BlobKey(getUrlVar(r,"key")))
+}
+
+func handleRedirectFileList(w http.ResponseWriter, r *http.Request) {
+    http.Redirect(w, r, "/admin/file", http.StatusFound)
 }

@@ -2,59 +2,67 @@ package gorbled
 
 import (
     "net/http"
+    "github.com/gorilla/mux"
+
 )
 
-var handlers = map[string](func(http.ResponseWriter, *http.Request)){
-    // config.go
-    "/admin/config": handleConfigEdit,
-
-    // article.go
-    "/admin/article-list":   handleArticleList,
-    "/admin/article-add":    handleArticleAdd,
-    "/admin/article-edit":   handleArticleEdit,
-    "/admin/article-delete": handleArticleDelete,
-    "/decodeContent": handleDecodeContent,
-
-    "/article": handleArticleView,
-
-    // file.go
-    "/admin/file-list": handleFileList,
-    "/admin/file-edit": handleFileEdit,
-    "/admin/file-new-url": handleFileNewUrl,
-    "/admin/file-upload": handleFileUpload,
-    "/admin/file-delete": handleFileDelete,
-    "/admin/file-data": handleFileData,
-
-    "/file": handleFileGet,
+func init() {
+    r := mux.NewRouter()
 
     // widget.go
-    "/admin/widget-list":   handleWidgetList,
-    "/admin/widget-add":    handleWidgetAdd,
-    "/admin/widget-edit":   handleWidgetEdit,
-    "/admin/widget-delete": handleWidgetDelete,
+    r.HandleFunc("/admin/widget/", handleRedirectWidgetList)
+    r.HandleFunc("/admin/widget", handleWidgetList)
+    r.HandleFunc("/admin/widget/{pid:[0-9]+}", handleWidgetList)
+    r.HandleFunc("/admin/widget/add", handleWidgetAdd)
+    r.HandleFunc("/admin/widget/edit/{id}", handleWidgetEdit)
+    r.HandleFunc("/admin/widget/delete/{id}", handleWidgetDelete)
 
     // user.go
-    "/login": handleUserLogin,
-    "/logout": handleUserLogout,
+    r.HandleFunc("/login", handleUserLogin)
+    r.HandleFunc("/logout", handleUserLogout)
 
     // rss.go
-    "/rss.xml": handleRSS,
+    r.HandleFunc("/feed", handleRSS)
 
-    // index.go
-    "/":    handleIndex,
+    // file.go
+    r.HandleFunc("/admin/file/", handleRedirectFileList)
+    r.HandleFunc("/admin/file", handleFileList)
+    r.HandleFunc("/admin/file/{pid:[0-9]+}", handleFileList)
+    r.HandleFunc("/admin/file/edit/{id}", handleFileEdit)
+    r.HandleFunc("/admin/file/new-url/{num}", handleFileNewUrl)
+    r.HandleFunc("/admin/file/upload", handleFileUpload)
+    r.HandleFunc("/admin/file/delete/{id}", handleFileDelete)
+    r.HandleFunc("/admin/file/data/{pid:[0-9]+}", handleFileData)
+
+    r.HandleFunc("/file/{key}", handleFileGet)
+
+    // article.go
+    r.HandleFunc("/admin/article/", handleRedirectArticleList)
+    r.HandleFunc("/admin/article", handleArticleList)
+    r.HandleFunc("/admin/article/{pid:[0-9]+}", handleArticleList)
+    r.HandleFunc("/admin/article/add", handleArticleAdd)
+    r.HandleFunc("/admin/article/edit/{id}", handleArticleEdit)
+    r.HandleFunc("/admin/article/delete/{id}", handleArticleDelete)
+
+    r.HandleFunc("/decodeContent", handleDecodeContent)
+    r.HandleFunc("/article/{id}", handleArticleView)
+
+    // config.go
+    r.HandleFunc("/admin/config", handleConfigEdit)
 
     // lang.go
-    "/admin/init-lang": handleInitLang,
-}
+    r.HandleFunc("/admin/init/lang", handleInitLang)
 
-func init() {
-    http.HandleFunc("/", handle)
+    // index.go
+    r.HandleFunc("/", handleIndex)
+    r.HandleFunc("/{pid:[0-9]+}", handleIndex)
+
+    r.HandleFunc("/test/{id}", handle)
+    r.HandleFunc("/test", handle)
+
+    http.Handle("/", r)
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
-    config = initConfig(r)
 
-    lang = initLang(r, config.Language)
-
-    handlers[r.URL.Path](w, r)
 }

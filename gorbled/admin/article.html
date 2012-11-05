@@ -10,7 +10,7 @@
     <div class="span4 manage-info"></div>
 </div>
 
-<form class="row-fluid article-edit" action="/admin/article-{{if .New}}add{{else}}edit?id={{.Article.ID}}{{end}}" method="post">
+<form class="row-fluid article-edit" action="/admin/article/{{if .New}}add{{else}}edit/{{.Article.ID}}{{end}}" method="post">
     <div class="span7">
         <input type="text" name="title" class="span12" id="title" placeholder='{{l "Article Title"}}' value="{{if not .New}}{{.Article.Title}}{{end}}" />
         <textarea rows="15" name="content" class="content span12" id="content" placeholder='{{l "Article Content"}}' >{{if not .New}}{{.Article.Content | printf "%s"}}{{end}}</textarea>
@@ -56,7 +56,6 @@
 
         <div class="tab-content">
             <div class="tab-pane active" id="file-list">
-                <link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
                 <span class="btn btn-primary fileinput-button">
                     <i class="icon-upload icon-white"></i>
                     <span>{{l "Upload"}}</span>

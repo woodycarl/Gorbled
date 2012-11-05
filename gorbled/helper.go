@@ -3,11 +3,13 @@ package gorbled
 import (
     "fmt"
     "net/url"
-    //"net/http"
+    "net/http"
 
     "appengine"
     "appengine/datastore"
     "time"
+
+    "github.com/gorilla/mux"
 )
 
 /*
@@ -66,4 +68,8 @@ func getUrlQuery(u *url.URL, query string) (result string) {
     result   = urlQuery.Get(query)
 
     return
+}
+
+func getUrlVar(r *http.Request, v string) string {
+    return mux.Vars(r)[v]
 }

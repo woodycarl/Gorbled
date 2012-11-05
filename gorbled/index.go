@@ -9,12 +9,13 @@ import (
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initSystem(r)
 
     // Get user info
     user := getUserInfo(c)
 
     // Get post id and page id
-    pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
+    pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
     pageSize  := config.Articles
 
     // Get offset and page nav

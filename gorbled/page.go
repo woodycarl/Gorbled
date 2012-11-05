@@ -7,7 +7,7 @@ import (
     "appengine"
     "appengine/datastore"
     "strings"
-    "other_package/blackfriday"
+    "github.com/russross/blackfriday"
 )
 
 type Page struct {
@@ -35,7 +35,6 @@ type PageId struct {
 type PageNav struct {
     ShowPrev      bool
     ShowNext      bool
-    ShowIDs       bool
     NextPageID    int
     PrevPageID    int
     PageIDs       []PageId
@@ -51,7 +50,7 @@ func decodeMD(content []byte) string {
 
 func showDate(t time.Time) string {
     newLocation := time.FixedZone("myTimeZone", (int)(config.TimeZone*60*60))
-    return t.In(newLocation).Format(L("3:04pm, Mon 2 Jan"))
+    return t.In(newLocation).Format(config.TimeFormat)
 }
 
 var funcMap = template.FuncMap{
@@ -80,39 +79,26 @@ func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (off
     }
     offset = (pageId - 1) * pageSize
 
-    pageHalfLen := (NavLen / 2)
-    if NavLen / 2 != 0 {
-        pageHalfLen++
-    }
-
     var start, length, nextId, prevId int
-    var prev, next, showIDs bool
+    var prev, next bool
 
-    switch {
-        case pageNums <= NavLen :
-            start = 1
-            prev = false
-            length = pageNums
-            next = false
-        case pageId <= pageHalfLen :
-            start = 1
-            prev = false
-            length = NavLen
-            next = true
-            nextId = NavLen + 1
-        case pageId + pageHalfLen >= pageNums :
-            start = pageNums - NavLen
-            prev = true
-            prevId = start - 1
-            length = NavLen
-            next = false
-        default :
-            start = pageId - pageHalfLen + 1
-            prev = true
-            prevId = start - 1
-            length = NavLen
-            next = true
-            nextId = start + length
+    start = ((pageId-1)/NavLen)*NavLen + 1
+    if start+NavLen-1<=pageNums {
+        length = NavLen
+    } else {
+        length = pageNums - start +1
+    }
+    if start - 1 > 0 {
+        prev = true
+        prevId = start - 1
+    } else {
+        prev = false
+    }
+    if start + length <= pageNums {
+        next = true
+        nextId = start + length
+    } else {
+        next = false
     }
 
     var ids = make([]PageId, length)
@@ -124,16 +110,10 @@ func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (off
             ids[i].Current = false
         }
     }
-    if length > 1 {
-        showIDs = true
-    } else {
-        showIDs = false
-    }
 
     pageNav = PageNav {
         ShowPrev      : prev,
         ShowNext      : next,
-        ShowIDs       : showIDs,
         NextPageID    : nextId,
         PrevPageID    : prevId,
         PageIDs       : ids,

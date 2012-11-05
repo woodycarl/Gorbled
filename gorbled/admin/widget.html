@@ -10,7 +10,7 @@
     <div class="span4 manage-info"></div>
 </div>
 
-<form class="row-fluid widget-edit" action="/admin/widget-{{if .New}}add{{else}}edit?id={{.Widget.ID}}{{end}}" method="post">
+<form class="row-fluid widget/edit" action="/admin/widget/{{if .New}}add{{else}}edit/{{.Widget.ID}}{{end}}" method="post">
     <div class="span7">
         <input type="text" name="title" class="span12" id="title" placeholder="Widget Title" value="{{if not .New}}{{.Widget.Title}}{{end}}" />
         <textarea rows="15" name="content" class="span12" id="content" placeholder="Widget Content" >{{if not .New}}{{.Widget.Content | printf "%s"}}{{end}}</textarea>
@@ -57,7 +57,6 @@
 
         <div class="tab-content">
             <div class="tab-pane active" id="file-list">
-                <link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
                 <span class="btn btn-primary fileinput-button">
                     <i class="icon-upload icon-white"></i>
                     <span>{{l "Upload"}}</span>
@@ -72,9 +71,7 @@
                     </tr></thead>
                     <tbody class="data"> </tbody>
                 </table>
-                <div class="pageination">
-                    <ul class="pager"> </ul>
-                </div>
+                <div class="pagination pagination-centered"><ul> </ul></div>
             </div>
 
             <div class="tab-pane" id="file-edit">

@@ -14,10 +14,6 @@ import (
     "path/filepath"
 )
 
-func init() {
-    //http.HandleFunc("/admin/init-lang", handleInitLang)
-}
-
 type Lang struct {
     ID          string
     Content     []byte
@@ -55,12 +51,14 @@ func getLangs(c appengine.Context) (langs []Lang, keys []*datastore.Key, err err
 
 func handleInitLang(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initLang2(c)
-    lang = initLang(r, config.Language)
+    initSystem(r)
+    readLang(c)
+    initLang(c, config.Language)
+
     fmt.Fprint(w, lang)
 }
 
-func initLang2(c appengine.Context) {
+func readLang(c appengine.Context) {
     _, keys, _ := getLangs(c)
     datastore.DeleteMulti(c, keys)
 
@@ -74,17 +72,14 @@ func initLang2(c appengine.Context) {
     }
 
     filepath.Walk("gorbled/local/", readFile)
-    
 }
 
-func initLang(r *http.Request, language string) (langC map[string]string) {
-    c := appengine.NewContext(r)
+func initLang(c appengine.Context, l string) {
+    langT, _, _ := getLang(l, c)
 
-    langD, _, _ := getLang(language, c)
+    dec := json.NewDecoder(strings.NewReader(string(langT.Content)))
 
-    dec := json.NewDecoder(strings.NewReader(string(langD.Content)))
-
-    dec.Decode(&langC)
+    dec.Decode(&lang)
 
     return
 }
@@ -94,6 +89,7 @@ func formatLangString(s string) string {
 
     return r.FindString(s)
 }
+
 func formatLangNum(s string) int {
     r, _ := regexp.Compile(`\d`)
     id, _ := strconv.Atoi(r.FindString(s))
@@ -119,14 +115,13 @@ func formatLang(file string) (lang Lang) {
         isAnnotate, _ := regexp.MatchString(`^\s*(#.*|$)`, line)
 
         if !isAnnotate {
-            isSentenceIn, _ := regexp.MatchString(`^\s*i.*`, line)
-            s := strings.Split(strings.Split(line, "-")[1], ":")
+            rexp, _ := regexp.Compile(`([io])-([^:]+):(.*)`)
+            s := rexp.FindStringSubmatch(line)
 
-            //id := formatLangNum(s[0])
-            id := formatLangString(s[0])
-            sentence := formatLangString(s[1])
+            id := formatLangString(s[2])
+            sentence := formatLangString(s[3])
 
-            if isSentenceIn {
+            if s[1]=="i" {
                 sentencesIn[id] = sentence
             } else {
                 sentencesOut[id] = sentence
@@ -150,6 +145,6 @@ func L(s string) string {
     if r := lang[s]; r != "" {
         return r
     }
-    // && len(lang) > 0 
+
     return s
 }

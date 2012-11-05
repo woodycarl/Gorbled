@@ -14,9 +14,9 @@
     <div class="alert alert-success"><h4 class="alert-heading">Welcome You</h4>{{.User.Nickname}}</div>
     <ul class="nav nav-list">
         {{if .User.IsAdmin}}
-            <li><a href="/admin/article-list">Article Manager</a></li>
-            <li><a href="/admin/widget-list">Widget Manager</a></li>
-            <li><a href="/admin/file-list">File Manager</a></li>
+            <li><a href="/admin/article">Article Manager</a></li>
+            <li><a href="/admin/widget">Widget Manager</a></li>
+            <li><a href="/admin/file">File Manager</a></li>
             <li>&nbsp;</li>
         {{end}}
         <li><a href="/logout">Logout</a></li>

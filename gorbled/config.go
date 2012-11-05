@@ -11,6 +11,7 @@ import (
     "appengine"
     "appengine/datastore"
     "strconv"
+
 )
 
 const (
@@ -34,6 +35,7 @@ type Config struct {
     Disqus              string
 
     TimeZone            float64
+    TimeFormat          string
     BaseUrl             string
     Version             float64
     Language            string
@@ -51,13 +53,13 @@ func (config *Config) update(key *datastore.Key, c appengine.Context) (err error
     return
 }
 
-func getConfig(c appengine.Context) (config Config, key *datastore.Key, err error) {
+func getConfig(c appengine.Context) (con Config, key *datastore.Key, err error) {
     dbQuery := datastore.NewQuery("Config")
     var configs []Config
     keys, err := dbQuery.GetAll(c, &configs)
     if len(keys) > 0 {
-        key    = keys[0]
-        config = configs[0]
+        key     = keys[0]
+        con     = configs[0]
     }
 
     return
@@ -78,6 +80,7 @@ func getJsonConfig() (config Config) {
  */
 func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initSystem(r)
 
     if r.Method != "POST" {
         // Show article edit page
@@ -116,6 +119,7 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
     config.AdminWidgets, _ = strconv.Atoi(r.FormValue("admin-widgets"))
     config.Theme = checkTheme(r.FormValue("theme"))
     config.TimeZone, _ = strconv.ParseFloat(r.FormValue("timezone"), 64)
+    config.TimeFormat = r.FormValue("time-format")
     config.Version, _ = strconv.ParseFloat(r.FormValue("version"), 64)
     config.Disqus = r.FormValue("disqus")
     config.GoogleAnalytics = r.FormValue("google-analytics")
@@ -137,23 +141,20 @@ func checkTheme(s string) string {
 }
 
 /*
- * Init system
+ * Install system
  */
-func initSystem(r *http.Request) (config Config) {
-    c := appengine.NewContext(r)
-
+func installSystem(c appengine.Context) {
     config = getJsonConfig()
     config.save(c)
 
-    initLang2(c)
-
-    lang = initLang(r, config.Language)
+    readLang(c)
+    initLang(c, config.Language)
 
     article := Article {
         ID:      genID(),
         Title:   L("Hello World!"),
         Date:    time.Now(),
-        Content: []byte(L("Welcome to Gorbled")+" "+fmt.Sprint(config.Version)+L(". You can edit or delete this post, then start blogging!")),
+        Content: []byte(fmt.Sprintf(L("Welcome to Gorbled %.1f. You can edit or delete this post, then start blogging!"), config.Version)),
     }
     article.save(c)
 
@@ -168,16 +169,18 @@ func initSystem(r *http.Request) (config Config) {
 }
 
 /*
- * Init config
+ * Init system
  */
-func initConfig(r *http.Request) (config Config) {
+func initSystem(r *http.Request)  {
     c := appengine.NewContext(r)
 
-    config, _, err := getConfig(c)
-    if err != nil || config.Title == "" {
-        config = initSystem(r)
+    con, _, err := getConfig(c)
+    if err != nil || con.Title == "" {
+        installSystem(c)
+    } else {
+        config = con
+        //initLang(c, config.Language)
     }
-    config.BaseUrl = "http://" + r.Host
 
-    return
+    config.BaseUrl = "http://" + r.Host
 }

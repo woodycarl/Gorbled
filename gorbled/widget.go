@@ -6,6 +6,7 @@ import (
 
     "appengine"
     "appengine/datastore"
+
 )
 
 /*
@@ -69,9 +70,10 @@ func getWidgetsPerPage(offset, pageSize int,
  */
 func handleWidgetList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initSystem(r)
 
     // Get page id, pageSize
-    pageId, _ := strconv.Atoi(getUrlQuery(r.URL, "pid"))
+    pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
     pageSize  := config.AdminWidgets
 
     // Get offset and page nav
@@ -98,6 +100,7 @@ func handleWidgetList(w http.ResponseWriter, r *http.Request) {
 
 func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initSystem(r)
 
     if r.Method != "POST" {
         // Show widget add page
@@ -138,14 +141,15 @@ func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
+    http.Redirect(w, r, "/admin/widget", http.StatusFound)
 }
 
 func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initSystem(r)
 
     // Get widget id
-    id := getUrlQuery(r.URL, "id")
+    id := getUrlVar(r, "id")
 
     // Get widget data
     widget, key, err := getWidget(id, c)
@@ -167,7 +171,7 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
 
         // Check error
         if count, _ := dbQuery.Count(c); count < 1 {
-            http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
+            http.Redirect(w, r, "/admin/widget", http.StatusFound)
         }
 
         // New Page
@@ -206,14 +210,14 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
         serveError(w, err)
         return
     }
-    http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
+    http.Redirect(w, r, "/admin/widget", http.StatusFound)
 }
 
 func handleWidgetDelete(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
 
     // Get widget id
-    id := getUrlQuery(r.URL, "id")
+    id := getUrlVar(r, "id")
 
     // Get widget data
     _, key, err := getWidget(id, c)
@@ -227,5 +231,9 @@ func handleWidgetDelete(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    http.Redirect(w, r, "/admin/widget-list", http.StatusFound)
+    http.Redirect(w, r, "/admin/widget", http.StatusFound)
+}
+
+func handleRedirectWidgetList(w http.ResponseWriter, r *http.Request) {
+    http.Redirect(w, r, "/admin/widget", http.StatusFound)
 }

@@ -32,12 +32,12 @@ var cS = {
     previewSave: "#modal-preview .save",
 
     // common
-    urlGetData: "/admin/file-data?pid=",
-    urlFile: "/file?key=",
-    urlDelete: "/admin/file-delete?id=",
-    urlNew: "/admin/file-new-url?num=",
-    urlDecode: "/decodeContent",
-    urlEdit: "/admin/file-edit?id=",
+    urlGetData: "/admin/file/data/",
+    urlFile:    "/file/",
+    urlDelete:  "/admin/file/delete/",
+    urlNew:     "/admin/file/new-url/",
+    urlDecode:  "/decodeContent",
+    urlEdit:    "/admin/file/edit/",
 
 }
 
@@ -143,7 +143,7 @@ initList: function(pid) {
                     d = tS.lDelete;
                     b = '';
                 }
-                filesInfo.push('<tr class="file" fileid="'+i+'"><td class="num">'+fileNum+'</td><td class="name">'+$.getFileIcon(file.Type)+' <a href="/file?key='+file.ID+'" target="blank">'+file.Name+'</a></td>'+s+'<td class="Operations"><a fileid="'+i+'" onclick="$.initEdit('+i+');" class="btn '+b+' edit"><i class="icon-pencil"></i> '+e+'</a><a href="javascript:void(0)" onclick="$.deleteFile('+i+','+pid+');" class="btn '+b+'"><i class="icon-trash"></i> '+d+'</a></td></tr>');
+                filesInfo.push('<tr class="file" fileid="'+i+'"><td class="num">'+fileNum+'</td><td class="name">'+$.getFileIcon(file.Type)+' <a href="'+cS.urlFile+file.ID+'" target="blank">'+file.Name+'</a></td>'+s+'<td class="Operations"><a fileid="'+i+'" onclick="$.initEdit('+i+');" class="btn '+b+' edit"><i class="icon-pencil"></i> '+e+'</a><a  onclick="$.deleteFile('+i+','+pid+');" class="btn '+b+'"><i class="icon-trash"></i> '+d+'</a></td></tr>');
             });
             $(cS.listData).html(filesInfo.join(''));
 
@@ -154,18 +154,15 @@ initList: function(pid) {
                 //navInfo.push('<li class="previous"><a href="javascript:void(0)" onclick="$.initList('+page.Nav.PrevPageID+');">&larr; '+tS.lOlder+'</a></li>');
                 navInfo.push('<li><a href="javascript:void(0)" onclick="$.initList('+page.Nav.PrevPageID+');">«</a></li>');
             }
-            if (page.Nav.ShowIDs) {
-
-                $.each(page.Nav.PageIDs, function(i, pageID) {
-                    if (pageID.Current) {
-                        //navInfo.push('<li class="current"><a>'+pageID.Id+'</a></li>');
-                        navInfo.push('<li class="active"><a>'+pageID.Id+'</a></li>');
-                    } else {
-                        //navInfo.push('<li class=""><a href="javascript:void(0)" onclick="$.initList('+pageID.Id+');">'+pageID.Id+'</a></li>');
-                        navInfo.push('<li><a href="javascript:void(0)" onclick="$.initList('+pageID.Id+');">'+pageID.Id+'</a></li>');
-                    }
-                });
-            }
+            $.each(page.Nav.PageIDs, function(i, pageID) {
+                if (pageID.Current) {
+                    //navInfo.push('<li class="current"><a>'+pageID.Id+'</a></li>');
+                    navInfo.push('<li class="active"><a>'+pageID.Id+'</a></li>');
+                } else {
+                    //navInfo.push('<li class=""><a href="javascript:void(0)" onclick="$.initList('+pageID.Id+');">'+pageID.Id+'</a></li>');
+                    navInfo.push('<li><a href="javascript:void(0)" onclick="$.initList('+pageID.Id+');">'+pageID.Id+'</a></li>');
+                }
+            });
             if (page.Nav.ShowNext) {
                 //navInfo.push('<li class="next"><a href="javascript:void(0)" onclick="$.initList('+page.Nav.NextPageID+');">'+tS.lNewer+' &rarr;</a></li>');
                 navInfo.push('<li><a href="javascript:void(0)" onclick="$.initList('+page.Nav.NextPageID+');">»</a></li>');
@@ -210,7 +207,6 @@ getFileIcon: function(type) {
 
     return '<i class="icon-'+content+'"></i>';
 },
-// edit
 initEdit: function(id) {
     fileEdit = files[id];
     var type = fileEdit.Type;
@@ -361,7 +357,6 @@ showMessage: function(message, r, state){
             id = cS.message;
         }
     }
-
     if (message=="") {
         result = "";
     } else {

@@ -4,7 +4,7 @@
         <h1>{{l .Title}}</h1>
     </div>
     <div class="span5 manage-tool btn-toolbar">
-        <a href="/admin/article-add" class="btn">
+        <a href="/admin/article/add" class="btn">
             <i class="icon-pencil"></i> {{l "Add Article"}}</a>
     </div>
     <div class="span4 manage-info"></div>
@@ -24,8 +24,8 @@
                 <td>{{.Title}}</td>
                 <td>{{showDate .Date}}</td>
                 <td>
-                    <a href="/admin/article-edit?id={{.ID}}" class="btn"><i class="icon-pencil"></i> {{l "Edit"}}</a>
-                    <a href="/admin/article-delete?id={{.ID}}" class="btn"><i class="icon-trash"></i> {{l "Delete"}}</a>
+                    <a href="/admin/article/edit/{{.ID}}" class="btn"><i class="icon-pencil"></i> {{l "Edit"}}</a>
+                    <a href="/admin/article/delete/{{.ID}}" class="btn"><i class="icon-trash"></i> {{l "Delete"}}</a>
                 </td>
             </tr>{{end}}
         </tbody>
@@ -33,9 +33,9 @@
 
     <div class="pagination pagination-centered">
         <ul>
-            {{if .Nav.ShowPrev}}<li><a href="?pid={{.Nav.PrevPageID}}">«</a></li>{{end}}
-            {{if .Nav.ShowIDs}}{{range .Nav.PageIDs}}{{if .Current}}<li class='active'><a>{{.Id}}</a></li>{{else}}<li><a href='?pid={{.Id}}'>{{.Id}}</a></li>{{end}}{{end}}{{end}}
-            {{if .Nav.ShowNext}}<li><a href="?pid={{.Nav.NextPageID}}">»</a></li>{{end}}
+            {{if .Nav.ShowPrev}}<li><a href="/admin/article/{{.Nav.PrevPageID}}">«</a></li>{{end}}
+            {{range .Nav.PageIDs}}{{if .Current}}<li class='active'><a>{{.Id}}</a></li>{{else}}<li><a href='/admin/article/{{.Id}}'>{{.Id}}</a></li>{{end}}{{end}}
+            {{if .Nav.ShowNext}}<li><a href="/admin/article/{{.Nav.NextPageID}}">»</a></li>{{end}}
         </ul>
     </div>
 </div>

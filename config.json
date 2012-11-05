@@ -14,5 +14,6 @@
 
     "Theme":            "default",
     "TimeZone":         8.0,
+    "TimeFormat":       "3:04pm, Mon 2 Jan",
     "Version":          2.2
 }

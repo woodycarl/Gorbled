@@ -169,8 +169,8 @@ o-u06:      上传中...
 
 
 #   w01:config.go
-i-w01:      Welcome to Gorbled
-o-w01:      欢迎使用Gorbled
+i-w01:      Welcome to Gorbled %.1f. You can edit or delete this post, then start blogging!
+o-w01:      欢迎使用Gorbled %.1f，可以随时删除或编辑这篇文章。
 #   w02:widget.go
 i-w02:      Widget Manager
 o-w02:      小工具管理
@@ -180,14 +180,6 @@ o-w03:      小工具
 
 
 
-#   .01:config.go
-i-.01:      . You can edit or delete this post, then start blogging!
-o-.01:      ，可以随时删除或编辑这篇文章。
-
-
 #   301:page.go
-#i-301:     3:04pm, Mon 2 Jan
-#o-301:  
-
-
-
+i-301:     3:04pm, Mon 2 Jan
+o-301:     2006-01-02 15:04:05

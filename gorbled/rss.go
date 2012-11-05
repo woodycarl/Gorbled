@@ -1,9 +1,7 @@
 package gorbled
 
-
 import (
     "net/http"
-
     "appengine"
     "appengine/datastore"
     "text/template"
@@ -14,6 +12,7 @@ import (
  */
 func handleRSS(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
+    initSystem(r)
 
     var articles []Article
     _, err := datastore.NewQuery("Article").Order("-Date").GetAll(c, &articles)

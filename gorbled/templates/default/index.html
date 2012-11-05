@@ -7,28 +7,22 @@
 
 {{range .Articles}}
 <div class="post well">
-    <h2><a href="/article?id={{.ID}}">{{.Title}}</a></h2>
+    <h2><a href="/article/{{.ID}}">{{.Title}}</a></h2>
     <h6>Post on {{showDate .Date}}</h6>
     <div style="margin-top:10px">{{decodeMD .Content}}</div>
 </div>
 {{end}}
 
-<div class="pageination">
-    <ul class="pager">
+<div class="pagination pagination-centered">
+    <ul>
     {{if .Nav.ShowPrev}}
-        <li class="previous">
-            <a href="?pid={{.Nav.PrevPageID}}">&larr; Older</a>
-        </li>
+        <li><a href="/{{.Nav.PrevPageID}}">«</a></li>
     {{end}}
-    {{if .Nav.ShowIDs}}
-        {{range .Nav.PageIDs}}
-            {{if .Current}}<li class='number current'><a>{{.Id}}</a></li>{{else}}<li class='number'><a href='?pid={{.Id}}'>{{.Id}}</a></li>{{end}}
-        {{end}}
+    {{range .Nav.PageIDs}}
+        {{if .Current}}<li class='active'><a>{{.Id}}</a></li>{{else}}<li><a href='/{{.Id}}'>{{.Id}}</a></li>{{end}}
     {{end}}
     {{if .Nav.ShowNext}}
-        <li class="next">
-            <a href="?pid={{.Nav.NextPageID}}">Newer &rarr;</a>
-        </li>
+        <li><a href="/{{.Nav.NextPageID}}">»</a></li>
     {{end}}
     </ul>
 </div>
