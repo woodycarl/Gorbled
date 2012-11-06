@@ -3,26 +3,17 @@ package gorbled
 import (
     "net/http"
     "strconv"
-    //"fmt"
     "appengine"
 )
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    //initSystem(r)
 
-    // Get user info
-    user := getUserInfo(c)
+    // Get post id and pagina id
+    paginaId, _ := strconv.Atoi(getUrlVar(r, "pid"))
+    paginaSize  := config.Articles
 
-    // Get post id and page id
-    pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
-    pageSize  := config.Articles
-
-    // Get offset and page nav
-    offset, nav := getPageNav("Article", pageId, pageSize, c)
-
-    // Get article data
-    articles, err := getArticlesPerPage(offset, pageSize, c)
+    articles, nav, err := getArticlesAndNav(paginaId, paginaSize, c)
     if err != nil {
         serveError(w, err)
         return
@@ -35,15 +26,15 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // New Page
-    page := Page {
-        "User":       user,
+    // New Pagina
+    pagina := Pagina {
+        "User":       getUserInfo(c),
         "Articles" :  articles,
         "Widgets" :   widgets,
         "Nav" :       nav,
         "Config" :    config,
     }
 
-    // Render page
-    page.Render("index", w)
+    // Render pagina
+    pagina.Render("index", w)
 }

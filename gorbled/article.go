@@ -4,49 +4,28 @@ import (
     "net/http"
     "time"
     "strconv"
-    "fmt"
     "appengine"
     "appengine/datastore"
 )
 
-/*
- * Article data struct
- */
-type Article struct {
-    ID         string
-    Title      string
-    Date       time.Time
-    Content    []byte
-}
+func getArticles(c appengine.Context) (articles []Entry, err error) {
 
-func (article *Article) save(c appengine.Context) (err error) {
-    _, err = datastore.Put(c, datastore.NewIncompleteKey(c, "Article", nil), article)
-    return
-}
-
-func (article *Article) update(key *datastore.Key, c appengine.Context) (err error) {
-    _, err = datastore.Put(c, key, article)
-    return
-}
-
-func getArticle(id string, c appengine.Context) (article Article, key *datastore.Key, err error) {
-    dbQuery := datastore.NewQuery("Article").Filter("ID =", id)
-    var articles []Article
-    keys, err := dbQuery.GetAll(c, &articles)
-    if len(articles) > 0 {
-        article = articles[0]
-        key = keys[0]
-    }
+    dbQuery := datastore.NewQuery("Entry").
+        Filter("Type =", "article")
+    _, err = dbQuery.GetAll(c, &articles)
 
     return
 }
 
-func getArticlesPerPage(offset, pageSize int, c appengine.Context) (articles []Article, err error) {
+func getArticlesAndNav(paginaId, paginaSize int, c appengine.Context) (articles []Entry, nav PaginaNav, err error) {
 
-    dbQuery := datastore.NewQuery("Article").
-                                    Order("-Date").
-                                    Offset(offset).
-                                    Limit(pageSize)
+    // Get offset and pagina nav
+    dbQuery := datastore.NewQuery("Entry").Filter("Type =", "article")
+    count, _ := dbQuery.Count(c)
+    offset, nav := getPaginaNav(count, paginaId, paginaSize, c)
+
+    // Get article data
+    dbQuery = dbQuery.Order("-Date").Offset(offset).Limit(paginaSize)
     _, err = dbQuery.GetAll(c, &articles)
 
     return
@@ -55,92 +34,71 @@ func getArticlesPerPage(offset, pageSize int, c appengine.Context) (articles []A
 /*
  * Article handler
  */
-
-/*
- * Decode markdown code
- *
- * @return (string) 
- */
-func handleDecodeContent(w http.ResponseWriter, r *http.Request) {
-    content := []byte(r.FormValue("content"))
-    fmt.Fprint(w, decodeMD(content))
-}
-
 func handleArticleList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    //initSystem(r)
 
-    // Get page id, pageSize
-    pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
-    pageSize  := config.AdminArticles
+    // Get pagina id, paginaSize
+    paginaId, _ := strconv.Atoi(getUrlVar(r, "pid"))
+    paginaSize  := config.AdminArticles
 
-    // Get offset and page nav
-    offset, nav := getPageNav("Article", pageId, pageSize, c)
-
-    // Get article data
-    articles, err := getArticlesPerPage(offset, pageSize, c)
+    articles, nav, err := getArticlesAndNav(paginaId, paginaSize, c)
     if err != nil {
         serveError(w, err)
         return
     }
 
-    // New Page
-    page := Page {
+    pagina := Pagina {
         "Title":    "Article Manager",
         "Articles": articles,
         "Nav":      nav,
         "Config":   config,
     }
 
-    // Render page
-    page.Render("admin/articles", w)
+    pagina.Render("admin/articles", w)
 }
 
 func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
 
     if r.Method != "POST" {
-        // Show article add page
-
-        // New Page
-        page := Page {
+        pagina := Pagina {
             "Title":  "Add Article",
             "Config": config,
             "New":    true,
         }
 
-        // Render page
-        page.Render("admin/article", w)
+        pagina.Render("admin/article", w)
 
         return
     }
 
     // Process post data
 
-    // Parse form data
     if err := r.ParseForm(); err != nil {
         serveError(w, err)
         return
     }
 
     // Create article
-    article := &Article{
+    article := &Entry{
         Date:    time.Now(),
         Title:   r.FormValue("title"),
         Content: []byte(r.FormValue("content")),
+        Type:   "article",
     }
 
-    // Get ID
-    if r.FormValue("customid") != "" && !checkIdIsExists("Article", r.FormValue("customid"), c) {
-        // Check id is exists
+    if r.FormValue("customid") != "" && !checkIdIsExists("Entry", r.FormValue("customid"), c) {
         article.ID = r.FormValue("customid")
-    } else {
-        article.ID = genID()
-    }
 
-    // Save to datastore
-    if err := article.save(c); err != nil {
+        // Save to datastore
+        if err := article.put(c); err != nil {
+            serveError(w, err)
+            return
+        }
+        
+    } else if err := article.save(c); err != nil {
         serveError(w, err)
+        return
     }
 
     http.Redirect(w, r, "/admin/article", http.StatusFound)
@@ -149,11 +107,8 @@ func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
 func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
 
-    // Get article id
-    id := getUrlVar(r, "id")
-
     // Get article data
-    article, key, err := getArticle(id, c)
+    article, key, err := getEntry(getUrlVar(r, "id"), c)
     if err != nil {
         serveError(w, err)
         return
@@ -166,18 +121,16 @@ func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
     }
 
     if r.Method != "POST" {
-        // Show article edit page
-
-        // New Page
-        page := Page {
+        // New Pagina
+        pagina := Pagina {
             "Title":   "Edit Article",
             "Article": article,
             "Config":  config,
             "New":     false,
         }
 
-        // Render page
-        page.Render("admin/article", w)
+        // Show article edit pagina
+        pagina.Render("admin/article", w)
 
         return
     }
@@ -202,63 +155,6 @@ func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
     }
 
     http.Redirect(w, r, "/admin/article", http.StatusFound)
-}
-
-func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
-
-    // Get article id
-    id := getUrlVar(r, "id")
-
-    // Get article data
-    _, key, err := getArticle(id, c)
-    if err != nil {
-        serveError(w, err)
-        return
-    }
-
-    if err = datastore.Delete(c, key); err != nil {
-        serveError(w, err)
-        return
-    }
-
-    http.Redirect(w, r, "/admin/article", http.StatusFound)
-}
-
-func handleArticleView(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
-    //initSystem(r)
-
-    // Get article id
-    id := getUrlVar(r, "id")
-
-    // Get user info
-    user := getUserInfo(c)
-
-    // Get article data
-    article, _, err := getArticle(id, c)
-    if err != nil {
-        serveError(w, err)
-        return
-    }
-
-    // Get widget data
-    widgets, err := getWidgets(c)
-    if err != nil {
-        serveError(w, err)
-        return
-    }
-
-    // New Page
-    page := Page {
-        "User":    user,
-        "Article": article,
-        "Widgets": widgets,
-        "Config":  config,
-    }
-
-    // Render page
-    page.Render("article", w)
 }
 
 func handleRedirectArticleList(w http.ResponseWriter, r *http.Request) {

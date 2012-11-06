@@ -3,7 +3,13 @@ package gorbled
 import (
     "net/http"
     "github.com/gorilla/mux"
+    "appengine/datastore"
+)
 
+var (
+    config      Config
+    configKey   *datastore.Key
+    lang        map[string]string
 )
 
 func init() {
@@ -15,7 +21,7 @@ func init() {
     r.HandleFunc("/admin/widget/{pid:[0-9]+}", requireConfig(handleWidgetList))
     r.HandleFunc("/admin/widget/add", requireConfig(handleWidgetAdd))
     r.HandleFunc("/admin/widget/edit/{id}", requireConfig(handleWidgetEdit))
-    r.HandleFunc("/admin/widget/delete/{id}", handleWidgetDelete)
+    r.HandleFunc("/admin/widget/delete/{id}", handleEntryDelete)
 
     // user.go
     r.HandleFunc("/login", handleUserLogin)
@@ -32,7 +38,7 @@ func init() {
     r.HandleFunc("/admin/file/new-url/{num}", handleFileNewUrl)
     r.HandleFunc("/admin/file/upload", handleFileUpload)
     r.HandleFunc("/admin/file/delete/{id}", handleFileDelete)
-    r.HandleFunc("/admin/file/data/{pid:[0-9]+}", handleFileData)
+    r.HandleFunc("/admin/file/data/{pid:[0-9]+}", requireConfig(handleFileData))
 
     r.HandleFunc("/file/{key}", handleFileGet)
 
@@ -42,10 +48,10 @@ func init() {
     r.HandleFunc("/admin/article/{pid:[0-9]+}", requireConfig(handleArticleList))
     r.HandleFunc("/admin/article/add", requireConfig(handleArticleAdd))
     r.HandleFunc("/admin/article/edit/{id}", requireConfig(handleArticleEdit))
-    r.HandleFunc("/admin/article/delete/{id}", handleArticleDelete)
+    r.HandleFunc("/admin/article/delete/{id}", handleEntryDelete)
 
     r.HandleFunc("/decodeContent", handleDecodeContent)
-    r.HandleFunc("/article/{id}", requireConfig(handleArticleView))
+    r.HandleFunc("/article/{id}", requireConfig(handleEntryView))
 
     // config.go
     r.HandleFunc("/admin/config", requireConfig(handleConfigEdit))
@@ -57,12 +63,5 @@ func init() {
     r.HandleFunc("/", requireConfig(handleIndex))
     r.HandleFunc("/{pid:[0-9]+}", requireConfig(handleIndex))
 
-    r.HandleFunc("/test/{id}", handle)
-    r.HandleFunc("/test", handle)
-
     http.Handle("/", r)
-}
-
-func handle(w http.ResponseWriter, r *http.Request) {
-
 }

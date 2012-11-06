@@ -5,19 +5,18 @@ import (
     "text/template"
     "time"
     "appengine"
-    "appengine/datastore"
     "strings"
     "github.com/russross/blackfriday"
 )
 
-type Page map[string]interface{}
+type Pagina map[string]interface{}
 
 type PageId struct {
     Id         int
     Current    bool
 }
 
-type PageNav struct {
+type PaginaNav struct {
     ShowPrev      bool
     ShowNext      bool
     NextPageID    int
@@ -50,28 +49,26 @@ var funcMap = template.FuncMap{
  * <<       2       3   ...   x             >>
  * prev     ids[0]  ids[1]    ids[NavLen-1] next
  */
-func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (offset int, pageNav PageNav) {
+func getPaginaNav(count, paginaId, paginaSize int, c appengine.Context) (offset int, paginaNav PaginaNav) {
     NavLen := config.NavLen
 
-    dbQuery  := datastore.NewQuery(kind)
-    count, _ := dbQuery.Count(c)
-    pageNums := (count / pageSize)
-    if count % pageSize != 0 {
-        pageNums++
+    paginaNums := (count / paginaSize)
+    if count % paginaSize != 0 {
+        paginaNums++
     }
-    if pageId <= 0 || pageId > pageNums {
-        pageId = 1
+    if paginaId <= 0 || paginaId > paginaNums {
+        paginaId = 1
     }
-    offset = (pageId - 1) * pageSize
+    offset = (paginaId - 1) * paginaSize
 
     var start, length, nextId, prevId int
     var prev, next bool
 
-    start = ((pageId-1)/NavLen)*NavLen + 1
-    if start+NavLen-1<=pageNums {
+    start = ((paginaId-1)/NavLen)*NavLen + 1
+    if start+NavLen-1<=paginaNums {
         length = NavLen
     } else {
-        length = pageNums - start +1
+        length = paginaNums - start +1
     }
     if start - 1 > 0 {
         prev = true
@@ -79,7 +76,7 @@ func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (off
     } else {
         prev = false
     }
-    if start + length <= pageNums {
+    if start + length <= paginaNums {
         next = true
         nextId = start + length
     } else {
@@ -89,14 +86,14 @@ func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (off
     var ids = make([]PageId, length)
     for i:=0; i < length;i++{
         ids[i].Id = i+start
-        if ids[i].Id == pageId {
+        if ids[i].Id == paginaId {
             ids[i].Current = true
         } else {
             ids[i].Current = false
         }
     }
 
-    pageNav = PageNav {
+    paginaNav = PaginaNav {
         ShowPrev      : prev,
         ShowNext      : next,
         NextPageID    : nextId,
@@ -108,25 +105,25 @@ func getPageNav(kind string, pageId int, pageSize int, c appengine.Context) (off
 }
 
 /*
- * Render page
+ * Render pagina
  *
- * @param page          (string)
+ * @param pagina          (string)
  * @param w             (http.ResponseWriter)
  *
  * @return (error)
  */
-func (page *Page) Render(pageFilePath string, w http.ResponseWriter) {
+func (pagina *Pagina) Render(paginaFilePath string, w http.ResponseWriter) {
     base := "gorbled/templates/" + config.Theme + "/"
     
-    if strings.Contains(pageFilePath, "admin") {
+    if strings.Contains(paginaFilePath, "admin") {
         base = "gorbled/admin/"
-        pageFilePath = strings.Replace(pageFilePath, "admin/", "", -1)
+        paginaFilePath = strings.Replace(paginaFilePath, "admin/", "", -1)
     }
 
     tmpl, err := template.New("main.html").Funcs(funcMap).ParseFiles(
         base + "main.html",
         base + "sidebar.html",
-        base + pageFilePath + ".html",
+        base + paginaFilePath + ".html",
     )
 
     if err != nil {
@@ -134,7 +131,7 @@ func (page *Page) Render(pageFilePath string, w http.ResponseWriter) {
         return
     }
 
-    if err = tmpl.Execute(w, page); err != nil {
+    if err = tmpl.Execute(w, pagina); err != nil {
         serveError(w, err)
         return
     }

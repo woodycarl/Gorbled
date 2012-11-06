@@ -7,7 +7,6 @@ import (
     "bufio"
     "strings"
     "regexp"
-    "strconv"
     "encoding/json"
     "appengine"
     "appengine/datastore"
@@ -18,8 +17,6 @@ type Lang struct {
     ID          string
     Content     []byte
 }
-
-var lang map[string]string
 
 func (lang *Lang) save(c appengine.Context) (err error) {
     _, err = datastore.Put(c, datastore.NewIncompleteKey(c, "Lang", nil), lang)
@@ -51,9 +48,9 @@ func getLangs(c appengine.Context) (langs []Lang, keys []*datastore.Key, err err
 
 func handleInitLang(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    //initSystem(r)
+
     readLang(c)
-    initLang(c, config.Language)
+    initLang(c)
 
     fmt.Fprint(w, lang)
 }
@@ -74,8 +71,8 @@ func readLang(c appengine.Context) {
     filepath.Walk("gorbled/local/", readFile)
 }
 
-func initLang(c appengine.Context, l string) {
-    langT, _, _ := getLang(l, c)
+func initLang(c appengine.Context) {
+    langT, _, _ := getLang(config.Language, c)
 
     dec := json.NewDecoder(strings.NewReader(string(langT.Content)))
 
@@ -90,13 +87,6 @@ func formatLangString(s string) string {
     return r.FindString(s)
 }
 
-func formatLangNum(s string) int {
-    r, _ := regexp.Compile(`\d`)
-    id, _ := strconv.Atoi(r.FindString(s))
-
-    return id
-}
-
 func formatLang(file string) (lang Lang) {
     f, _ := os.Open("gorbled/local/"+file+".lang")
     read := bufio.NewReader(f)
@@ -105,12 +95,11 @@ func formatLang(file string) (lang Lang) {
     sentences := make(map[string]string)
 
     for true {
-        //lineStr, err := read.ReadString('\n')
-        lineStr, _, err := read.ReadLine()
+        lineByte, _, err := read.ReadLine()
         if err != nil {
             break
         }
-        line := string(lineStr)
+        line := string(lineByte)
 
         isAnnotate, _ := regexp.MatchString(`^\s*(#.*|$)`, line)
 

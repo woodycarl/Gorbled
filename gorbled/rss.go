@@ -3,7 +3,7 @@ package gorbled
 import (
     "net/http"
     "appengine"
-    "appengine/datastore"
+    //"appengine/datastore"
     "text/template"
 )
 
@@ -12,23 +12,21 @@ import (
  */
 func handleRSS(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    //initSystem(r)
 
-    var articles []Article
-    _, err := datastore.NewQuery("Article").Order("-Date").GetAll(c, &articles)
+    articles, err := getArticles(c)
     if err != nil {
         serveError(w, err)
         return
     }
 
-    // New Page
-    page := Page {
+    // New Pagina
+    pagina := Pagina {
         "Title" :     "RSS",
         "Articles" :  articles,
         "Config" :    config,
     }
 
-    // Render page
+    // Render pagina
     tmpl, err := template.New("rss.html").Funcs(funcMap).ParseFiles(
             "gorbled/admin/rss.html",
         )
@@ -37,5 +35,5 @@ func handleRSS(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    tmpl.Execute(w, page)
+    tmpl.Execute(w, pagina)
 }

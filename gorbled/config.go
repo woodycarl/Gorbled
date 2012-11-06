@@ -5,7 +5,6 @@ import (
     "net/http"
     "time"
     "fmt"
-
     "io/ioutil"
     "encoding/json"
     "appengine"
@@ -17,8 +16,6 @@ import (
 const (
     CONFIG_FILE_PATH = "config.json"
 )
-
-var config Config
 
 type Config struct {
     Title               string
@@ -39,6 +36,8 @@ type Config struct {
     BaseUrl             string
     Version             float64
     Language            string
+
+    EntryID             int
 }
 
 func (config *Config) save(c appengine.Context) (err error) {
@@ -80,37 +79,19 @@ func getJsonConfig() (config Config) {
  */
 func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    //initSystem(r)
 
     if r.Method != "POST" {
-        // Show article edit page
-
-        // New Page
-        page := Page {
+        pagina := Pagina {
             "Title":  "Config",
             "Config": config,
         }
 
-        // Render page
-        page.Render("admin/config", w)
+        pagina.Render("admin/config", w)
 
         return
     }
 
-    // Process post data
-
-    if err := r.ParseForm(); err != nil {
-        serveError(w, err)
-        return
-    }
-
-    // Get config
-    config, key, err := getConfig(c)
-    if err != nil {
-        serveError(w, err)
-        return
-    }
-
+    // r.Method == "GET"
     // Update config data
     config.Title = r.FormValue("title")
     config.Description = r.FormValue("description")
@@ -124,13 +105,12 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
     config.Disqus = r.FormValue("disqus")
     config.GoogleAnalytics = r.FormValue("google-analytics")
 
-
-    if err := config.update(key, c); err != nil {
-      serveError(w, err)
-      return
+    if err := config.update(configKey, c); err != nil {
+        serveError(w, err)
+        return
     }
 
-    http.Redirect(w, r, "/admin/config", http.StatusFound)
+    http.Redirect(w, r, r.Referer(), http.StatusFound)
 }
 
 func checkTheme(s string) string {
@@ -144,24 +124,27 @@ func checkTheme(s string) string {
  * Install system
  */
 func installSystem(c appengine.Context) {
-    config = getJsonConfig()
-    config.save(c)
+    con := getJsonConfig()
+    con.EntryID = 0
+    con.save(c)
+    config, configKey, _ = getConfig(c)
 
     readLang(c)
-    initLang(c, config.Language)
+    initLang(c)
 
-    article := Article {
-        ID:      genID(),
+    article := Entry {
         Title:   L("Hello World!"),
         Date:    time.Now(),
         Content: []byte(fmt.Sprintf(L("Welcome to Gorbled %.1f. You can edit or delete this post, then start blogging!"), config.Version)),
+        Type:   "article",
     }
     article.save(c)
 
-    widget := Widget {
-        ID:      genID(),
+    widget := Entry {
         Title:   L("Notice"),
+        Date:    time.Now(),
         Content: []byte(L("This is **Notice** !")),
+        Type:   "widget",
     }
     widget.save(c)
 
@@ -174,12 +157,13 @@ func installSystem(c appengine.Context) {
 func initSystem(r *http.Request)  {
     c := appengine.NewContext(r)
 
-    con, _, err := getConfig(c)
+    con, key, err := getConfig(c)
     if err != nil || con.Title == "" {
         installSystem(c)
     } else {
         config = con
-        initLang(c, config.Language)
+        configKey = key
+        initLang(c)
     }
 
     config.BaseUrl = "http://" + r.Host

@@ -10,56 +10,27 @@ import (
 )
 
 /*
- * Widget data struct
- */
-type Widget struct {
-    ID          string
-    Title       string
-    Sequence    int
-    Content     []byte
-}
-
-func (p *Widget) save(c appengine.Context) (err error) {
-    _, err = datastore.Put(c, datastore.NewIncompleteKey(c, "Widget", nil), p)
-    return
-}
-
-func (p *Widget) update(key *datastore.Key, c appengine.Context) (err error) {
-    _, err = datastore.Put(c, key, p)
-    return
-}
-
-/*
  * Get widget data
  */
-func getWidgets(c appengine.Context) (widgets []Widget, err error) {
-    dbQuery := datastore.NewQuery("Widget").Order("Sequence")
+func getWidgets(c appengine.Context) (widgets []Entry, err error) {
+
+    dbQuery := datastore.NewQuery("Entry").
+        Filter("Type =", "widget").
+        Order("Sequence")
     _, err = dbQuery.GetAll(c, &widgets)
-    return
-}
-
-func getWidget(id string,
-    c appengine.Context) (widget Widget, key *datastore.Key, err error) {
-
-    dbQuery := datastore.NewQuery("Widget").Filter("ID =", id)
-    var widgets []Widget
-    keys, err := dbQuery.GetAll(c, &widgets)
-    if len(widgets) > 0 {
-        widget = widgets[0]
-        key = keys[0]
-    }
 
     return
 }
 
-func getWidgetsPerPage(offset, pageSize int,
-    c appengine.Context) (widgets []Widget, err error) {
+func getWidgetsAndNav(paginaId, paginaSize int, c appengine.Context) (widgets []Entry, nav PaginaNav, err error) {
 
-    dbQuery := datastore.NewQuery("Widget").
-        Order("-Sequence").
-        Offset(offset).
-        Limit(pageSize)
+    // Get offset and pagina nav
+    dbQuery := datastore.NewQuery("Entry").Filter("Type =", "widget")
+    count, _ := dbQuery.Count(c)
+    offset, nav := getPaginaNav(count, paginaId, paginaSize, c)
 
+    // Get widget data
+    dbQuery = dbQuery.Order("Sequence").Offset(offset).Limit(paginaSize)
     _, err = dbQuery.GetAll(c, &widgets)
 
     return
@@ -70,50 +41,42 @@ func getWidgetsPerPage(offset, pageSize int,
  */
 func handleWidgetList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initSystem(r)
 
-    // Get page id, pageSize
-    pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
-    pageSize  := config.AdminWidgets
+    // Get pagina id, paginaSize
+    paginaId, _ := strconv.Atoi(getUrlVar(r, "pid"))
+    paginaSize  := config.AdminWidgets
 
-    // Get offset and page nav
-    offset, nav := getPageNav("Widget", pageId, pageSize, c)
-
-    // Get widget data
-    widgets, err := getWidgetsPerPage(offset, pageSize, c)
+    widgets, nav, err := getWidgetsAndNav(paginaId, paginaSize, c)
     if err != nil {
         serveError(w, err)
         return
     }
 
-    // New Page
-    page := Page {
+    // New Pagina
+    pagina := Pagina {
         "Title" :     "Widget Manager",
         "Widgets" :   widgets,
         "Nav" :       nav,
         "Config" :    config,
     }
 
-    // Render page
-    page.Render("admin/widgets", w)
+    // Render pagina
+    pagina.Render("admin/widgets", w)
 }
 
 func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initSystem(r)
 
     if r.Method != "POST" {
-        // Show widget add page
-
-        // New Page
-        page := Page {
+        // New Pagina
+        pagina := Pagina {
             "Title":     "Add Widget",
             "Config":    config,
             "New":       true,
         }
 
-        // Render page
-        page.Render("admin/widget", w)
+        // Show widget add pagina
+        pagina.Render("admin/widget", w)
 
         return
     }
@@ -128,11 +91,12 @@ func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
 
     // Create widget
     sequence, _ := strconv.Atoi(r.FormValue("sequence"))
-    widget := &Widget{
+    widget := &Entry{
         ID:         getID("Widget", r.FormValue("customid"), c),
         Title:      r.FormValue("title"),
         Content:    []byte(r.FormValue("content")),
         Sequence:   sequence,
+        Type:       "widget",
     }
 
     // Save to datastore
@@ -146,13 +110,12 @@ func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
 
 func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initSystem(r)
 
     // Get widget id
     id := getUrlVar(r, "id")
 
     // Get widget data
-    widget, key, err := getWidget(id, c)
+    widget, key, err := getEntry(id, c)
     if err != nil {
         serveError(w, err)
         return
@@ -165,25 +128,16 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
     }
 
     if r.Method != "POST" {
-        // Show widget edit page
-
-        dbQuery := datastore.NewQuery("Widget").Filter("ID =", id)
-
-        // Check error
-        if count, _ := dbQuery.Count(c); count < 1 {
-            http.Redirect(w, r, "/admin/widget", http.StatusFound)
-        }
-
-        // New Page
-        page := Page {
+        // New Pagina
+        pagina := Pagina {
             "Title" :     "Edit Widget",
             "Config" :    config,
             "Widget":     widget,
             "New":        false,
         }
 
-        // Render page
-        page.Render("admin/widget", w)
+        // Show widget edit pagina
+        pagina.Render("admin/widget", w)
 
         return
     }
@@ -210,27 +164,6 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
         serveError(w, err)
         return
     }
-    http.Redirect(w, r, "/admin/widget", http.StatusFound)
-}
-
-func handleWidgetDelete(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
-
-    // Get widget id
-    id := getUrlVar(r, "id")
-
-    // Get widget data
-    _, key, err := getWidget(id, c)
-    if err != nil {
-        serveError(w, err)
-        return
-    }
-
-    if err = datastore.Delete(c, key); err != nil {
-        serveError(w, err)
-        return
-    }
-
     http.Redirect(w, r, "/admin/widget", http.StatusFound)
 }
 
