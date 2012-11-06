@@ -68,7 +68,7 @@ func handleDecodeContent(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleList(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initSystem(r)
+    //initSystem(r)
 
     // Get page id, pageSize
     pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
@@ -86,10 +86,10 @@ func handleArticleList(w http.ResponseWriter, r *http.Request) {
 
     // New Page
     page := Page {
-        Title:    "Article Manager",
-        Articles: articles,
-        Nav:      nav,
-        Config:   config,
+        "Title":    "Article Manager",
+        "Articles": articles,
+        "Nav":      nav,
+        "Config":   config,
     }
 
     // Render page
@@ -104,9 +104,9 @@ func handleArticleAdd(w http.ResponseWriter, r *http.Request) {
 
         // New Page
         page := Page {
-            Title:  "Add Article",
-            Config: config,
-            New:    true,
+            "Title":  "Add Article",
+            "Config": config,
+            "New":    true,
         }
 
         // Render page
@@ -170,10 +170,10 @@ func handleArticleEdit(w http.ResponseWriter, r *http.Request) {
 
         // New Page
         page := Page {
-            Title:   "Edit Article",
-            Article: article,
-            Config:  config,
-            New:     false,
+            "Title":   "Edit Article",
+            "Article": article,
+            "Config":  config,
+            "New":     false,
         }
 
         // Render page
@@ -227,7 +227,7 @@ func handleArticleDelete(w http.ResponseWriter, r *http.Request) {
 
 func handleArticleView(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initSystem(r)
+    //initSystem(r)
 
     // Get article id
     id := getUrlVar(r, "id")
@@ -251,10 +251,10 @@ func handleArticleView(w http.ResponseWriter, r *http.Request) {
 
     // New Page
     page := Page {
-        User:    user,
-        Article: article,
-        Widgets: widgets,
-        Config:  config,
+        "User":    user,
+        "Article": article,
+        "Widgets": widgets,
+        "Config":  config,
     }
 
     // Render page

@@ -12,7 +12,7 @@ import (
  */
 func handleRSS(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initSystem(r)
+    //initSystem(r)
 
     var articles []Article
     _, err := datastore.NewQuery("Article").Order("-Date").GetAll(c, &articles)
@@ -23,9 +23,9 @@ func handleRSS(w http.ResponseWriter, r *http.Request) {
 
     // New Page
     page := Page {
-        Title :     "RSS",
-        Articles :  articles,
-        Config :    config,
+        "Title" :     "RSS",
+        "Articles" :  articles,
+        "Config" :    config,
     }
 
     // Render page

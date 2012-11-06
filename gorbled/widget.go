@@ -88,10 +88,10 @@ func handleWidgetList(w http.ResponseWriter, r *http.Request) {
 
     // New Page
     page := Page {
-        Title :     "Widget Manager",
-        Widgets :   widgets,
-        Nav :       nav,
-        Config :    config,
+        "Title" :     "Widget Manager",
+        "Widgets" :   widgets,
+        "Nav" :       nav,
+        "Config" :    config,
     }
 
     // Render page
@@ -107,9 +107,9 @@ func handleWidgetAdd(w http.ResponseWriter, r *http.Request) {
 
         // New Page
         page := Page {
-            Title:     "Add Widget",
-            Config:    config,
-            New:       true,
+            "Title":     "Add Widget",
+            "Config":    config,
+            "New":       true,
         }
 
         // Render page
@@ -176,10 +176,10 @@ func handleWidgetEdit(w http.ResponseWriter, r *http.Request) {
 
         // New Page
         page := Page {
-            Title :     "Edit Widget",
-            Config :    config,
-            Widget:     widget,
-            New:        false,
+            "Title" :     "Edit Widget",
+            "Config" :    config,
+            "Widget":     widget,
+            "New":        false,
         }
 
         // Render page

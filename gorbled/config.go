@@ -80,15 +80,15 @@ func getJsonConfig() (config Config) {
  */
 func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initSystem(r)
+    //initSystem(r)
 
     if r.Method != "POST" {
         // Show article edit page
 
         // New Page
         page := Page {
-            Title:  "Config",
-            Config: config,
+            "Title":  "Config",
+            "Config": config,
         }
 
         // Render page
@@ -179,7 +179,7 @@ func initSystem(r *http.Request)  {
         installSystem(c)
     } else {
         config = con
-        //initLang(c, config.Language)
+        initLang(c, config.Language)
     }
 
     config.BaseUrl = "http://" + r.Host

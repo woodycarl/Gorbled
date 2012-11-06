@@ -239,12 +239,12 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleFileList(w http.ResponseWriter, r *http.Request) {
-    initSystem(r)
+    //initSystem(r)
 
     // New Page
     page := Page {
-        Title:      "File Manager",
-        Config:     config,
+        "Title":      "File Manager",
+        "Config":     config,
     }
 
     // Render page

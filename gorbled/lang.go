@@ -51,7 +51,7 @@ func getLangs(c appengine.Context) (langs []Lang, keys []*datastore.Key, err err
 
 func handleInitLang(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initSystem(r)
+    //initSystem(r)
     readLang(c)
     initLang(c, config.Language)
 

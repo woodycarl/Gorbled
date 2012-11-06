@@ -10,22 +10,7 @@ import (
     "github.com/russross/blackfriday"
 )
 
-type Page struct {
-    Title       string
-
-    User        User
-    Articles    []Article
-    Article     Article
-    Widgets     []Widget
-    Widget      Widget
-    Files       []File
-    File        File
-
-    Nav         PageNav
-    Config      Config
-
-    New         bool    // Show add or edit template
-}
+type Page map[string]interface{}
 
 type PageId struct {
     Id         int
@@ -153,5 +138,11 @@ func (page *Page) Render(pageFilePath string, w http.ResponseWriter) {
         serveError(w, err)
         return
     }
+}
 
+func requireConfig(handler http.HandlerFunc) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        initSystem(r)
+        handler(w, r)
+    }
 }

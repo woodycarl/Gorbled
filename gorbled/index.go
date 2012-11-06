@@ -9,7 +9,7 @@ import (
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
     c := appengine.NewContext(r)
-    initSystem(r)
+    //initSystem(r)
 
     // Get user info
     user := getUserInfo(c)
@@ -37,11 +37,11 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 
     // New Page
     page := Page {
-        User:       user,
-        Articles :  articles,
-        Widgets :   widgets,
-        Nav :       nav,
-        Config :    config,
+        "User":       user,
+        "Articles" :  articles,
+        "Widgets" :   widgets,
+        "Nav" :       nav,
+        "Config" :    config,
     }
 
     // Render page
