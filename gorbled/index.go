@@ -11,9 +11,8 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 
     // Get post id and pagina id
     paginaId, _ := strconv.Atoi(getUrlVar(r, "pid"))
-    paginaSize  := config.Articles
 
-    articles, nav, err := getArticlesAndNav(paginaId, paginaSize, c)
+    articles, nav, err := getArticlesAndNav(paginaId, c)
     if err != nil {
         serveError(w, err)
         return

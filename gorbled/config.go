@@ -24,6 +24,7 @@ type Config struct {
     Articles            int
     AdminArticles       int
     AdminWidgets        int
+    AdminPages          int
     AdminFiles          int
     NavLen              int
 

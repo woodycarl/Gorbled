@@ -6,6 +6,8 @@ import (
     "fmt"
     "appengine"
     "appengine/datastore"
+    "strings"
+    "strconv"
 )
 
 /*
@@ -53,6 +55,81 @@ func getEntry(id string, c appengine.Context) (entry Entry, key *datastore.Key, 
         entry = entries[0]
         key = keys[0]
     }
+
+    return
+}
+
+/*
+ * Get widget data
+ */
+func getWidgets(c appengine.Context) (widgets []Entry, err error) {
+
+    dbQuery := datastore.NewQuery("Entry").
+        Filter("Type =", "widget").
+        Order("Sequence")
+    _, err = dbQuery.GetAll(c, &widgets)
+
+    return
+}
+
+func getWidgetsAndNav(paginaId int, c appengine.Context) (widgets []Entry, nav PaginaNav, err error) {
+    paginaSize  := config.AdminWidgets
+
+    // Get offset and pagina nav
+    dbQuery := datastore.NewQuery("Entry").Filter("Type =", "widget")
+    count, _ := dbQuery.Count(c)
+    offset, nav := getPaginaNav(count, paginaId, paginaSize, c)
+
+    // Get widget data
+    dbQuery = dbQuery.Order("Sequence").Offset(offset).Limit(paginaSize)
+    _, err = dbQuery.GetAll(c, &widgets)
+
+    return
+}
+
+/*
+ * Get article data
+ */
+func getArticles(c appengine.Context) (articles []Entry, err error) {
+
+    dbQuery := datastore.NewQuery("Entry").
+        Filter("Type =", "article")
+    _, err = dbQuery.GetAll(c, &articles)
+
+    return
+}
+
+func getArticlesAndNav(paginaId int, c appengine.Context) (articles []Entry, nav PaginaNav, err error) {
+    paginaSize  := config.AdminArticles
+
+    // Get offset and pagina nav
+    dbQuery := datastore.NewQuery("Entry").Filter("Type =", "article")
+    count, _ := dbQuery.Count(c)
+    offset, nav := getPaginaNav(count, paginaId, paginaSize, c)
+
+    // Get article data
+    dbQuery = dbQuery.Order("-Date").Offset(offset).Limit(paginaSize)
+    _, err = dbQuery.GetAll(c, &articles)
+
+    return
+}
+
+/*
+ * Get page data
+ */
+func getPagesAndNav(paginaId int, c appengine.Context) (pages []Entry, nav PaginaNav, err error) {
+    paginaSize  := config.AdminPages
+
+    // Get offset and pagina nav
+    dbQuery := datastore.NewQuery("Entry").
+        Filter("Type =", "page").
+        Filter("PageClass =", 0)
+    count, _ := dbQuery.Count(c)
+    offset, nav := getPaginaNav(count, paginaId, paginaSize, c)
+
+    // Get page data
+    dbQuery = dbQuery.Order("Sequence").Offset(offset).Limit(paginaSize)
+    _, err = dbQuery.GetAll(c, &pages)
 
     return
 }
@@ -118,4 +195,154 @@ func handleEntryDelete(w http.ResponseWriter, r *http.Request) {
     }
 
     http.Redirect(w, r, r.Referer(), http.StatusFound)
+}
+
+func handleEntryAdd(w http.ResponseWriter, r *http.Request) {
+    entryType := getUrlVar(r, "entryType")
+    c := appengine.NewContext(r)
+
+    if r.Method != "POST" {
+        entryTypeTitle := strings.Title(entryType)
+        pagina := Pagina {
+            "Title":  "Add " + entryTypeTitle,
+            "Config": config,
+            "Is" + entryTypeTitle:true,
+            "New": true,
+            "ActionUrl": "/admin/" + entryType + "/add",
+        }
+
+        pagina.Render("admin/entry-edit", w)
+
+        return
+    }
+
+    // r.Method == "POST"
+    // Create entry
+    entry := &Entry{
+        Date:    time.Now(),
+        Title:   r.FormValue("title"),
+        Content: []byte(r.FormValue("content")),
+        Type:   entryType,
+    }
+
+    switch entryType {
+
+    case "widget":
+        entry.Sequence, _ = strconv.Atoi(r.FormValue("sequence"))
+
+        if err := entry.save(c); err != nil {
+            serveError(w, err)
+            return
+        }
+    case "page":    fallthrough
+    case "article":
+        customid := r.FormValue("customid")
+        if customid != "" && !checkIdIsExists("Entry", customid, c) {
+            entry.ID = customid
+
+            if err := entry.put(c); err != nil {
+                serveError(w, err)
+                return
+            }
+            
+        } else if err := entry.save(c); err != nil {
+            serveError(w, err)
+            return
+        }
+
+    }
+
+    http.Redirect(w, r, "/admin/" + entryType, http.StatusFound)
+}
+
+func handleEntryEdit(w http.ResponseWriter, r *http.Request) {
+    entryType := getUrlVar(r, "entryType")
+    c := appengine.NewContext(r)
+
+    entry, key, err := getEntry(getUrlVar(r, "id"), c)
+    if err != nil {
+        serveError(w, err)
+        return
+    }
+
+    if entry.ID == "" {
+        serve404(w)
+        return
+    }
+
+    if r.Method != "POST" {
+        entryTypeTitle := strings.Title(entryType)
+        pagina := Pagina {
+            "Title":   "Edit " + entryTypeTitle,
+            "Entry": entry,
+            "Config":  config,
+            "Is" + entryTypeTitle:true,
+            "New": false,
+            "ActionUrl": "/admin/" + entryType + "/edit/" + entry.ID,
+        }
+
+        pagina.Render("admin/entry-edit", w)
+
+        return
+    }
+
+    // r.Method == "POST"
+    // Update entry
+    entry.Title   = r.FormValue("title")
+    entry.Content = []byte(r.FormValue("content"))
+
+    switch entryType {
+    case "widget":
+        entry.Sequence, _ = strconv.Atoi(r.FormValue("sequence"))
+    case "page":    fallthrough
+    case "article":
+        customid := r.FormValue("customid")
+        if customid != "" && !checkIdIsExists("Entry", customid, c) {
+            entry.ID = customid
+        }
+    }
+
+    if err := entry.update(key, c); err != nil {
+        serveError(w, err)
+        return
+    }
+
+    http.Redirect(w, r, "/admin/" + entryType, http.StatusFound)
+}
+
+func handleEntryList(w http.ResponseWriter, r *http.Request) {
+    c := appengine.NewContext(r)
+    entryType := getUrlVar(r, "entryType")
+
+    // Get pagina id, paginaSize
+    paginaId, _ := strconv.Atoi(getUrlVar(r, "pid"))
+
+    entriesAndNav := map[string]func(int, appengine.Context)([]Entry,PaginaNav,error){
+        "article": getArticlesAndNav,
+        "page": getPagesAndNav,
+        "widget": getWidgetsAndNav,
+    }
+
+    entries, nav, err := entriesAndNav[entryType](paginaId, c)
+    if err != nil {
+        serveError(w, err)
+        return
+    }
+
+    entryTypeTitle := strings.Title(entryType)
+    pagina := Pagina {
+        "Title":    entryTypeTitle + " Manager",
+        "Entries":  entries,
+        "Nav":      nav,
+        "Config":   config,
+        "Action":   "Add " + entryTypeTitle,
+        "EntryType": entryType,
+    }
+
+    pagina.Render("admin/entry-list", w)
+}
+
+func handleRedirect(w http.ResponseWriter, r *http.Request) {
+    url := getUrlVar(r, "url")
+    http.Redirect(w, r, "/"+url, http.StatusFound)
 }

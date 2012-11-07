@@ -37,10 +37,18 @@ func showDate(t time.Time) string {
     return t.In(newLocation).Format(config.TimeFormat)
 }
 
+func equalString(s1, s2 string) bool {
+    if s1 == s2 {
+        return true
+    }
+    return false
+}
+
 var funcMap = template.FuncMap{
     "showDate": showDate,
     "decodeMD": decodeMD,
     "l":        L,
+    "equalString": equalString,
 }
 
 /*

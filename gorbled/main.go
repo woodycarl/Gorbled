@@ -14,14 +14,19 @@ var (
 
 func init() {
     r := mux.NewRouter()
+    a := r.PathPrefix("/admin").Subrouter()
 
-    // widget.go
-    r.HandleFunc("/admin/widget/", handleRedirectWidgetList)
-    r.HandleFunc("/admin/widget", requireConfig(handleWidgetList))
-    r.HandleFunc("/admin/widget/{pid:[0-9]+}", requireConfig(handleWidgetList))
-    r.HandleFunc("/admin/widget/add", requireConfig(handleWidgetAdd))
-    r.HandleFunc("/admin/widget/edit/{id}", requireConfig(handleWidgetEdit))
-    r.HandleFunc("/admin/widget/delete/{id}", handleEntryDelete)
+    // entry.go
+    a.HandleFunc("/{entryType:page|widget|article}", requireConfig(handleEntryList))
+    a.HandleFunc("/{entryType:page|widget|article}/{pid:[0-9]+}", requireConfig(handleEntryList))
+    a.HandleFunc("/{entryType:page|widget|article}/add", requireConfig(handleEntryAdd))
+    a.HandleFunc("/{entryType:page|widget|article}/edit/{id}", requireConfig(handleEntryEdit))
+    a.HandleFunc("/{entryType:page|widget|article}/delete/{id}", handleEntryDelete)
+    
+    r.HandleFunc("/decodeContent", handleDecodeContent)
+    r.HandleFunc("/article/{id}", requireConfig(handleEntryView))
+
+    r.HandleFunc("/{url:.+}/", handleRedirect)
 
     // user.go
     r.HandleFunc("/login", handleUserLogin)
@@ -31,33 +36,22 @@ func init() {
     r.HandleFunc("/feed", requireConfig(handleRSS))
 
     // file.go
-    r.HandleFunc("/admin/file/", handleRedirectFileList)
-    r.HandleFunc("/admin/file", requireConfig(handleFileList))
-    r.HandleFunc("/admin/file/{pid:[0-9]+}", requireConfig(handleFileList))
-    r.HandleFunc("/admin/file/edit/{id}", handleFileEdit)
-    r.HandleFunc("/admin/file/new-url/{num}", handleFileNewUrl)
-    r.HandleFunc("/admin/file/upload", handleFileUpload)
-    r.HandleFunc("/admin/file/delete/{id}", handleFileDelete)
-    r.HandleFunc("/admin/file/data/{pid:[0-9]+}", requireConfig(handleFileData))
+    a.HandleFunc("/file/", handleRedirectFileList)
+    a.HandleFunc("/file", requireConfig(handleFileList))
+    a.HandleFunc("/file/{pid:[0-9]+}", requireConfig(handleFileList))
+    a.HandleFunc("/file/edit/{id}", handleFileEdit)
+    a.HandleFunc("/file/new-url/{num}", handleFileNewUrl)
+    a.HandleFunc("/file/upload", handleFileUpload)
+    a.HandleFunc("/file/delete/{id}", handleFileDelete)
+    a.HandleFunc("/file/data/{pid:[0-9]+}", requireConfig(handleFileData))
 
     r.HandleFunc("/file/{key}", handleFileGet)
 
-    // article.go
-    r.HandleFunc("/admin/article/", handleRedirectArticleList)
-    r.HandleFunc("/admin/article", requireConfig(handleArticleList))
-    r.HandleFunc("/admin/article/{pid:[0-9]+}", requireConfig(handleArticleList))
-    r.HandleFunc("/admin/article/add", requireConfig(handleArticleAdd))
-    r.HandleFunc("/admin/article/edit/{id}", requireConfig(handleArticleEdit))
-    r.HandleFunc("/admin/article/delete/{id}", handleEntryDelete)
-
-    r.HandleFunc("/decodeContent", handleDecodeContent)
-    r.HandleFunc("/article/{id}", requireConfig(handleEntryView))
-
     // config.go
-    r.HandleFunc("/admin/config", requireConfig(handleConfigEdit))
+    a.HandleFunc("/config", requireConfig(handleConfigEdit))
 
     // lang.go
-    r.HandleFunc("/admin/init/lang", requireConfig(handleInitLang))
+    a.HandleFunc("/init/lang", requireConfig(handleInitLang))
 
     // index.go
     r.HandleFunc("/", requireConfig(handleIndex))

@@ -1,4 +1,4 @@
-Gorbled v2.2
+Gorbled v2.3
 ============
 
 A simple blog system written by Go, Running in Google App Engine
@@ -25,7 +25,5 @@ A simple blog system written by Go, Running in Google App Engine
 * [Gorbled](https://github.com/specode/Gorbled) MIT License
 
 ### todo list: v3
-* 简洁的代码 
-  * pageNav算法改进
-* 改进后台页面样式
+* 简洁的代码
 * 新的主题

@@ -10,17 +10,21 @@
     <div class="span4 manage-info"></div>
 </div>
 
-<form class="row-fluid widget/edit" action="/admin/widget/{{if .New}}add{{else}}edit/{{.Widget.ID}}{{end}}" method="post">
+<form class="row-fluid entry-edit" action="{{.ActionUrl}}" method="post">
     <div class="span7">
-        <input type="text" name="title" class="span12" id="title" placeholder="Widget Title" value="{{if not .New}}{{.Widget.Title}}{{end}}" />
-        <textarea rows="15" name="content" class="span12" id="content" placeholder="Widget Content" >{{if not .New}}{{.Widget.Content | printf "%s"}}{{end}}</textarea>
+        <input type="text" name="title" class="span12" id="title" placeholder='{{l "Title"}}' value="{{if not .New}}{{.Entry.Title}}{{end}}" />
+        <textarea rows="15" name="content" class="content span12" id="content" placeholder='{{l "Content"}}' >{{if not .New}}{{.Entry.Content | printf "%s"}}{{end}}</textarea>
     </div>
-
     <div class="span5 well">
-        <div class="input-prepend row-fluid">
+        {{if or .IsArticle .IsPage}}<div class="input-prepend row-fluid">
+            <span class="add-on">{{l "Custom ID"}}</span>
+            <input type="text" name="customid" class="span8" id="customID" placeholder='{{l "Optional"}}' value="{{if not .New}}{{.Entry.ID}}{{end}}" />
+
+        </div>{{end}}
+        {{if .IsWidget}}<div class="input-prepend row-fluid">
             <span class="add-on">{{l "Sequence"}}</span>
-            <input type="text" name="sequence" class="sequence" placeholder="Widget Sequence" value="{{if not .New}}{{.Widget.Sequence}}{{end}}" />
-        </div>
+            <input type="text" name="sequence" class="span8" id="sequence" placeholder='{{l "Widget Sequence"}}' value="{{if not .New}}{{.Entry.Sequence}}{{end}}" />
+        </div>{{end}}
         <div class="row-fluid" style="margin-top:20px;">
             <input class="btn btn-primary" type="submit" id="submit" value='{{l "Submit"}}' /> 
             <input class="btn btn-danger" type="reset" value='{{l "Reset"}}' />
@@ -29,7 +33,7 @@
 
 </form>
 
-<!-- Widget Preview -->
+<!-- Entry Preview -->
 <div id="modal-preview" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -44,9 +48,7 @@
 
 <!-- File Upload -->
 <div id="modal-upload" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
-
     <div class="modal-body">
-
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 
         <ul class="nav nav-tabs">
@@ -62,7 +64,6 @@
                     <span>{{l "Upload"}}</span>
                     <input id="file" type="file" name="file" multiple>
                 </span>
-
                 <table class="table table-striped table-hover">
                     <thead><tr>
                           <th>{{l "Num"}}</th>
@@ -76,7 +77,7 @@
 
             <div class="tab-pane" id="file-edit">
                 <div class="preview" style="text-align:center;">{{l "Preview"}}</div>
-                <table class="table table-striped table-hover">
+                <table class="table table-hover">
                     <tbody>
                         <tr>
                           <th>{{l "File Name"}}</th>
@@ -89,7 +90,7 @@
             </div>
 
             <div class="tab-pane" id="file-upload">
-                <table class="table table-striped">
+                <table class="table table-striped table-hover">
                     <thead><tr>
                         <th>{{l "Num"}}</th>
                         <th>{{l "File Name"}}</th>

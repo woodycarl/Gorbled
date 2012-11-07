@@ -9,11 +9,12 @@
     "Articles":         5,
     "AdminArticles":    10,
     "AdminWidgets":     10,
+    "AdminPages":       5,
     "AdminFiles":       10,
     "NavLen":           5,
 
     "Theme":            "default",
     "TimeZone":         8.0,
     "TimeFormat":       "3:04pm, Mon 2 Jan",
-    "Version":          2.2
+    "Version":          2.3
 }

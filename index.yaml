@@ -12,6 +12,18 @@ indexes:
 
 - kind: Entry
   properties:
+  - name: PageClass
+  - name: Type
+  - name: Sequence
+
+- kind: Entry
+  properties:
+  - name: ParentID
+  - name: Type
+  - name: Sequence
+
+- kind: Entry
+  properties:
   - name: Type
   - name: Date
     direction: desc
