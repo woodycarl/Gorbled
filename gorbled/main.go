@@ -1,61 +1,61 @@
 package gorbled
 
 import (
-    "net/http"
-    "github.com/gorilla/mux"
-    "appengine/datastore"
+	"appengine/datastore"
+	"github.com/gorilla/mux"
+	"net/http"
 )
 
 var (
-    config      Config
-    configKey   *datastore.Key
-    lang        map[string]string
+	config    Config
+	configKey *datastore.Key
+	lang      map[string]string
 )
 
 func init() {
-    r := mux.NewRouter()
-    a := r.PathPrefix("/admin").Subrouter()
+	r := mux.NewRouter()
+	a := r.PathPrefix("/admin").Subrouter()
 
-    // entry.go
-    a.HandleFunc("/{entryType:page|widget|article}", requireConfig(handleEntryList))
-    a.HandleFunc("/{entryType:page|widget|article}/{pid:[0-9]+}", requireConfig(handleEntryList))
-    a.HandleFunc("/{entryType:page|widget|article}/add", requireConfig(handleEntryAdd))
-    a.HandleFunc("/{entryType:page|widget|article}/edit/{id}", requireConfig(handleEntryEdit))
-    a.HandleFunc("/{entryType:page|widget|article}/delete/{id}", handleEntryDelete)
-    
-    r.HandleFunc("/decodeContent", handleDecodeContent)
-    r.HandleFunc("/article/{id}", requireConfig(handleEntryView))
+	// entry.go
+	a.HandleFunc("/{entryType:page|widget|article}", requireConfig(handleEntryList))
+	a.HandleFunc("/{entryType:page|widget|article}/{pid:[0-9]+}", requireConfig(handleEntryList))
+	a.HandleFunc("/{entryType:page|widget|article}/add", requireConfig(handleEntryAdd))
+	a.HandleFunc("/{entryType:page|widget|article}/edit/{id}", requireConfig(handleEntryEdit))
+	a.HandleFunc("/{entryType:page|widget|article}/delete/{id}", handleEntryDelete)
 
-    r.HandleFunc("/{url:.+}/", handleRedirect)
+	r.HandleFunc("/decodeContent", handleDecodeContent)
+	r.HandleFunc("/article/{id}", requireConfig(handleEntryView))
 
-    // user.go
-    r.HandleFunc("/login", handleUserLogin)
-    r.HandleFunc("/logout", handleUserLogout)
+	r.HandleFunc("/{url:.+}/", handleRedirect)
 
-    // rss.go
-    r.HandleFunc("/feed", requireConfig(handleRSS))
+	// user.go
+	r.HandleFunc("/login", handleUserLogin)
+	r.HandleFunc("/logout", handleUserLogout)
 
-    // file.go
-    a.HandleFunc("/file/", handleRedirectFileList)
-    a.HandleFunc("/file", requireConfig(handleFileList))
-    a.HandleFunc("/file/{pid:[0-9]+}", requireConfig(handleFileList))
-    a.HandleFunc("/file/edit/{id}", handleFileEdit)
-    a.HandleFunc("/file/new-url/{num}", handleFileNewUrl)
-    a.HandleFunc("/file/upload", handleFileUpload)
-    a.HandleFunc("/file/delete/{id}", handleFileDelete)
-    a.HandleFunc("/file/data/{pid:[0-9]+}", requireConfig(handleFileData))
+	// rss.go
+	r.HandleFunc("/feed", requireConfig(handleRSS))
 
-    r.HandleFunc("/file/{key}", handleFileGet)
+	// file.go
+	a.HandleFunc("/file/", handleRedirectFileList)
+	a.HandleFunc("/file", requireConfig(handleFileList))
+	a.HandleFunc("/file/{pid:[0-9]+}", requireConfig(handleFileList))
+	a.HandleFunc("/file/edit/{id}", handleFileEdit)
+	a.HandleFunc("/file/new-url/{num}", handleFileNewUrl)
+	a.HandleFunc("/file/upload", handleFileUpload)
+	a.HandleFunc("/file/delete/{id}", handleFileDelete)
+	a.HandleFunc("/file/data/{pid:[0-9]+}", requireConfig(handleFileData))
 
-    // config.go
-    a.HandleFunc("/config", requireConfig(handleConfigEdit))
+	r.HandleFunc("/file/{key}", handleFileGet)
 
-    // lang.go
-    a.HandleFunc("/init/lang", requireConfig(handleInitLang))
+	// config.go
+	a.HandleFunc("/config", requireConfig(handleConfigEdit))
 
-    // index.go
-    r.HandleFunc("/", requireConfig(handleIndex))
-    r.HandleFunc("/{pid:[0-9]+}", requireConfig(handleIndex))
+	// lang.go
+	a.HandleFunc("/init/lang", requireConfig(handleInitLang))
 
-    http.Handle("/", r)
+	// index.go
+	r.HandleFunc("/", requireConfig(handleIndex))
+	r.HandleFunc("/{pid:[0-9]+}", requireConfig(handleIndex))
+
+	http.Handle("/", r)
 }

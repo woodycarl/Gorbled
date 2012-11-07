@@ -1,15 +1,13 @@
 package gorbled
 
 import (
-    "fmt"
-    "net/url"
-    "net/http"
-
-    "appengine"
-    "appengine/datastore"
-    "time"
-
-    "github.com/gorilla/mux"
+	"appengine"
+	"appengine/datastore"
+	"fmt"
+	"github.com/gorilla/mux"
+	"net/http"
+	"net/url"
+	"time"
 )
 
 /*
@@ -18,7 +16,7 @@ import (
  * @return (string) 
  */
 func genID() string {
-    return fmt.Sprint(time.Now().Unix())
+	return fmt.Sprint(time.Now().Unix())
 }
 
 /*
@@ -30,11 +28,11 @@ func genID() string {
  * @return (string)
  */
 func getID(kind string, id string, c appengine.Context) string {
-    if id != "" && !checkIdIsExists(kind, id, c) {
-        return id
-    }
+	if id != "" && !checkIdIsExists(kind, id, c) {
+		return id
+	}
 
-    return genID()
+	return genID()
 }
 
 /*
@@ -46,13 +44,13 @@ func getID(kind string, id string, c appengine.Context) string {
  * @return (bool)
  */
 func checkIdIsExists(kind string, id string, c appengine.Context) bool {
-    dbQuery := datastore.NewQuery(kind).Filter("ID =", id)
+	dbQuery := datastore.NewQuery(kind).Filter("ID =", id)
 
-    if count, _ := dbQuery.Count(c); count < 1 {
-        return false
-    }
+	if count, _ := dbQuery.Count(c); count < 1 {
+		return false
+	}
 
-    return true
+	return true
 }
 
 /*
@@ -64,12 +62,12 @@ func checkIdIsExists(kind string, id string, c appengine.Context) bool {
  * @return result ([]string)
  */
 func getUrlQuery(u *url.URL, query string) (result string) {
-    urlQuery := u.Query()
-    result   = urlQuery.Get(query)
+	urlQuery := u.Query()
+	result = urlQuery.Get(query)
 
-    return
+	return
 }
 
 func getUrlVar(r *http.Request, v string) string {
-    return mux.Vars(r)[v]
+	return mux.Vars(r)[v]
 }

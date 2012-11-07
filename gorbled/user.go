@@ -1,17 +1,17 @@
 package gorbled
 
 import (
-    "net/http"
-    "strings"
-    "appengine"
-    "appengine/user"
+	"appengine"
+	"appengine/user"
+	"net/http"
+	"strings"
 )
 
 type User struct {
-    Nickname    string
-    Email       string
-    IsAdmin     bool
-    IsLogin     bool
+	Nickname string
+	Email    string
+	IsAdmin  bool
+	IsLogin  bool
 }
 
 /*
@@ -19,16 +19,16 @@ type User struct {
  *
  */
 func handleUserLogin(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
+	c := appengine.NewContext(r)
 
-    url := r.Referer()
-    loginUrl, err := user.LoginURL(c, url)
-    if err != nil {
-        serveError(w, err)
-        return
-    }
-    
-    http.Redirect(w, r, loginUrl, http.StatusFound)
+	url := r.Referer()
+	loginUrl, err := user.LoginURL(c, url)
+	if err != nil {
+		serveError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, loginUrl, http.StatusFound)
 }
 
 /*
@@ -36,19 +36,19 @@ func handleUserLogin(w http.ResponseWriter, r *http.Request) {
  *
  */
 func handleUserLogout(w http.ResponseWriter, r *http.Request) {
-    c := appengine.NewContext(r)
+	c := appengine.NewContext(r)
 
-    url := r.Referer()
-    if strings.Contains(r.URL.Path, "admin") {
-      url = "/"
-    }
-    logoutUrl, err := user.LogoutURL(c, url)
-    if err != nil {
-        serveError(w, err)
-        return
-    }
+	url := r.Referer()
+	if strings.Contains(r.URL.Path, "admin") {
+		url = "/"
+	}
+	logoutUrl, err := user.LogoutURL(c, url)
+	if err != nil {
+		serveError(w, err)
+		return
+	}
 
-    http.Redirect(w, r, logoutUrl, http.StatusFound)
+	http.Redirect(w, r, logoutUrl, http.StatusFound)
 }
 
 /*
@@ -59,15 +59,15 @@ func handleUserLogout(w http.ResponseWriter, r *http.Request) {
  * @return (string) 
  */
 func getUserInfo(c appengine.Context) User {
-    u := user.Current(c)
-    if u != nil {
-        return User { 
-                Nickname: u.String(), 
-                Email: u.Email, 
-                IsAdmin: user.IsAdmin(c), 
-                IsLogin: true,
-            }
-    }
+	u := user.Current(c)
+	if u != nil {
+		return User{
+			Nickname: u.String(),
+			Email:    u.Email,
+			IsAdmin:  user.IsAdmin(c),
+			IsLogin:  true,
+		}
+	}
 
-    return User{}
+	return User{}
 }

@@ -1,20 +1,20 @@
 {
-    "Title":            "Gorbled",
-    "Description":      "A simple blog system written by Go, Running in Google App Engine",
+	"Title":            "Gorbled",
+	"Description":      "A simple blog system written by Go, Running in Google App Engine",
 
-    "GoogleAnalytics":  "UA-28475410-3",
-    "Disqus":           "gorbled",
-    "Language":         "zh",
+	"GoogleAnalytics":  "UA-28475410-3",
+	"Disqus":           "gorbled",
+	"Language":         "zh",
 
-    "Articles":         5,
-    "AdminArticles":    10,
-    "AdminWidgets":     10,
-    "AdminPages":       5,
-    "AdminFiles":       10,
-    "NavLen":           5,
+	"Articles":         5,
+	"AdminArticles":    10,
+	"AdminWidgets":     10,
+	"AdminPages":       5,
+	"AdminFiles":       10,
+	"NavLen":           5,
 
-    "Theme":            "default",
-    "TimeZone":         8.0,
-    "TimeFormat":       "3:04pm, Mon 2 Jan",
-    "Version":          2.3
+	"Theme":            "default",
+	"TimeZone":         8.0,
+	"TimeFormat":       "3:04pm, Mon 2 Jan",
+	"Version":          2.3
 }

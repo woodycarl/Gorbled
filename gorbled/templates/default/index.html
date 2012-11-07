@@ -1,30 +1,30 @@
 {{define "content"}}
 
 <div class="hero-unit">
-    <h1>{{.Config.Title}}</h1>
-    <p>{{.Config.Description}}</p>
+	<h1>{{.Config.Title}}</h1>
+	<p>{{.Config.Description}}</p>
 </div>
 
 {{range .Articles}}
 <div class="post well">
-    <h2><a href="/article/{{.ID}}">{{.Title}}</a></h2>
-    <h6>Post on {{showDate .Date}}</h6>
-    <div style="margin-top:10px">{{decodeMD .Content}}</div>
+	<h2><a href="/article/{{.ID}}">{{.Title}}</a></h2>
+	<h6>Post on {{showDate .Date}}</h6>
+	<div style="margin-top:10px">{{decodeMD .Content}}</div>
 </div>
 {{end}}
 
 <div class="pagination pagination-centered">
-    <ul>
-    {{if .Nav.ShowPrev}}
-        <li><a href="/{{.Nav.PrevPageID}}">«</a></li>
-    {{end}}
-    {{range .Nav.PageIDs}}
-        {{if .Current}}<li class='active'><a>{{.Id}}</a></li>{{else}}<li><a href='/{{.Id}}'>{{.Id}}</a></li>{{end}}
-    {{end}}
-    {{if .Nav.ShowNext}}
-        <li><a href="/{{.Nav.NextPageID}}">»</a></li>
-    {{end}}
-    </ul>
+	<ul>
+	{{if .Nav.ShowPrev}}
+		<li><a href="/{{.Nav.PrevPageID}}">«</a></li>
+	{{end}}
+	{{range .Nav.PageIDs}}
+		{{if .Current}}<li class='active'><a>{{.Id}}</a></li>{{else}}<li><a href='/{{.Id}}'>{{.Id}}</a></li>{{end}}
+	{{end}}
+	{{if .Nav.ShowNext}}
+		<li><a href="/{{.Nav.NextPageID}}">»</a></li>
+	{{end}}
+	</ul>
 </div>
 
 {{end}}
