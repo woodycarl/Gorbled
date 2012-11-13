@@ -20,13 +20,13 @@
 	<generator>Gorbled {{.Config.Version}}</generator>
 		{{range .Articles}}<item>
 		<title>{{.Title}}</title>
-		<link>{{$baseUrl}}/article?id={{.ID}}</link>
+		<link>{{$baseUrl}}/article/{{.ID}}</link>
 		<comments></comments>
 		<pubDate>{{showDate .Date}}</pubDate>
 		<dc:creator></dc:creator>
 		<description><![CDATA[{{decodeMD .Content}}]]></description>
 			<content:encoded><![CDATA[{{decodeMD .Content}}
-<p>本文网址:<a href="{{$baseUrl}}/article?id={{.ID}}">{{$baseUrl}}/article?id={{.ID}}</a></p>
+<p>本文网址:<a href="{{$baseUrl}}/article/{{.ID}}">{{$baseUrl}}/article/{{.ID}}</a></p>
 ]]></content:encoded>
 			<wfw:commentRss></wfw:commentRss>
 		<slash:comments></slash:comments>

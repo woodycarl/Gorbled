@@ -44,11 +44,26 @@ func equalString(s1, s2 string) bool {
 	return false
 }
 
+func OddOrEven() func() string {
+	b := true
+	return func() string {
+		if b {
+			b = false
+			return "odd"
+		}
+		b = true
+		return "even"
+	}
+}
+
+var oddOrEven = OddOrEven()
+
 var funcMap = template.FuncMap{
 	"showDate":    showDate,
 	"decodeMD":    decodeMD,
 	"l":           L,
 	"equalString": equalString,
+	"oddOrEven":   oddOrEven,
 }
 
 /*

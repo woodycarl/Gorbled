@@ -1,0 +1,31 @@
+{{define "content"}}
+<div id="content">
+<ul id="article_list">
+<li>
+<div class="article">
+<div class="inner">
+<h2 class="article-title"><a href="/view?id={{.Post.Id}}">{{.Entry.Title}}</a></h2>
+<div class="meta-container"><span class="date">{{showDate .Entry.Date}}</span></div>
+<div class="article-text">{{decodeMD .Entry.Content}}</div>
+<div class="comments"><h2 class="comments-title">评论</h2>
+{{if equalString .Config.Disqus ""}}{{else}}<div id="disqus_thread"></div>
+<script type="text/javascript">
+	/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+	var disqus_shortname = '{{.Config.Disqus}}'; // required: replace example with your forum shortname
+	var disqus_identifier = '{{.Config.BaseUrl}}/article/'+{{.Entry.ID}};
+	var disqus_url = '{{.Config.BaseUrl}}/article/'+{{.Entry.ID}};
+	/* * * DON'T EDIT BELOW THIS LINE * * */
+	(function() {
+		var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	})();
+</script>
+{{end}}
+</div> <!--comments-->
+</div>
+</div>
+</li>
+</ul>
+</div> <!--div content-->
+{{end}}

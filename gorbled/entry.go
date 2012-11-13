@@ -19,13 +19,21 @@ type Entry struct {
 	Date    time.Time
 	Content []byte
 
-	Type      string //article:文章；page:页面；widget: 小工具
+	// Type: article:文章；page:页面；widget: 小工具
+	Type      string
 	SubPage   []string
 	PageClass int
 	Sequence  int
+	Tags      []string
+	Cats      string
 
 	AllowComment bool
-	Slug         string
+	// Status: published 已发布, deleted 删除, unpublished 草稿
+	Status   string
+	Password string
+
+	Slug      string
+	Readtimes int
 }
 
 func (entry *Entry) save(c appengine.Context) (err error) {
@@ -72,8 +80,7 @@ func getWidgets(c appengine.Context) (widgets []Entry, err error) {
 	return
 }
 
-func getWidgetsAndNav(paginaId int, c appengine.Context) (widgets []Entry, nav PaginaNav, err error) {
-	paginaSize := config.AdminWidgets
+func getWidgetsAndNav(paginaId, paginaSize int, c appengine.Context) (widgets []Entry, nav PaginaNav, err error) {
 
 	// Get offset and pagina nav
 	dbQuery := datastore.NewQuery("Entry").Filter("Type =", "widget")
@@ -99,8 +106,7 @@ func getArticles(c appengine.Context) (articles []Entry, err error) {
 	return
 }
 
-func getArticlesAndNav(paginaId int, c appengine.Context) (articles []Entry, nav PaginaNav, err error) {
-	paginaSize := config.AdminArticles
+func getArticlesAndNav(paginaId, paginaSize int, c appengine.Context) (articles []Entry, nav PaginaNav, err error) {
 
 	// Get offset and pagina nav
 	dbQuery := datastore.NewQuery("Entry").Filter("Type =", "article")
@@ -117,8 +123,7 @@ func getArticlesAndNav(paginaId int, c appengine.Context) (articles []Entry, nav
 /*
  * Get page data
  */
-func getPagesAndNav(paginaId int, c appengine.Context) (pages []Entry, nav PaginaNav, err error) {
-	paginaSize := config.AdminPages
+func getPagesAndNav(paginaId, paginaSize int, c appengine.Context) (pages []Entry, nav PaginaNav, err error) {
 
 	// Get offset and pagina nav
 	dbQuery := datastore.NewQuery("Entry").
@@ -225,7 +230,6 @@ func handleEntryAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch entryType {
-
 	case "widget":
 		entry.Sequence, _ = strconv.Atoi(r.FormValue("sequence"))
 
@@ -317,14 +321,23 @@ func handleEntryList(w http.ResponseWriter, r *http.Request) {
 
 	// Get pagina id, paginaSize
 	paginaId, _ := strconv.Atoi(getUrlVar(r, "pid"))
+	var paginaSize int
+	switch entryType {
+	case "article":
+		paginaSize = config.AdminArticles
+	case "widget":
+		paginaSize = config.AdminWidgets
+	case "page":
+		paginaSize = config.AdminPages
+	}
 
-	entriesAndNav := map[string]func(int, appengine.Context) ([]Entry, PaginaNav, error){
+	entriesAndNav := map[string]func(int, int, appengine.Context) ([]Entry, PaginaNav, error){
 		"article": getArticlesAndNav,
 		"page":    getPagesAndNav,
 		"widget":  getWidgetsAndNav,
 	}
 
-	entries, nav, err := entriesAndNav[entryType](paginaId, c)
+	entries, nav, err := entriesAndNav[entryType](paginaId, paginaSize, c)
 	if err != nil {
 		serveError(w, err)
 		return

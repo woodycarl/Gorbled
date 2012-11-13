@@ -1,5 +1,5 @@
 application: gorbled
-version: 2
+version: 3
 runtime: go
 api_version: go1
 default_expiration: "7d"
@@ -12,10 +12,6 @@ handlers:
 - url: /([\w]+)/static/(.*)
   static_files: gorbled/templates/\1/static/\2
   upload: gorbled/templates/([\w]+)/static/(.*)
-
-- url: /favicon.ico
-  static_files: gorbled/static/favicon.ico
-  upload: gorbled/static/favicon.ico
 
 - url: /admin/.*
   script: _go_app

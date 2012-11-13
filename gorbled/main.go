@@ -36,16 +36,15 @@ func init() {
 	r.HandleFunc("/feed", requireConfig(handleRSS))
 
 	// file.go
-	a.HandleFunc("/file/", handleRedirectFileList)
 	a.HandleFunc("/file", requireConfig(handleFileList))
 	a.HandleFunc("/file/{pid:[0-9]+}", requireConfig(handleFileList))
 	a.HandleFunc("/file/edit/{id}", handleFileEdit)
 	a.HandleFunc("/file/new-url/{num}", handleFileNewUrl)
-	a.HandleFunc("/file/upload", handleFileUpload)
+	a.HandleFunc("/file/upload", requireConfig(handleFileUpload))
 	a.HandleFunc("/file/delete/{id}", handleFileDelete)
 	a.HandleFunc("/file/data/{pid:[0-9]+}", requireConfig(handleFileData))
 
-	r.HandleFunc("/file/{key}", handleFileGet)
+	r.HandleFunc("/file/{id}", handleFileGet)
 
 	// config.go
 	a.HandleFunc("/config", requireConfig(handleConfigEdit))

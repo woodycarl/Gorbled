@@ -7,6 +7,7 @@ var cS = {
 	Edit: "#file-edit",
 	editPreview: "#file-edit .preview",
 	editName: "#file-edit .name",
+	editID: "#file-edit .id",
 	editDes: "#file-edit .description",
 	editMessage: "#file-edit .message",
 
@@ -215,6 +216,7 @@ initEdit: function(id) {
 	$(cS.editPreview).html($.getPreview(type, src));
 	$(cS.editDes).val(fileEdit.Description);
 	$(cS.editName).val(fileEdit.Name);
+	$(cS.editID).val(fileEdit.ID);
 	$.showMessage("", "edit", true);
 
 	$.showEdit();
@@ -240,10 +242,11 @@ getPreview: function(type, src){
 	return preview;
 },
 saveEditFile: function(){
+	var id = $(cS.editID).val();
 	var name = $(cS.editName).val();
 	var description = $(cS.editDes).val();
-	if (name != "" && (name != fileEdit.Name || description != fileEdit.Description)){
-		$.getJSON(cS.urlEdit+fileEdit.ID,{name:name,description:description},function(message){
+	if (id != "" && (id != fileEdit.ID || name != fileEdit.Name || description != fileEdit.Description)){
+		$.getJSON(cS.urlEdit+fileEdit.ID,{id:id,name:name,description:description},function(message){
 			$.showMessage(message.Info, "edit", "success")
 			$.initList(1);
 			$.closeEdit();

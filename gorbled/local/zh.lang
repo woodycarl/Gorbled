@@ -1,22 +1,28 @@
 
-#	a01:article.go
+#	a01:entry-list.html
 i-a01:		Article Manager
 o-a01:		文章管理
-#	a02:article.go
+#	a02:entry-list.html
 i-a02:		Add Article
 o-a02:		写文章
-#	a03:widget.go
+#	a03:entry-list.html
 i-a03:		Add Widget
 o-a03:		添加小工具
-#	a04:main.html
+#	a04:main.html 
 i-a04:		Article
 o-a04:		文章
-#	a05:article.html
-i-a05:		Article Title
-o-a05:		文章标题
-#	a06:article.html
-i-a06:		Article Content
-o-a06:		文章内容
+#	a05:
+#i-a05:		Article Title
+#o-a05:		文章标题
+#	a06:
+#i-a06:		Article Content
+#o-a06:		文章内容
+#	a07:entry-list.html
+i-a07:		Add Page
+o-a07:		添加页面
+#	a08:config.html
+i-a08:		Author
+o-a08:		作者
 
 
 #	c01:config.go, main.html
@@ -28,30 +34,32 @@ o-c02:		关闭
 #	c03:files.html
 i-c03:		Cancel
 o-c03:		取消
-#	c04:article.html
+#	c04:entry-edit.html
 i-c04:		Custom ID
 o-c04:		自定义ID
+#	c05:entry-edit.html
+i-c05:		Content
+o-c05:		内容
 
 
-
-#	d01:articles.html
+#	d01:entry-list.html
 i-d01:		Delete
 o-d01:		删除
-#	d02:articles.html
+#	d02:entry-list.html
 i-d02:		Date
 o-d02:		日期
-#	d03:article.html
+#	d03:entry-edit.html
 i-d03:		Delete File...
 o-d03:		删除文件...
 
 
-#	e01:article.go
+#	e01:entry-list.go
 i-e01:		Edit Article
 o-e01:		编辑文章
 #	e02:widget.go
 i-e02:		Edit Widget
 o-e02:		编辑小工具
-#	e03:articles.html
+#	e03:entry-list.html
 i-e03:		Edit
 o-e03:		编辑
 
@@ -74,9 +82,12 @@ o-f05:		编辑文件
 #	f06:files.html
 i-f06:		File Description
 o-f06:		文件描述
-#	f07:article.html
+#	f07:entry-edit.html, files.html
 i-f07:		File List
 o-f07:		文件列表
+#	f08:files.html, entry-edit.html
+i-f08:		File ID
+o-f08:		文件ID
 
 
 
@@ -93,8 +104,6 @@ o-i01:		系统内部错误：
 
 
 
-
-
 #	n01:config.go
 i-n01:		Notice
 o-n01:		公告
@@ -104,21 +113,34 @@ o-n02:		页面未找到！
 #	n03:files.html
 i-n03:		Num
 o-n03:		序号
-#	n04:article.html
+#	n04:entry-edit.html
 i-n04:		Newer
 o-n04:		后一页
+#	n05:file.go
+i-n05:		No File Get!
+o-n05:		未找到文件！
 
 
 #	o01:articles.html
 i-o01:		Operations
 o-o01:		操作
-#	o02:article.html
+#	o02:entry-edit.html
 i-o02:		Older
 o-o02:		前一页
+#	o03:entry-edit.html
+i-o03:		Optional
+o-o03:		可选
 
-#	p01:files.html
+
+#	p01:files.html, entry-list.html
 i-p01:		Preview
 o-p01:		预览
+#	p02:main.html
+i-p02:		Page
+o-p02:		页面
+#	p03:entry-list.html
+i-p03:		Page Manager
+o-p03:		页面管理
 
 
 #	r01:article.html
@@ -138,6 +160,21 @@ o-s02:		保存修改
 #	s03:article.html
 i-s03:		Submit
 o-s03:		提交
+#	s04:config.html
+i-s04:		Site Title
+o-s04:		站点标题
+#	s05:config.html
+i-s05:		System Config
+o-s05:		系统设置
+#	s06:config.html
+i-s06:		Site Description
+o-s06:		站点描述
+#	s07:config.html
+i-s07:		Site Subtitle
+o-s07:		站点副标题
+#	s08:config.html
+i-s08:		System
+o-s08:		系统
 
 
 #	t01:config.go
@@ -146,6 +183,15 @@ o-t01:		这个是**公告**呢！
 #	t02:articles.html
 i-t02:		Title
 o-t02:		标题
+#	t03:config.go
+i-t03:		Theme
+o-t03:		主题
+#	t04:config.html
+i-t04:		Timezone
+o-t04:		时区
+# 	t05:config.html
+i-t05:		Time Format
+o-t05:		时间显示格式
 
 
 #	u01:file.html
@@ -157,7 +203,7 @@ o-u02:		成功获取上传地址！
 #	u03:files.html
 i-u03:		Upload File List
 o-u03:		上传文件列表
-#	u04:files.html
+#	u04:files.html, entry-list.html
 i-u04:		Upload Files
 o-u04:		上传文件
 #	u05:article.html
@@ -177,7 +223,9 @@ o-w02:		小工具管理
 #	w03:main.html
 i-w03:		Widget
 o-w03:		小工具
-
+#	w04:entry-edit.html
+i-w04:		Widget Sequence
+o-w04:		小工具显示顺序
 
 
 #	301:page.go

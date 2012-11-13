@@ -1,4 +1,4 @@
-Gorbled v2.3
+Gorbled v3.0
 ============
 
 A simple blog system written by Go, Running in Google App Engine
@@ -24,6 +24,13 @@ A simple blog system written by Go, Running in Google App Engine
 * [blackfriday](https://github.com/russross/blackfriday) BSD License
 * [Gorbled](https://github.com/specode/Gorbled) MIT License
 
-### todo list: v3
-* 简洁的代码
-* 新的主题
+### todo list: v4
+* 主题
+  + 我要一个和blogger.com一样的侧边栏 = =
+* 利用GAE的免费配额，优化数据库操作，Memcache?
+* Page页
+* 优化针对google的索引
+* 数据导入导出(wordpress格式？)
+* 搜索页
+* 标签目录？
+* 

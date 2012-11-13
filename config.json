@@ -1,10 +1,13 @@
 {
 	"Title":            "Gorbled",
 	"Description":      "A simple blog system written by Go, Running in Google App Engine",
+	"SubTitle":         "",
+	"Author":           "",
 
 	"GoogleAnalytics":  "UA-28475410-3",
 	"Disqus":           "gorbled",
 	"Language":         "zh",
+	"GooglePlus":       "",
 
 	"Articles":         5,
 	"AdminArticles":    10,
@@ -16,5 +19,6 @@
 	"Theme":            "default",
 	"TimeZone":         8.0,
 	"TimeFormat":       "3:04pm, Mon 2 Jan",
-	"Version":          2.3
+	"Program":          "Gorbled",
+	"Version":          3.0
 }

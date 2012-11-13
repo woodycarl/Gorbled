@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -87,12 +86,6 @@ func (f *File) encode() string {
 	return string(b)
 }
 
-func decodeFile(s string) (f File, err error) {
-	dec := json.NewDecoder(strings.NewReader(s))
-	err = dec.Decode(&f)
-	return
-}
-
 /*
  * File handler
  */
@@ -147,8 +140,11 @@ func handleFileUpload(w http.ResponseWriter, r *http.Request) {
 
 	blobInfo, _ := blobstore.Stat(c, blobs["file"][0].BlobKey)
 
+	config.FileID = config.FileID + 1
+	config.update(configKey, c)
+
 	file := File{
-		ID:   string(blobInfo.BlobKey),
+		ID:   fmt.Sprint(config.FileID),
 		Key:  blobInfo.BlobKey,
 		Type: blobInfo.ContentType,
 		Date: blobInfo.CreationTime,
@@ -193,13 +189,14 @@ func handleFileEdit(w http.ResponseWriter, r *http.Request) {
 		m.Info = "Error: " + fmt.Sprint(err)
 	} else {
 		name := r.FormValue("name")
+		id := r.FormValue("id")
 		description := r.FormValue("description")
-		if name != "" {
-			file.Name = name
+
+		if id != file.ID {
+			file.ID = id
 		}
-		if description != "" {
-			file.Description = description
-		}
+		file.Name = name
+		file.Description = description
 
 		file.update(key, c)
 		m.Success = true
@@ -228,7 +225,7 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 		m.Info = "Error: " + fmt.Sprint(err)
 	} else if len(files) == 0 {
 		m.Success = false
-		m.Info = "No File Get!"
+		m.Info = L("No File Get!")
 	} else {
 		type Data struct {
 			Files []File
@@ -262,9 +259,7 @@ func handleFileList(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleFileGet(w http.ResponseWriter, r *http.Request) {
-	blobstore.Send(w, appengine.BlobKey(getUrlVar(r, "key")))
-}
-
-func handleRedirectFileList(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/admin/file", http.StatusFound)
+	c := appengine.NewContext(r)
+	file, _, _ := getFile(getUrlVar(r, "id"), c)
+	blobstore.Send(w, appengine.BlobKey(file.Key))
 }

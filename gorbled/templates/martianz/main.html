@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>{{.Config.Title}}</title>
+	<link rel="shortcut icon"href="/martianz/static/logo.png">
+	<link rel="stylesheet" href="/martianz/static/style.css" type="text/css">
+	<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>-->
+	<script src="/static/js/jquery-1.8.2.min.js"></script>
+
+	{{if equalString .Config.GoogleAnalytics ""}}{{else}}<script type="text/javascript">
+		// Google Analytics config
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', '{{.Config.GoogleAnalytics}}']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>{{end}}
+
+</head>
+<body>
+<div id="header">
+	<div id="nav_wrapper">
+	<div id="nav">
+	<div class="inner">
+		<div id="title"><a href="/">{{.Config.Title}}</a></div>
+		<div id="description">{{.Config.SubTitle}} ! ! {{if not .User.IsLogin}}<a href="/login">?</a>{{else}}<a href="/logout">!</a>{{end}}
+			{{if .User.IsAdmin}}<a href="/admin/article">文章</a> | <a href="/admin/file">文件</a> | <a href="/admin/config">设置</a> {{end}}
+			</div>
+		<ul class="right">
+			<li><a href="{{.Config.GooglePlus}}">Google+</a></li>
+		</ul>
+	</div>
+	</div>
+	<div id="shadow"></div>
+	</div>
+</div> <!--div header-->
+{{template "content" .}}
+
+{{template "sidebar" .}}
+<div id="footer">
+	Copyright &copy; <a href="/">{{.Config.Author}}</a> | 
+	Theme: <a target="_blank" href="http://blog.4321.la">MartianZ!</a> | 
+	Code: <a target="_blank" href="https://github.com/specode/Gorbled">Gorbled</a>
+	</div> <!--div footer-->
+
+</body></html>

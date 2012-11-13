@@ -18,7 +18,7 @@
 	<div class="span5 well">
 		{{if or .IsArticle .IsPage}}<div class="input-prepend row-fluid">
 			<span class="add-on">{{l "Custom ID"}}</span>
-			<input type="text" name="customid" class="span8" id="customID" placeholder='{{l "Optional"}}' value="{{if not .New}}{{.Entry.ID}}{{end}}" />
+			<input type="text" name="customID" class="span8" id="customID" placeholder='{{l "Optional"}}' value="{{if not .New}}{{.Entry.ID}}{{end}}" />
 
 		</div>{{end}}
 		{{if .IsWidget}}<div class="input-prepend row-fluid">
@@ -26,11 +26,10 @@
 			<input type="text" name="sequence" class="span8" id="sequence" placeholder='{{l "Widget Sequence"}}' value="{{if not .New}}{{.Entry.Sequence}}{{end}}" />
 		</div>{{end}}
 		<div class="row-fluid" style="margin-top:20px;">
-			<input class="btn btn-primary" type="submit" id="submit" value='{{l "Submit"}}' /> 
+			<input class="btn btn-primary" type="submit" id="submit" value='{{l "Submit"}}' />
 			<input class="btn btn-danger" type="reset" value='{{l "Reset"}}' />
 		</div>
 	</div>
-
 </form>
 
 <!-- Entry Preview -->
@@ -80,11 +79,14 @@
 				<table class="table table-hover">
 					<tbody>
 						<tr>
-						  <th>{{l "File Name"}}</th>
-						  <td><input type="text" class="name" placeholder='{{l "File Name"}}' value="" /></td></tr>
+							<th>{{l "File ID"}}</th>
+							<td><input type="text" class="id" placeholder='{{l "File ID"}}' value="" /></td></tr>
 						<tr>
-						  <th>{{l "File Description"}}</th>
-						  <td><input type="text" class="description" placeholder='{{l "File Description"}}' value="" /></td></tr>
+							<th>{{l "File Name"}}</th>
+							<td><input type="text" class="name" placeholder='{{l "File Name"}}' value="" /></td></tr>
+						<tr>
+							<th>{{l "File Description"}}</th>
+							<td><input type="text" class="description" placeholder='{{l "File Description"}}' value="" /></td></tr>
 					</tbody>
 				</table>
 			</div>
@@ -140,5 +142,4 @@ var tS = {
 	lSaveEdit: '{{l "Save"}}'
 }
 </script>
-
 {{end}}

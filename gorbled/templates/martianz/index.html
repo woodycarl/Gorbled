@@ -1,0 +1,74 @@
+{{define "content"}}{{$disqus:=.Config.Disqus}}
+<div id="content">
+<ul id="article_list">
+{{range .Articles}}
+<li>
+	<div class="article">
+		<div class="inner">
+			<h2 class="article-title"><a href="/article/{{.ID}}">{{.Title}}</a></h2>
+			<div class="meta-container"><span class="date">{{showDate .Date}}</span></div>
+			<div class="article-text">{{decodeMD .Content}}</div>
+			{{if equalString $disqus ""}}{{else}}<div class="comment-new" entryid="{{.ID}}" entrytitle="{{.Title}}" tabindex="0">添加评论...</div>
+			<div class="disqus" id="disqus-{{.ID}}" disqusid="{{.ID}}" ><div id=""></div></div>{{end}}
+		</div>
+	</div>
+</li>
+{{end}}
+</ul>
+</div> <!--div content-->
+
+<div id="pagenav">
+{{if .Nav.ShowPrev}}
+	<a class="prev" href="/{{.Nav.PrevPageID}}">&laquo;</a>
+{{end}}
+{{range .Nav.PageIDs}}
+	{{if .Current}}<span class='number current'>{{.Id}}</span>{{else}}<a class='number' href='/{{.Id}}'>{{.Id}}</a>{{end}}
+{{end}}
+{{if .Nav.ShowNext}}
+	<a class="next" href="/{{.Nav.NextPageID}}">&raquo;</a>
+{{end}}
+</div> <!--div pagenav-->
+
+<script type="text/javascript"> 
+var disqus_shortname = '{{$disqus}}';
+var disqus_identifier;
+var disqus_url;
+$(document).ready(function(){
+
+$(".comment-new").click(function(){
+	oldEntryid = $(".comment-new.hide").attr('entryid');
+	if ($(".comment-new.hide") != 'undefined') {
+		$(".comment-new.hide").removeClass("hide").css("display", "block");
+		$("#disqus-"+oldEntryid+">div").attr("id", "");
+	}
+
+	entryid = $(this).attr('entryid');
+	$("#disqus-"+entryid+">div").attr("id", "disqus_thread");
+
+	if( typeof DISQUS != 'undefined' ) {
+		DISQUS.reset({
+			reload: true,
+			config: function () {
+				//this.page.identifier = '{{.Config.BaseUrl}}/article/'+entryid; 
+				//this.page.url = '{{.Config.BaseUrl}}/article/'+entryid;
+		        //this.page.title = "New Page Title";
+		        //this.language = "zh-cn";
+			}
+		});
+	}
+
+	disqus_identifier = '{{.Config.BaseUrl}}/article/'+entryid;
+	disqus_url = '{{.Config.BaseUrl}}/article/'+entryid;
+
+	(function() {
+		var dsq = document.createElement("script"); dsq.type = "text/javascript"; dsq.async = true;
+		dsq.src = "http://" + disqus_shortname + ".disqus.com/embed.js";
+		(document.getElementsByTagName("head")[0] || document.getElementsByTagName("body")[0]).appendChild(dsq);
+	})();
+
+	$(this).css("display", "none").addClass("hide");
+});
+
+});
+</script>
+{{end}}

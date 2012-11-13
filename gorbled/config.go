@@ -19,6 +19,8 @@ const (
 type Config struct {
 	Title       string
 	Description string
+	SubTitle    string
+	Author      string
 
 	Articles      int
 	AdminArticles int
@@ -30,14 +32,19 @@ type Config struct {
 	Theme           string
 	GoogleAnalytics string
 	Disqus          string
+	GooglePlus      string
 
 	TimeZone   float64
 	TimeFormat string
 	BaseUrl    string
-	Version    float64
-	Language   string
+
+	Language string
+
+	Version float64
+	Program string
 
 	EntryID int
+	FileID  int
 }
 
 func (config *Config) save(c appengine.Context) (err error) {
@@ -66,6 +73,9 @@ func getConfig(c appengine.Context) (con Config, key *datastore.Key, err error) 
 
 func getJsonConfig() (config Config) {
 	configFile, err := ioutil.ReadFile(CONFIG_FILE_PATH)
+	if err != nil {
+		log.Fatal(err)
+	}
 	err = json.Unmarshal(configFile, &config)
 	if err != nil {
 		log.Fatal(err)
@@ -101,9 +111,10 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
 	config.Theme = checkTheme(r.FormValue("theme"))
 	config.TimeZone, _ = strconv.ParseFloat(r.FormValue("timezone"), 64)
 	config.TimeFormat = r.FormValue("time-format")
-	config.Version, _ = strconv.ParseFloat(r.FormValue("version"), 64)
 	config.Disqus = r.FormValue("disqus")
 	config.GoogleAnalytics = r.FormValue("google-analytics")
+	config.Theme = r.FormValue("theme")
+	config.SubTitle = r.FormValue("subtitle")
 
 	if err := config.update(configKey, c); err != nil {
 		serveError(w, err)
@@ -125,7 +136,6 @@ func checkTheme(s string) string {
  */
 func installSystem(c appengine.Context) {
 	con := getJsonConfig()
-	con.EntryID = 0
 	con.save(c)
 	config, configKey, _ = getConfig(c)
 

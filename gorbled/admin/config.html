@@ -12,18 +12,32 @@
 
 <form class="form-horizontal" action="/admin/config" method="post">
 	<fieldset>
-		<legend>系统设置</legend>
+		<legend>{{l "System Config"}}</legend>
 		<div class="control-group">
-			<label class="control-label" for="title">站点标题</label>
+			<label class="control-label" for="title">{{l "Site Title"}}</label>
 			<div class="controls">
 			<input type="text" name="title" id="title" class="" placeholder="Title" value="{{.Config.Title}}" />
 			<span class="help-inline"> </span>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="description">站点描述</label>
+			<label class="control-label" for="description">{{l "Site Description"}}</label>
 			<div class="controls">
 			<textarea name="description" id="description" rows="3" style="width:480px;">{{.Config.Description}}</textarea>
+			<span class="help-inline"> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="subtitle">{{l "Site Subtitle"}}</label>
+			<div class="controls">
+			<input type="text" name="subtitle" id="subtitle" class="" placeholder='{{l "Site Subtitle"}}' value="{{.Config.SubTitle}}" />
+			<span class="help-inline"> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="author">{{l "Author"}}</label>
+			<div class="controls">
+			<input type="text" name="author" id="author" class="" placeholder='{{l "Author"}}' value="{{.Config.Author}}" />
 			<span class="help-inline"> </span>
 			</div>
 		</div>
@@ -49,14 +63,14 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="timezone">时区</label>
+			<label class="control-label" for="timezone">{{l "Timezone"}}</label>
 			<div class="controls">
 			<input type="text" name="timezone" id="timezone" class="" placeholder="Timezone" value="{{.Config.TimeZone}}" />
 			<span class="help-inline"> </span>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="time-format">时间显示格式</label>
+			<label class="control-label" for="time-format">{{l "Time Format"}}</label>
 			<div class="controls">
 			<input type="text" name="time-format" id="time-format" class="" placeholder="Time Format" value="{{.Config.TimeFormat}}" />
 			<span class="help-inline">2006-01-02 15:04:05;</span>
@@ -77,9 +91,9 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="version">程序版本</label>
+			<label class="control-label" for="theme">{{l "Theme"}}</label>
 			<div class="controls">
-			<input type="text" name="version" id="version" class="" placeholder="Version" value="{{.Config.Version}}" />
+			<input type="text" name="theme" id="theme" class="" placeholder="Theme" value="{{.Config.Theme}}" />
 			<span class="help-inline"> </span>
 			</div>
 		</div>
@@ -88,5 +102,4 @@
 		<input type="submit" value='{{l "Submit"}}' class="btn btn-primary"/> 
 		<input type="reset" value='{{l "Reset"}}' class="btn btn-danger" /></div>
 </form>
-
 {{end}}
