@@ -1,11 +1,11 @@
 {{define "content"}}{{$EntryType:=.EntryType}}
 <div class="row-fluid manage-bar">
 	<div class="span3 manage-title">
-		<h1>{{l .Title}}</h1>
+		<h1>{{.Title}}</h1>
 	</div>
 	<div class="span5 manage-tool btn-toolbar">
 		<a href="/admin/{{$EntryType}}/add" class="btn">
-			<i class="icon-pencil"></i> {{l .Action}}</a>
+			<i class="icon-pencil"></i> {{.Action}}</a>
 	</div>
 	<div class="span4 manage-info"></div>
 </div>
@@ -14,9 +14,9 @@
 	<table class="table table-hover table-striped">
 		<thead>
 			<tr>
-				<th>{{l "Title"}}</th>
-				<th>{{l "Date"}}</th>
-				<th>{{l "Operations"}}</th>
+				<th>{{"标题"}}</th>
+				<th>{{"日期"}}</th>
+				<th>{{"操作"}}</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -24,8 +24,8 @@
 				<td>{{.Title}}</td>
 				<td>{{showDate .Date}}</td>
 				<td>
-					<a href="/admin/{{$EntryType}}/edit/{{.ID}}" class="btn"><i class="icon-pencil"></i> {{l "Edit"}}</a>
-					<a href="/admin/{{$EntryType}}/delete/{{.ID}}" class="btn"><i class="icon-trash"></i> {{l "Delete"}}</a>
+					<a href="/admin/{{$EntryType}}/edit/{{.ID}}" class="btn"><i class="icon-pencil"></i> {{"编辑"}}</a>
+					<a href="/admin/{{$EntryType}}/delete/{{.ID}}" class="btn"><i class="icon-trash"></i> {{"删除"}}</a>
 				</td>
 			</tr>{{end}}
 		</tbody>

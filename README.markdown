@@ -1,4 +1,4 @@
-Gorbled v3.0
+Gorbled
 ============
 
 A simple blog system written by Go, Running in Google App Engine
@@ -34,3 +34,8 @@ A simple blog system written by Go, Running in Google App Engine
 * 搜索页
 * 标签目录？
 * 
+
+### Update
+
+* 13-3-15
+	去掉语言支持

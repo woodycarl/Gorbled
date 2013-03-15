@@ -61,7 +61,6 @@ var oddOrEven = OddOrEven()
 var funcMap = template.FuncMap{
 	"showDate":    showDate,
 	"decodeMD":    decodeMD,
-	"l":           L,
 	"equalString": equalString,
 	"oddOrEven":   oddOrEven,
 }

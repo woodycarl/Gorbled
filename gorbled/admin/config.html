@@ -1,43 +1,43 @@
 {{define "content"}}
 <div class="row-fluid manage-bar">
 	<div class="span3 manage-title">
-		<h1>{{l .Title}}</h1>
+		<h1>{{.Title}}</h1>
 	</div>
 	<div class="span5 manage-tool btn-toolbar">
-		<!--<a href="" class="btn">{{l "System"}}</a>
-		<a href="" class="btn">{{l "Read"}}</a>-->
+		<!--<a href="" class="btn">{{"System"}}</a>
+		<a href="" class="btn">{{"Read"}}</a>-->
 	</div>
 	<div class="span4 manage-info"></div>
 </div>
 
 <form class="form-horizontal" action="/admin/config" method="post">
 	<fieldset>
-		<legend>{{l "System Config"}}</legend>
+		<legend>{{"系统设置"}}</legend>
 		<div class="control-group">
-			<label class="control-label" for="title">{{l "Site Title"}}</label>
+			<label class="control-label" for="title">{{"站点名称"}}</label>
 			<div class="controls">
 			<input type="text" name="title" id="title" class="" placeholder="Title" value="{{.Config.Title}}" />
 			<span class="help-inline"> </span>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="description">{{l "Site Description"}}</label>
+			<label class="control-label" for="description">{{"站点描述"}}</label>
 			<div class="controls">
 			<textarea name="description" id="description" rows="3" style="width:480px;">{{.Config.Description}}</textarea>
 			<span class="help-inline"> </span>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="subtitle">{{l "Site Subtitle"}}</label>
+			<label class="control-label" for="subtitle">{{"站点副标题"}}</label>
 			<div class="controls">
-			<input type="text" name="subtitle" id="subtitle" class="" placeholder='{{l "Site Subtitle"}}' value="{{.Config.SubTitle}}" />
+			<input type="text" name="subtitle" id="subtitle" class="" placeholder='{{"Site Subtitle"}}' value="{{.Config.SubTitle}}" />
 			<span class="help-inline"> </span>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="author">{{l "Author"}}</label>
+			<label class="control-label" for="author">{{"作者"}}</label>
 			<div class="controls">
-			<input type="text" name="author" id="author" class="" placeholder='{{l "Author"}}' value="{{.Config.Author}}" />
+			<input type="text" name="author" id="author" class="" placeholder='{{"Author"}}' value="{{.Config.Author}}" />
 			<span class="help-inline"> </span>
 			</div>
 		</div>
@@ -63,14 +63,14 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="timezone">{{l "Timezone"}}</label>
+			<label class="control-label" for="timezone">{{"时区"}}</label>
 			<div class="controls">
 			<input type="text" name="timezone" id="timezone" class="" placeholder="Timezone" value="{{.Config.TimeZone}}" />
 			<span class="help-inline"> </span>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="time-format">{{l "Time Format"}}</label>
+			<label class="control-label" for="time-format">{{"显示时间格式"}}</label>
 			<div class="controls">
 			<input type="text" name="time-format" id="time-format" class="" placeholder="Time Format" value="{{.Config.TimeFormat}}" />
 			<span class="help-inline">2006-01-02 15:04:05;</span>
@@ -91,7 +91,7 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="theme">{{l "Theme"}}</label>
+			<label class="control-label" for="theme">{{"主题"}}</label>
 			<div class="controls">
 			<input type="text" name="theme" id="theme" class="" placeholder="Theme" value="{{.Config.Theme}}" />
 			<span class="help-inline"> </span>
@@ -99,7 +99,7 @@
 		</div>
 	</fieldset>
 	<div>
-		<input type="submit" value='{{l "Submit"}}' class="btn btn-primary"/> 
-		<input type="reset" value='{{l "Reset"}}' class="btn btn-danger" /></div>
+		<input type="submit" value='{{"提交"}}' class="btn btn-primary"/> 
+		<input type="reset" value='{{"重置"}}' class="btn btn-danger" /></div>
 </form>
 {{end}}

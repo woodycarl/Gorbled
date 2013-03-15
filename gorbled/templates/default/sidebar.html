@@ -9,26 +9,27 @@
 {{end}}
 
 <div class="manager well">
-	<h3>Manager</h3>
+	<h3>管理</h3>
 {{if .User.IsLogin}}
-	<div class="alert alert-success"><h4 class="alert-heading">Welcome You</h4>{{.User.Nickname}}</div>
+	<div class="alert alert-success"><h4 class="alert-heading">欢迎你回来，主人</h4>{{.User.Nickname}}</div>
 	<ul class="nav nav-list">
 		{{if .User.IsAdmin}}
-			<li><a href="/admin/article">Article Manager</a></li>
-			<li><a href="/admin/widget">Widget Manager</a></li>
-			<li><a href="/admin/file">File Manager</a></li>
+			<li><a href="/admin/article">文章</a></li>
+			<li><a href="/admin/page">页面</a></li>
+			<li><a href="/admin/widget">小工具</a></li>
+			<li><a href="/admin/file">文件</a></li>
 			<li>&nbsp;</li>
 		{{end}}
-		<li><a href="/logout">Logout</a></li>
+		<li><a href="/logout">退出</a></li>
 {{else}}
 	<ul class="nav nav-list">
-		<li><a href="/login">Login</a></li>
+		<li><a href="/login">登陆</a></li>
 {{end}}
 	</ul>
 </div>
 
 <div class="meta well">
-	<h3>Meta</h3>
+	<h3>网站信息</h3>
 	<p><i class="icon-pencil"></i> <a href="http://golang.org" title="Written by Go 1" alt="Written by Go 1">Written by Go 1</a></p>
 	<p><i class="icon-eye-open"></i> <a href="http://twitter.github.com/bootstrap/" title="Style: Bootstrap" alt="Style: Bootstrap">Style: Bootstrap</a></p>
 	<p><i class="icon-off"></i> <a href="https://developers.google.com/appengine/" title="Powered by Google App Engine" alt="Powered by Google App Engine">Powered by Google App Engine</a></p>

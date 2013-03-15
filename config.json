@@ -1,11 +1,11 @@
 {
-	"Title":            "Gorbled",
-	"Description":      "A simple blog system written by Go, Running in Google App Engine",
-	"SubTitle":         "",
-	"Author":           "",
+	"Title":            "woody carl",
+	"Description":      "woodycarl，起床，吃饭，工作，睡觉，三国杀，魔兽，编程",
+	"SubTitle":         "Happy Ending",
+	"Author":           "woodycarl",
 
 	"GoogleAnalytics":  "UA-28475410-3",
-	"Disqus":           "gorbled",
+	"Disqus":           "woodycarl",
 	"Language":         "zh",
 	"GooglePlus":       "",
 
@@ -18,7 +18,8 @@
 
 	"Theme":            "default",
 	"TimeZone":         8.0,
-	"TimeFormat":       "3:04pm, Mon 2 Jan",
+	"TimeFormat":       "2006-01-02 15:04:05",
+	
 	"Program":          "Gorbled",
-	"Version":          3.0
+	"Version":          3.1
 }

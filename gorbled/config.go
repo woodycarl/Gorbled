@@ -38,13 +38,14 @@ type Config struct {
 	TimeFormat string
 	BaseUrl    string
 
-	Language string
-
 	Version float64
 	Program string
 
 	EntryID int
 	FileID  int
+
+	// = =
+	Language string
 }
 
 func (config *Config) save(c appengine.Context) (err error) {
@@ -92,7 +93,7 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
 		pagina := Pagina{
-			"Title":  "Config",
+			"Title":  "设置",
 			"Config": config,
 		}
 
@@ -139,21 +140,18 @@ func installSystem(c appengine.Context) {
 	con.save(c)
 	config, configKey, _ = getConfig(c)
 
-	readLang(c)
-	initLang(c)
-
 	article := Entry{
-		Title:   L("Hello World!"),
+		Title:   "Hello World!",
 		Date:    time.Now(),
-		Content: []byte(fmt.Sprintf(L("Welcome to Gorbled %.1f. You can edit or delete this post, then start blogging!"), config.Version)),
+		Content: []byte(fmt.Sprintf("欢迎使用Gorbled %.1f，可以随时删除或编辑这篇文章。", config.Version)),
 		Type:    "article",
 	}
 	article.save(c)
 
 	widget := Entry{
-		Title:   L("Notice"),
+		Title:   "公告",
 		Date:    time.Now(),
-		Content: []byte(L("This is **Notice** !")),
+		Content: []byte("这个是**公告**呢！"),
 		Type:    "widget",
 	}
 	widget.save(c)
@@ -173,7 +171,6 @@ func initSystem(r *http.Request) {
 	} else {
 		config = con
 		configKey = key
-		initLang(c)
 	}
 
 	config.BaseUrl = "http://" + r.Host

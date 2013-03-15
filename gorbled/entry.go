@@ -23,6 +23,7 @@ type Entry struct {
 	Type      string
 	SubPage   []string
 	PageClass int
+	ParentID  string
 	Sequence  int
 	Tags      []string
 	Cats      string
@@ -139,6 +140,19 @@ func getPagesAndNav(paginaId, paginaSize int, c appengine.Context) (pages []Entr
 	return
 }
 
+type Page map[string]([]Entry)
+
+/*
+func getPages() {
+	var pages []Entry
+	dbQuery := datastore.NewQuery("Entry").Filter("Type =", "page")
+	_, err = dbQuery.GetAll(c, &pages)
+
+
+
+}
+*/
+
 /*
  * Entry handler
  */
@@ -208,7 +222,7 @@ func handleEntryAdd(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		entryTypeTitle := strings.Title(entryType)
 		pagina := Pagina{
-			"Title":               "Add " + entryTypeTitle,
+			"Title":               "添加" + translate(entryType),
 			"Config":              config,
 			"Is" + entryTypeTitle: true,
 			"New":                 true,
@@ -343,13 +357,12 @@ func handleEntryList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	entryTypeTitle := strings.Title(entryType)
 	pagina := Pagina{
-		"Title":     entryTypeTitle + " Manager",
+		"Title":     translate(entryType) + "管理",
 		"Entries":   entries,
 		"Nav":       nav,
 		"Config":    config,
-		"Action":    "Add " + entryTypeTitle,
+		"Action":    "添加" + translate(entryType),
 		"EntryType": entryType,
 	}
 
@@ -359,4 +372,13 @@ func handleEntryList(w http.ResponseWriter, r *http.Request) {
 func handleRedirect(w http.ResponseWriter, r *http.Request) {
 	url := getUrlVar(r, "url")
 	http.Redirect(w, r, "/"+url, http.StatusFound)
+}
+
+var Zh = map[string]string {
+	"article": "文章",
+	"page":"页面",
+	"widget":"小工具",
+}
+func translate(d string) string {
+	return Zh[d]
 }

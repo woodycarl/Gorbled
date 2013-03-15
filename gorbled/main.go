@@ -49,9 +49,6 @@ func init() {
 	// config.go
 	a.HandleFunc("/config", requireConfig(handleConfigEdit))
 
-	// lang.go
-	a.HandleFunc("/init/lang", requireConfig(handleInitLang))
-
 	// index.go
 	r.HandleFunc("/", requireConfig(handleIndex))
 	r.HandleFunc("/{pid:[0-9]+}", requireConfig(handleIndex))

@@ -2,13 +2,13 @@
 
 <div class="hero-unit">
 	<h1>{{.Config.Title}}</h1>
-	<p>{{.Config.Description}}</p>
+	<p>{{.Config.SubTitle}}</p>
 </div>
 
 {{range .Articles}}
 <div class="post well">
 	<h2><a href="/article/{{.ID}}">{{.Title}}</a></h2>
-	<h6>Post on {{showDate .Date}}</h6>
+	<h6>发布于 {{showDate .Date}}</h6>
 	<div style="margin-top:10px">{{decodeMD .Content}}</div>
 </div>
 {{end}}
