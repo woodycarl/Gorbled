@@ -9,7 +9,6 @@ import (
 var (
 	config    Config
 	configKey *datastore.Key
-	lang      map[string]string
 )
 
 func init() {
@@ -48,9 +47,6 @@ func init() {
 
 	// config.go
 	a.HandleFunc("/config", requireConfig(handleConfigEdit))
-
-	// lang.go
-	a.HandleFunc("/init/lang", requireConfig(handleInitLang))
 
 	// index.go
 	r.HandleFunc("/", requireConfig(handleIndex))

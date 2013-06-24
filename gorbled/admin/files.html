@@ -1,12 +1,12 @@
 {{define "content"}}
 <div class="row-fluid manage-bar">
 	<div class="span3 manage-title">
-		<h1>{{l .Title}}</h1>
+		<h1>{{.Title}}</h1>
 	</div>
 	<div class="span5 manage-tool btn-toolbar">
 		<span class="btn fileinput-button">
 			<i class="icon-upload"></i>
-			<span>{{l "Upload"}}</span>
+			<span>{{"Upload"}}</span>
 			<input id="file" type="file" name="file" multiple>
 		</span>
 	</div>
@@ -17,10 +17,10 @@
 	<table class="table table-striped table-hover">
 		<thead>
 			<tr>
-				<th>{{l "Num"}}</th>
-				<th>{{l "File Name"}}</th>
-				<th>{{l "Date"}}</th>
-				<th>{{l "Operations"}}</th>
+				<th>{{"Num"}}</th>
+				<th>{{"File Name"}}</th>
+				<th>{{"Date"}}</th>
+				<th>{{"Operations"}}</th>
 			</tr>
 		</thead>
 		<tbody class="data"></tbody>
@@ -32,44 +32,44 @@
 <div id="file-edit" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-edit-modal-Label" aria-hidden="true">
 	<div class="modal-header">
 		<button type="button" class="close cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
-		<h3>{{l "File Edit"}}</h3>
+		<h3>{{"File Edit"}}</h3>
 	</div>
 	<div class="modal-body">
 		<div class="preview" style="text-align:center;"> </div>
 		<table class="table table-striped table-hover">
 			<tbody>
 				<tr>
-					<th>{{l "File ID"}}</th>
-					<td><input type="text" class="id" placeholder='{{l "File ID"}}' value="" /></td></tr>
+					<th>{{"File ID"}}</th>
+					<td><input type="text" class="id" placeholder='{{"File ID"}}' value="" /></td></tr>
 				<tr>
-					<th>{{l "File Name"}}</th>
-					<td><input type="text" class="name" placeholder='{{l "File Name"}}' value="" /></td></tr>
+					<th>{{"File Name"}}</th>
+					<td><input type="text" class="name" placeholder='{{"File Name"}}' value="" /></td></tr>
 				<tr>
-					<th>{{l "File Description"}}</th>
-					<td><input type="text" class="description" placeholder='{{l "File Description"}}' value="" /></td></tr>
+					<th>{{"File Description"}}</th>
+					<td><input type="text" class="description" placeholder='{{"File Description"}}' value="" /></td></tr>
 			</tbody>
 		</table>
 	</div>
 	<div class="modal-footer">
 		<div class="message" style="float:left;"></div>
-		<button class="btn cancel" data-dismiss="modal">{{l "Close"}}</button>
-		<button class="btn btn-primary" onclick="$.saveEditFile();">{{l "Save changes"}}</button>
+		<button class="btn cancel" data-dismiss="modal">{{"Close"}}</button>
+		<button class="btn btn-primary" onclick="$.saveEditFile();">{{"Save changes"}}</button>
 	</div>
 </div>
 
 <div id="file-upload" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="file-upload-modal-Label" data-dismiss="modal" aria-hidden="true">
 	<div class="modal-header">
 		<button type="button" class="close cancel" aria-hidden="true">&times;</button>
-		<h3>{{l "Upload File List"}}</h3>
+		<h3>{{"Upload File List"}}</h3>
 	</div>
 	<div class="modal-body">
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
-					<th>{{l "Num"}}</th>
-					<!--<th>{{l "Preview"}}</th>-->
-					<th>{{l "File Name"}}</th>
-					<th>{{l "Operations"}}</th>
+					<th>{{"Num"}}</th>
+					<!--<th>{{"Preview"}}</th>-->
+					<th>{{"File Name"}}</th>
+					<th>{{"Operations"}}</th>
 				</tr>
 			</thead>
 			<tbody class="data"></tbody>
@@ -77,8 +77,8 @@
 	</div>
 	<div class="modal-footer">
 		<div class="message" style="float:left;"></div>
-		<button class="btn cancel" data-dismiss="modal">{{l "Cancel"}}</button>
-		<button class="btn btn-primary save" onclick="$.uploadFiles();">{{l "Upload Files"}}</button>
+		<button class="btn cancel" data-dismiss="modal">{{"Cancel"}}</button>
+		<button class="btn btn-primary save" onclick="$.uploadFiles();">{{"Upload Files"}}</button>
 	</div>
 </div>
 
@@ -91,15 +91,15 @@ var tS = {
 	numListFiles: {{.Config.AdminFiles}},
 
 	// lang
-	lOrdler: '{{l "Older"}}',
-	lNewer: '{{l "Newer"}}',
-	lUpload: '{{l "Upload"}}',
-	lDeleteFile: '{{l "Delete File..."}}',
-	lUploading: '{{l "Uploading..."}}',
-	lRefresh: '{{l "Refresh"}}',
-	lSaveEdit: '{{l "Save"}}',
-	lDelete: '{{l "Delete"}}',
-	lEdit: '{{l "Edit"}}'
+	lOrdler: '{{"Older"}}',
+	lNewer: '{{"Newer"}}',
+	lUpload: '{{"Upload"}}',
+	lDeleteFile: '{{"Delete File..."}}',
+	lUploading: '{{"Uploading..."}}',
+	lRefresh: '{{"Refresh"}}',
+	lSaveEdit: '{{"Save"}}',
+	lDelete: '{{"Delete"}}',
+	lEdit: '{{"Edit"}}'
 }
 
 $(document).ready(function(){

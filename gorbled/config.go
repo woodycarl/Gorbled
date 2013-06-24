@@ -139,21 +139,18 @@ func installSystem(c appengine.Context) {
 	con.save(c)
 	config, configKey, _ = getConfig(c)
 
-	readLang(c)
-	initLang(c)
-
 	article := Entry{
-		Title:   L("Hello World!"),
+		Title:   "Hello World!",
 		Date:    time.Now(),
-		Content: []byte(fmt.Sprintf(L("Welcome to Gorbled %.1f. You can edit or delete this post, then start blogging!"), config.Version)),
+		Content: []byte(fmt.Sprintf("Welcome to Gorbled %.1f. You can edit or delete this post, then start blogging!", config.Version)),
 		Type:    "article",
 	}
 	article.save(c)
 
 	widget := Entry{
-		Title:   L("Notice"),
+		Title:   "Notice",
 		Date:    time.Now(),
-		Content: []byte(L("This is **Notice** !")),
+		Content: []byte("This is **Notice** !"),
 		Type:    "widget",
 	}
 	widget.save(c)
@@ -173,7 +170,6 @@ func initSystem(r *http.Request) {
 	} else {
 		config = con
 		configKey = key
-		initLang(c)
 	}
 
 	config.BaseUrl = "http://" + r.Host

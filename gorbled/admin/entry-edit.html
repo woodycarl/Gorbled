@@ -1,33 +1,33 @@
 {{define "content"}}
 <div class="row-fluid manage-bar">
 	<div class="span3 manage-title">
-		<h1>{{l .Title}}</h1>
+		<h1>{{.Title}}</h1>
 	</div>
 	<div class="span5 manage-tool btn-toolbar">
-		<a class="btn" id="upload">{{l "Upload Files"}}</a>
-		<a class="btn" id="preview">{{l "Preview"}}</a>
+		<a class="btn" id="upload">{{"Upload Files"}}</a>
+		<a class="btn" id="preview">{{"Preview"}}</a>
 	</div>
 	<div class="span4 manage-info"></div>
 </div>
 
 <form class="row-fluid entry-edit" action="{{.ActionUrl}}" method="post">
 	<div class="span7">
-		<input type="text" name="title" class="span12" id="title" placeholder='{{l "Title"}}' value="{{if not .New}}{{.Entry.Title}}{{end}}" />
-		<textarea rows="15" name="content" class="content span12" id="content" placeholder='{{l "Content"}}' >{{if not .New}}{{.Entry.Content | printf "%s"}}{{end}}</textarea>
+		<input type="text" name="title" class="span12" id="title" placeholder='{{"Title"}}' value="{{if not .New}}{{.Entry.Title}}{{end}}" />
+		<textarea rows="15" name="content" class="content span12" id="content" placeholder='{{"Content"}}' >{{if not .New}}{{.Entry.Content | printf "%s"}}{{end}}</textarea>
 	</div>
 	<div class="span5 well">
 		{{if or .IsArticle .IsPage}}<div class="input-prepend row-fluid">
-			<span class="add-on">{{l "Custom ID"}}</span>
-			<input type="text" name="customID" class="span8" id="customID" placeholder='{{l "Optional"}}' value="{{if not .New}}{{.Entry.ID}}{{end}}" />
+			<span class="add-on">{{"Custom ID"}}</span>
+			<input type="text" name="customID" class="span8" id="customID" placeholder='{{"Optional"}}' value="{{if not .New}}{{.Entry.ID}}{{end}}" />
 
 		</div>{{end}}
 		{{if .IsWidget}}<div class="input-prepend row-fluid">
-			<span class="add-on">{{l "Sequence"}}</span>
-			<input type="text" name="sequence" class="span8" id="sequence" placeholder='{{l "Widget Sequence"}}' value="{{if not .New}}{{.Entry.Sequence}}{{end}}" />
+			<span class="add-on">{{"Sequence"}}</span>
+			<input type="text" name="sequence" class="span8" id="sequence" placeholder='{{"Widget Sequence"}}' value="{{if not .New}}{{.Entry.Sequence}}{{end}}" />
 		</div>{{end}}
 		<div class="row-fluid" style="margin-top:20px;">
-			<input class="btn btn-primary" type="submit" id="submit" value='{{l "Submit"}}' />
-			<input class="btn btn-danger" type="reset" value='{{l "Reset"}}' />
+			<input class="btn btn-primary" type="submit" id="submit" value='{{"Submit"}}' />
+			<input class="btn btn-danger" type="reset" value='{{"Reset"}}' />
 		</div>
 	</div>
 </form>
@@ -40,8 +40,8 @@
 	</div>
 	<div class="modal-body"> </div>
 	<div class="modal-footer">
-		<button class="btn" data-dismiss="modal">{{l "Close"}}</button>
-		<button class="btn btn-primary save">{{l "Save changes"}}</button>
+		<button class="btn" data-dismiss="modal">{{"Close"}}</button>
+		<button class="btn btn-primary save">{{"Save changes"}}</button>
 	</div>
 </div>
 
@@ -51,23 +51,23 @@
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 
 		<ul class="nav nav-tabs">
-			<li class="active"><a href="#file-list" data-toggle="tab">{{l "File List"}}</a></li>
-			<li><a href="#file-upload" data-toggle="tab">{{l "Upload List"}}</a></li>
-			<li><a href="#file-edit" data-toggle="tab">{{l "Edit"}}</a></li>
+			<li class="active"><a href="#file-list" data-toggle="tab">{{"File List"}}</a></li>
+			<li><a href="#file-upload" data-toggle="tab">{{"Upload List"}}</a></li>
+			<li><a href="#file-edit" data-toggle="tab">{{"Edit"}}</a></li>
 		</ul>
 
 		<div class="tab-content">
 			<div class="tab-pane active" id="file-list">
 				<span class="btn btn-primary fileinput-button">
 					<i class="icon-upload icon-white"></i>
-					<span>{{l "Upload"}}</span>
+					<span>{{"Upload"}}</span>
 					<input id="file" type="file" name="file" multiple>
 				</span>
 				<table class="table table-striped table-hover">
 					<thead><tr>
-						<th>{{l "Num"}}</th>
-						<th>{{l "File Name"}}</th>
-						<th>{{l "Operations"}}</th>
+						<th>{{"Num"}}</th>
+						<th>{{"File Name"}}</th>
+						<th>{{"Operations"}}</th>
 					</tr></thead>
 					<tbody class="data"> </tbody>
 				</table>
@@ -75,18 +75,18 @@
 			</div>
 
 			<div class="tab-pane" id="file-edit">
-				<div class="preview" style="text-align:center;">{{l "Preview"}}</div>
+				<div class="preview" style="text-align:center;">{{"Preview"}}</div>
 				<table class="table table-hover">
 					<tbody>
 						<tr>
-							<th>{{l "File ID"}}</th>
-							<td><input type="text" class="id" placeholder='{{l "File ID"}}' value="" /></td></tr>
+							<th>{{"File ID"}}</th>
+							<td><input type="text" class="id" placeholder='{{"File ID"}}' value="" /></td></tr>
 						<tr>
-							<th>{{l "File Name"}}</th>
-							<td><input type="text" class="name" placeholder='{{l "File Name"}}' value="" /></td></tr>
+							<th>{{"File Name"}}</th>
+							<td><input type="text" class="name" placeholder='{{"File Name"}}' value="" /></td></tr>
 						<tr>
-							<th>{{l "File Description"}}</th>
-							<td><input type="text" class="description" placeholder='{{l "File Description"}}' value="" /></td></tr>
+							<th>{{"File Description"}}</th>
+							<td><input type="text" class="description" placeholder='{{"File Description"}}' value="" /></td></tr>
 					</tbody>
 				</table>
 			</div>
@@ -94,9 +94,9 @@
 			<div class="tab-pane" id="file-upload">
 				<table class="table table-striped table-hover">
 					<thead><tr>
-						<th>{{l "Num"}}</th>
-						<th>{{l "File Name"}}</th>
-						<th>{{l "Operations"}}</th>
+						<th>{{"Num"}}</th>
+						<th>{{"File Name"}}</th>
+						<th>{{"Operations"}}</th>
 					</tr></thead>
 					<tbody class="data"> </tbody>
 				</table>
@@ -108,8 +108,8 @@
 
 	<div class="modal-footer">
 		<div class="message" style="float:left;"></div>
-		<button class="btn" data-dismiss="modal">{{l "Close"}}</button>
-		<button class="btn btn-primary save">{{l "Refresh"}}</button>
+		<button class="btn" data-dismiss="modal">{{"Close"}}</button>
+		<button class="btn btn-primary save">{{"Refresh"}}</button>
 	</div>
 </div>
 
@@ -133,13 +133,13 @@ var tS = {
 	previewModal: "#modal-preview",
 
 	// lang
-	lOrdler: '{{l "Older"}}',
-	lNewer: '{{l "Newer"}}',
-	lUpload: '{{l "Upload"}}',
-	lDeleteFile: '{{l "Delete File..."}}',
-	lUploading: '{{l "Uploading..."}}',
-	lRefresh: '{{l "Refresh"}}',
-	lSaveEdit: '{{l "Save"}}'
+	lOrdler: '{{"Older"}}',
+	lNewer: '{{"Newer"}}',
+	lUpload: '{{"Upload"}}',
+	lDeleteFile: '{{"Delete File..."}}',
+	lUploading: '{{"Uploading..."}}',
+	lRefresh: '{{"Refresh"}}',
+	lSaveEdit: '{{"Save"}}'
 }
 </script>
 {{end}}

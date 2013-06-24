@@ -93,7 +93,7 @@ func (f *File) encode() string {
 /*
  * New file upload url
  *
- * @return (string) 
+ * @return (string)
  */
 func handleFileNewUrl(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
@@ -126,7 +126,7 @@ func handleFileNewUrl(w http.ResponseWriter, r *http.Request) {
 		m.Info = "Error: " + errInfo
 	} else {
 		m.Success = true
-		m.Info = L("UploadURL Get!")
+		m.Info = "UploadURL Get!"
 		m.Data = string(b)
 	}
 
@@ -209,7 +209,7 @@ func handleFileEdit(w http.ResponseWriter, r *http.Request) {
 /*
  * File data per pagina
  *
- * @return (json) 
+ * @return (json)
  */
 func handleFileData(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
@@ -225,7 +225,7 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 		m.Info = "Error: " + fmt.Sprint(err)
 	} else if len(files) == 0 {
 		m.Success = false
-		m.Info = L("No File Get!")
+		m.Info = "No File Get!"
 	} else {
 		type Data struct {
 			Files []File
@@ -238,7 +238,7 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 
 		b, _ := json.Marshal(data)
 		m.Success = true
-		m.Info = L(" Files Date Get! ")
+		m.Info = " Files Date Get! "
 		m.Data = string(b)
 	}
 
