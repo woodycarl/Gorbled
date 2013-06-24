@@ -9,11 +9,11 @@ import (
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 
-	// Get post id and pagina id
-	paginaId, _ := strconv.Atoi(getUrlVar(r, "pid"))
-	paginaSize := config.Articles
+	// Get post id and page id
+	pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
+	pageSize := config.Articles
 
-	articles, nav, err := getArticlesAndNav(paginaId, paginaSize, c)
+	articles, nav, err := getArticlesAndNav(pageId, pageSize, c)
 	if err != nil {
 		serveError(w, err)
 		return
@@ -26,8 +26,8 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// New Pagina
-	pagina := Pagina{
+	// New Page
+	page := Page{
 		"User":     getUserInfo(c),
 		"Articles": articles,
 		"Widgets":  widgets,
@@ -35,6 +35,6 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		"Config":   config,
 	}
 
-	// Render pagina
-	pagina.Render("index", w)
+	// Render page
+	page.Render("index", w)
 }

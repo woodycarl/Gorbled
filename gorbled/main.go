@@ -32,7 +32,7 @@ func init() {
 	r.HandleFunc("/logout", handleUserLogout)
 
 	// rss.go
-	r.HandleFunc("/feed", requireConfig(handleRSS))
+	r.HandleFunc("/{rss:feed|rss}", requireConfig(handleRSS))
 
 	// file.go
 	a.HandleFunc("/file", requireConfig(handleFileList))

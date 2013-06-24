@@ -4,6 +4,7 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -29,19 +30,18 @@ type Config struct {
 	AdminFiles    int
 	NavLen        int
 
-	Theme           string
 	GoogleAnalytics string
 	Disqus          string
 	GooglePlus      string
 
+	Theme      string
 	TimeZone   float64
 	TimeFormat string
-	BaseUrl    string
-
-	Language string
 
 	Version float64
 	Program string
+
+	BaseUrl string
 
 	EntryID int
 	FileID  int
@@ -62,12 +62,16 @@ func (config *Config) update(key *datastore.Key, c appengine.Context) (err error
 func getConfig(c appengine.Context) (con Config, key *datastore.Key, err error) {
 	dbQuery := datastore.NewQuery("Config")
 	var configs []Config
-	keys, err := dbQuery.GetAll(c, &configs)
-	if len(keys) > 0 {
-		key = keys[0]
-		con = configs[0]
+	var keys []*datastore.Key
+	keys, err = dbQuery.GetAll(c, &configs)
+
+	if len(keys) < 1 || len(configs) < 1 {
+		err = errors.New("getConfig: none get!")
+		return
 	}
 
+	key = keys[0]
+	con = configs[0]
 	return
 }
 
@@ -76,6 +80,7 @@ func getJsonConfig() (config Config) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	err = json.Unmarshal(configFile, &config)
 	if err != nil {
 		log.Fatal(err)
@@ -91,12 +96,12 @@ func handleConfigEdit(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 
 	if r.Method != "POST" {
-		pagina := Pagina{
+		page := Page{
 			"Title":  "Config",
 			"Config": config,
 		}
 
-		pagina.Render("admin/config", w)
+		page.Render("admin/config", w)
 
 		return
 	}
@@ -156,21 +161,4 @@ func installSystem(c appengine.Context) {
 	widget.save(c)
 
 	return
-}
-
-/*
- * Init system
- */
-func initSystem(r *http.Request) {
-	c := appengine.NewContext(r)
-
-	con, key, err := getConfig(c)
-	if err != nil || con.Title == "" {
-		installSystem(c)
-	} else {
-		config = con
-		configKey = key
-	}
-
-	config.BaseUrl = "http://" + r.Host
 }

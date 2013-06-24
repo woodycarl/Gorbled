@@ -46,25 +46,25 @@ func getFile(id string, c appengine.Context) (file File, key *datastore.Key, err
 	return
 }
 
-func getFilesPerPagina(offset, paginaSize int, c appengine.Context) (files []File, err error) {
+func getFilesPerPage(offset, pageSize int, c appengine.Context) (files []File, err error) {
 	dbQuery := datastore.NewQuery("File").
 		Order("-Date").
 		Offset(offset).
-		Limit(paginaSize)
+		Limit(pageSize)
 	_, err = dbQuery.GetAll(c, &files)
 	return
 }
 
-func getFilesAndNav(paginaId, paginaSize int,
-	c appengine.Context) (files []File, nav PaginaNav, err error) {
+func getFilesAndNav(pageId, pageSize int,
+	c appengine.Context) (files []File, nav PageNav, err error) {
 
-	// Get offset and pagina nav
+	// Get offset and page nav
 	dbQuery := datastore.NewQuery("File")
 	count, _ := dbQuery.Count(c)
-	offset, nav := getPaginaNav(count, paginaId, paginaSize, c)
+	offset, nav := getPageNav(count, pageId, pageSize, c)
 
 	// Get file data
-	dbQuery = dbQuery.Order("-Date").Offset(offset).Limit(paginaSize)
+	dbQuery = dbQuery.Order("-Date").Offset(offset).Limit(pageSize)
 	_, err = dbQuery.GetAll(c, &files)
 
 	return
@@ -207,7 +207,7 @@ func handleFileEdit(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
- * File data per pagina
+ * File data per page
  *
  * @return (json)
  */
@@ -215,12 +215,12 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	m := new(Message)
 
-	// Get pagina id, paginaSize
-	paginaId, _ := strconv.Atoi(getUrlVar(r, "pid"))
-	paginaSize := config.AdminFiles
+	// Get page id, pageSize
+	pageId, _ := strconv.Atoi(getUrlVar(r, "pid"))
+	pageSize := config.AdminFiles
 
 	// Get file data
-	if files, nav, err := getFilesAndNav(paginaId, paginaSize, c); err != nil {
+	if files, nav, err := getFilesAndNav(pageId, pageSize, c); err != nil {
 		m.Success = false
 		m.Info = "Error: " + fmt.Sprint(err)
 	} else if len(files) == 0 {
@@ -229,7 +229,7 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 	} else {
 		type Data struct {
 			Files []File
-			Nav   PaginaNav
+			Nav   PageNav
 		}
 		data := Data{
 			Files: files,
@@ -248,14 +248,14 @@ func handleFileData(w http.ResponseWriter, r *http.Request) {
 func handleFileList(w http.ResponseWriter, r *http.Request) {
 	//initSystem(r)
 
-	// New Pagina
-	pagina := Pagina{
+	// New Page
+	page := Page{
 		"Title":  "File Manager",
 		"Config": config,
 	}
 
-	// Render pagina
-	pagina.Render("admin/files", w)
+	// Render page
+	page.Render("admin/files", w)
 }
 
 func handleFileGet(w http.ResponseWriter, r *http.Request) {

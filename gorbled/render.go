@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-type Pagina map[string]interface{}
+type Page map[string]interface{}
 
 type PageId struct {
 	Id      int
 	Current bool
 }
 
-type PaginaNav struct {
+type PageNav struct {
 	ShowPrev   bool
 	ShowNext   bool
 	NextPageID int
@@ -71,26 +71,26 @@ var funcMap = template.FuncMap{
  * <<       2       3   ...   x             >>
  * prev     ids[0]  ids[1]    ids[NavLen-1] next
  */
-func getPaginaNav(count, paginaId, paginaSize int, c appengine.Context) (offset int, paginaNav PaginaNav) {
+func getPageNav(count, pageId, pageSize int, c appengine.Context) (offset int, pageNav PageNav) {
 	NavLen := config.NavLen
 
-	paginaNums := (count / paginaSize)
-	if count%paginaSize != 0 {
-		paginaNums++
+	pageNums := (count / pageSize)
+	if count%pageSize != 0 {
+		pageNums++
 	}
-	if paginaId <= 0 || paginaId > paginaNums {
-		paginaId = 1
+	if pageId <= 0 || pageId > pageNums {
+		pageId = 1
 	}
-	offset = (paginaId - 1) * paginaSize
+	offset = (pageId - 1) * pageSize
 
 	var start, length, nextId, prevId int
 	var prev, next bool
 
-	start = ((paginaId-1)/NavLen)*NavLen + 1
-	if start+NavLen-1 <= paginaNums {
+	start = ((pageId-1)/NavLen)*NavLen + 1
+	if start+NavLen-1 <= pageNums {
 		length = NavLen
 	} else {
-		length = paginaNums - start + 1
+		length = pageNums - start + 1
 	}
 	if start-1 > 0 {
 		prev = true
@@ -98,7 +98,7 @@ func getPaginaNav(count, paginaId, paginaSize int, c appengine.Context) (offset 
 	} else {
 		prev = false
 	}
-	if start+length <= paginaNums {
+	if start+length <= pageNums {
 		next = true
 		nextId = start + length
 	} else {
@@ -108,14 +108,14 @@ func getPaginaNav(count, paginaId, paginaSize int, c appengine.Context) (offset 
 	var ids = make([]PageId, length)
 	for i := 0; i < length; i++ {
 		ids[i].Id = i + start
-		if ids[i].Id == paginaId {
+		if ids[i].Id == pageId {
 			ids[i].Current = true
 		} else {
 			ids[i].Current = false
 		}
 	}
 
-	paginaNav = PaginaNav{
+	pageNav = PageNav{
 		ShowPrev:   prev,
 		ShowNext:   next,
 		NextPageID: nextId,
@@ -127,25 +127,25 @@ func getPaginaNav(count, paginaId, paginaSize int, c appengine.Context) (offset 
 }
 
 /*
- * Render pagina
+ * Render page
  *
- * @param pagina          (string)
+ * @param page          (string)
  * @param w             (http.ResponseWriter)
  *
  * @return (error)
  */
-func (pagina *Pagina) Render(paginaFilePath string, w http.ResponseWriter) {
+func (page *Page) Render(pageFilePath string, w http.ResponseWriter) {
 	base := "gorbled/templates/" + config.Theme + "/"
 
-	if strings.Contains(paginaFilePath, "admin") {
+	if strings.Contains(pageFilePath, "admin") {
 		base = "gorbled/admin/"
-		paginaFilePath = strings.Replace(paginaFilePath, "admin/", "", -1)
+		pageFilePath = strings.Replace(pageFilePath, "admin/", "", -1)
 	}
 
 	tmpl, err := template.New("main.html").Funcs(funcMap).ParseFiles(
 		base+"main.html",
 		base+"sidebar.html",
-		base+paginaFilePath+".html",
+		base+pageFilePath+".html",
 	)
 
 	if err != nil {
@@ -153,7 +153,7 @@ func (pagina *Pagina) Render(paginaFilePath string, w http.ResponseWriter) {
 		return
 	}
 
-	if err = tmpl.Execute(w, pagina); err != nil {
+	if err = tmpl.Execute(w, page); err != nil {
 		serveError(w, err)
 		return
 	}
@@ -161,7 +161,18 @@ func (pagina *Pagina) Render(paginaFilePath string, w http.ResponseWriter) {
 
 func requireConfig(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		initSystem(r)
+		c := appengine.NewContext(r)
+
+		con, key, err := getConfig(c)
+		if err != nil || con.Title == "" {
+			installSystem(c)
+		} else {
+			config = con
+			configKey = key
+		}
+
+		config.BaseUrl = "http://" + r.Host
+
 		handler(w, r)
 	}
 }

@@ -18,14 +18,14 @@ func handleRSS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// New Pagina
-	pagina := Pagina{
+	// New Page
+	page := Page{
 		"Title":    "RSS",
 		"Articles": articles,
 		"Config":   config,
 	}
 
-	// Render pagina
+	// Render page
 	tmpl, err := template.New("rss.html").Funcs(funcMap).ParseFiles(
 		"gorbled/admin/rss.html",
 	)
@@ -34,5 +34,5 @@ func handleRSS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl.Execute(w, pagina)
+	tmpl.Execute(w, page)
 }
